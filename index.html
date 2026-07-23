@@ -299,7 +299,7 @@ textarea.wf-in{min-height:110px;resize:none}
     <div class="prof-row">
       <div class="prof-ava">🧑🏻</div>
       <div>
-        <div class="prof-nm">Mankil J.</div>
+        <div class="prof-nm">🇰🇷 Mankil J.</div>
         <div class="prof-loc" id="profVerified">📍 Lippo Cikarang · 인증 회원 ✓</div>
       </div>
     </div>
@@ -448,6 +448,9 @@ var LANGS=[
 ];
 var lang='id';
 function L(o){return o[lang]||o.ko}
+var MEMBER_LANG={GolfDad_Kim:'ko',Sarah_Exp:'en',Yuki_T:'ja',Mike_R:'en',Anita:'id',JennyMom:'en',David_L:'en',Emma:'en',Chen_L:'zh',Sato_K:'ja',Budi_S:'id','Mankil J.':'ko'};
+function flagOf(code){return ({ko:'🇰🇷',en:'🇬🇧',zh:'🇨🇳',ja:'🇯🇵',id:'🇮🇩'})[code]||''}
+function flagName(name,src){return flagOf(MEMBER_LANG[name]||src)}
 
 /* ============ UI STRINGS ============ */
 var UI={
@@ -574,7 +577,16 @@ var listings=[
    desc:{ko:'타이틀리스트 드라이버 10.5도 + 페어웨이 우드 3번, 5번입니다. 헤드커버 포함이에요.',en:'Titleist driver 10.5° + fairway woods #3 and #5. Head covers included.',zh:'泰特利斯特发球杆 10.5度 + 球道木 3号、5号。含杆头套。',ja:'タイトリスト ドライバー10.5度 + フェアウェイウッド3番・5番です。ヘッドカバー付き。',id:'Driver Titleist 10.5° + fairway wood no.3 dan no.5. Termasuk head cover.'}},
  {id:8,emoji:'🧳',bg:'linear-gradient(135deg,#6366F1,#4338ca)',cat:'etc',price:'1.500.000',rp:'≈ ₩125,000',loc:'Semarang',city:'Semarang',time:'d1',seller:'David_L',ava:'🧑🏽',rating:7.8,reviews:6,likes:5,chats:2,nego:false,fresh:false,src:'en',
    title:{ko:'리모와 대형 캐리어 (귀국 정리)',en:'RIMOWA Large Suitcase (Moving Sale)',zh:'RIMOWA 大号行李箱（回国清理）',ja:'RIMOWA 大型スーツケース（帰国整理）',id:'Koper Besar RIMOWA (Jual Pindahan)'},
-   desc:{ko:'출장용으로 쓰던 리모와 대형 캐리어입니다. 바퀴 멀쩡합니다.',en:'RIMOWA large suitcase used for business trips. Wheels are in good shape.',zh:'出差用的 RIMOWA 大号行李箱。轮子完好。',ja:'出張で使っていたRIMOWAの大型スーツケースです。キャスターは問題ありません。',id:'Koper besar RIMOWA yang dipakai untuk perjalanan dinas. Roda masih bagus.'}}
+   desc:{ko:'출장용으로 쓰던 리모와 대형 캐리어입니다. 바퀴 멀쩡합니다.',en:'RIMOWA large suitcase used for business trips. Wheels are in good shape.',zh:'出差用的 RIMOWA 大号行李箱。轮子完好。',ja:'出張で使っていたRIMOWAの大型スーツケースです。キャスターは問題ありません。',id:'Koper besar RIMOWA yang dipakai untuk perjalanan dinas. Roda masih bagus.'}},
+ {id:21,emoji:'🪑',bg:'linear-gradient(135deg,#0EA5E9,#0369a1)',cat:'furn',price:'900.000',rp:'≈ ₩75,000',loc:'Lippo Cikarang',city:'Cikarang',time:'m22',seller:'Chen_L',ava:'🧑🏻',rating:8.9,reviews:12,likes:7,chats:3,nego:true,fresh:true,src:'zh',
+   title:{ko:'이케아 화이트 책상 (거의 새것)',en:'IKEA White Desk (like new)',zh:'宜家白色书桌 九成新',ja:'IKEA 白いデスク（ほぼ新品）',id:'Meja Putih IKEA (seperti baru)'},
+   desc:{ko:'이사 때문에 급하게 팝니다. 이케아 화이트 책상, 거의 새것, 리포에서 직접 가져가세요.',en:'Urgent sale due to moving. IKEA white desk, like new, pickup at Lippo.',zh:'搬家急出，宜家白色书桌，九成新，Lippo自取。',ja:'引越しのため急ぎで出品。IKEAの白いデスク、ほぼ新品、リッポーで引き取り。',id:'Jual cepat karena pindahan. Meja putih IKEA, seperti baru, ambil di Lippo.'}},
+ {id:22,emoji:'🍚',bg:'linear-gradient(135deg,#EF4444,#991b1b)',cat:'elec',price:'1.200.000',rp:'≈ ₩100,000',loc:'Jababeka',city:'Cikarang',time:'h3',seller:'Sato_K',ava:'🧑🏻',rating:9.0,reviews:16,likes:10,chats:5,nego:false,fresh:false,src:'ja',
+   title:{ko:'조지루시 전기밥솥 5.5합 (일본산)',en:'Zojirushi Rice Cooker 5.5 cup (Japan)',zh:'象印电饭煲 5.5合（日本产）',ja:'象印 炊飯器 5.5合（日本製）',id:'Rice Cooker Zojirushi 5.5 cup (Jepang)'},
+   desc:{ko:'일본에서 가져온 조지루시 밥솥입니다. 상태 좋아요. 자바베카 직거래.',en:'Zojirushi rice cooker brought from Japan. Good condition. Jababeka meet-up.',zh:'从日本带来的象印电饭煲。状态良好。Jababeka面交。',ja:'日本から持ってきた象印の炊飯器です。状態良好。ジャバベカで手渡し。',id:'Rice cooker Zojirushi dari Jepang. Kondisi bagus. COD Jababeka.'}},
+ {id:23,emoji:'🪖',bg:'linear-gradient(135deg,#22C55E,#15803d)',cat:'etc',price:'350.000',rp:'≈ ₩29,000',loc:'Cikarang Baru',city:'Cikarang',time:'h5',seller:'Budi_S',ava:'🧑🏽',rating:8.3,reviews:7,likes:4,chats:2,nego:true,fresh:false,src:'id',
+   title:{ko:'혼다 스쿠터 헬멧 (거의 안 씀)',en:'Honda Scooter Helmet (barely used)',zh:'本田摩托头盔（几乎没用）',ja:'ホンダ スクーターヘルメット（ほぼ未使用）',id:'Helm Motor Honda (jarang dipakai)'},
+   desc:{ko:'거의 안 쓴 헬멧입니다. 상태 좋아요. 치까랑 직거래.',en:'Barely used helmet. Good condition. Cikarang meet-up.',zh:'几乎没用过的头盔。状态好。芝卡朗面交。',ja:'ほとんど使っていないヘルメット。状態良好。チカランで手渡し。',id:'Helm jarang dipakai, kondisi bagus. COD Cikarang.'}}
 ];
 
 /* ============ COMMUNITY ============ */
@@ -591,7 +603,11 @@ var comm=[
   body:{ko:'델타마스 쪽에 새로 생긴 한인마트 가봤는데 물건 종류가 꽤 많네요. 라면이랑 고추장 재고도 많습니다.',en:'Checked out the new Korean mart near Deltamas — quite a wide selection. Plenty of ramen and gochujang in stock too.',zh:'去了 Deltamas 附近新开的韩国超市，种类挺多的。泡面和辣椒酱库存也很足。',ja:'デルタマス付近に新しくできた韓国系スーパーに行きましたが、品揃えがかなり豊富です。ラーメンやコチュジャンの在庫も多いです。',id:'Coba mampir ke Korean mart baru dekat Deltamas — pilihannya cukup banyak. Stok ramyeon dan gochujang juga melimpah.'}},
  {id:4,liked:false,ava:'👩🏻',nm:'Anita',loc:'Semarang',city:'Semarang',time:'h5',src:'id',likes:5,cmt:7,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
   comments:[{ava:'🧑🏻',nm:'Yuki_T',tx:{ko:'제가 쓰는 기사님 번호 DM 드릴게요',en:'I will DM you my repair guy number',zh:'我私信给你维修师傅电话',ja:'業者の番号をDMします',id:'Saya DM nomor tukang saya'}},{ava:'👩🏼',nm:'Emma',tx:{ko:'저도 필요했는데 감사해요',en:'I needed this too, thanks',zh:'我也需要，谢谢',ja:'私も必要でした、ありがとう',id:'Saya juga butuh, makasih'}}],
-  body:{ko:'자바베카 근처에 믿을 만한 에어컨 수리 기사님 아시는 분? 어젯밤에 고장 났어요 🥵 (영어 가능!)',en:'Anyone know a trustworthy AC repair guy around Jababeka? Mine broke last night 🥵 (English ok!)',zh:'有人知道 Jababeka 附近靠谱的空调维修师傅吗？昨晚坏了 🥵（会英语！）',ja:'ジャバベカ周辺で信頼できるエアコン修理業者をご存知の方いますか？昨夜壊れてしまいました 🥵（英語OK！）',id:'Ada yang tahu tukang servis AC yang terpercaya di sekitar Jababeka? Punya saya rusak semalam 🥵 (bisa bahasa Inggris!)'}}
+  body:{ko:'자바베카 근처에 믿을 만한 에어컨 수리 기사님 아시는 분? 어젯밤에 고장 났어요 🥵 (영어 가능!)',en:'Anyone know a trustworthy AC repair guy around Jababeka? Mine broke last night 🥵 (English ok!)',zh:'有人知道 Jababeka 附近靠谱的空调维修师傅吗？昨晚坏了 🥵（会英语！）',ja:'ジャバベカ周辺で信頼できるエアコン修理業者をご存知の方いますか？昨夜壊れてしまいました 🥵（英語OK！）',id:'Ada yang tahu tukang servis AC yang terpercaya di sekitar Jababeka? Punya saya rusak semalam 🥵 (bisa bahasa Inggris!)'}},
+ {id:21,liked:false,ava:'🧑🏻',nm:'Chen_L',loc:'Lippo Cikarang',city:'Cikarang',time:'m20',src:'zh',likes:11,cmt:0,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},comments:[],
+  body:{ko:'찌까랑에 중국 식자재 파는 마트 있나요? 훠궈 재료를 찾고 있어요 🍲',en:'Is there a mart selling Chinese groceries in Cikarang? Looking for hotpot ingredients 🍲',zh:'请问芝卡朗有卖中国食材的超市吗？在找火锅材料 🍲',ja:'チカランに中国食材を売っているスーパーはありますか？火鍋の材料を探しています 🍲',id:'Ada yang tahu mart yang jual bahan makanan China di Cikarang? Lagi cari bahan hotpot 🍲'}},
+ {id:22,liked:false,ava:'🧑🏻',nm:'Sato_K',loc:'Jababeka',city:'Cikarang',time:'h2',src:'ja',likes:9,cmt:0,catT:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},comments:[],
+  body:{ko:'자바베카에 일본식 라멘집이 새로 생겼어요. 맛 괜찮습니다!',en:'A new Japanese ramen shop opened in Jababeka. Pretty good!',zh:'Jababeka新开了一家日式拉面店，味道不错！',ja:'ジャバベカに日本式ラーメン屋が新しくできました。なかなか美味しいです！',id:'Ada kedai ramen Jepang baru buka di Jababeka. Lumayan enak!'}}
 ];
 
 /* ============ CHATS ============ */
@@ -608,7 +624,13 @@ var chats=[
  {id:3,item:3,nm:'Yuki_T',ava:'🧑🏻',th:'🛋️',price:'Rp 1.800.000',titleObj:listings[2].title,rating:8.1,reviews:9,unread:0,time:'yest',partnerSrc:'ja',
   msgs:[{f:'them',src:'ja',tx:{ko:'소파에 관심 있으신가요?',en:'Are you interested in the sofa?',zh:'您对沙发感兴趣吗？',ja:'ソファにご興味ありますか？',id:'Apakah Anda tertarik dengan sofanya?'}},
         {f:'me',src:'ja',tx:{ko:'네! 배송도 되나요?',en:'Yes! Do you offer delivery?',zh:'感兴趣！可以配送吗？',ja:'はい！配送も可能ですか？',id:'Iya! Apakah bisa dikirim?'}},
-        {f:'me',src:'ja',tx:{ko:'배송비는 트럭 부르면 얼마 정도 나올까요?',en:'Roughly how much would delivery cost if we hire a truck?',zh:'如果叫货车，配送费大概多少？',ja:'トラックを頼んだ場合、配送料はどのくらいになりますか？',id:'Kira-kira biaya kirim kalau pakai truk berapa ya?'}}]}
+        {f:'me',src:'ja',tx:{ko:'배송비는 트럭 부르면 얼마 정도 나올까요?',en:'Roughly how much would delivery cost if we hire a truck?',zh:'如果叫货车，配送费大概多少？',ja:'トラックを頼んだ場合、配送料はどのくらいになりますか？',id:'Kira-kira biaya kirim kalau pakai truk berapa ya?'}}]},
+ {id:21,item:21,nm:'Chen_L',ava:'🧑🏻',th:'🪑',price:'Rp 900.000',titleObj:{ko:'이케아 화이트 책상',en:'IKEA White Desk',zh:'宜家白色书桌',ja:'IKEA 白いデスク',id:'Meja Putih IKEA'},rating:8.9,reviews:12,unread:1,time:'now',partnerSrc:'zh',
+  msgs:[{f:'them',src:'zh',tx:{ko:'책상 아직 있나요?',en:'Is the desk still available?',zh:'书桌还在吗？',ja:'デスクはまだありますか？',id:'Mejanya masih ada?'}},
+        {f:'me',src:'zh',tx:{ko:'네, 있습니다. 리포에서 직거래 가능해요.',en:'Yes, still here. Meet-up at Lippo works.',zh:'在的，可以在Lippo面交。',ja:'はい、あります。リッポーで直接取引できます。',id:'Masih ada. Bisa COD di Lippo.'}}]},
+ {id:22,item:5,nm:'Budi_S',ava:'🧑🏽',th:'🚲',price:'Rp 900.000',titleObj:listings[4].title,rating:8.3,reviews:7,unread:0,time:'h2',partnerSrc:'id',
+  msgs:[{f:'them',src:'id',tx:{ko:'자전거 상태 어때요? 흠집 있나요?',en:'How is the bike condition? Any scratches?',zh:'自行车状态怎么样？有划痕吗？',ja:'自転車の状態はどうですか？傷はありますか？',id:'Sepedanya kondisinya gimana? Ada lecet?'}},
+        {f:'me',src:'id',tx:{ko:'거의 새것이에요. 흠집 없습니다.',en:'Almost new. No scratches.',zh:'几乎全新，没有划痕。',ja:'ほぼ新品です。傷はありません。',id:'Hampir baru. Tidak ada lecet.'}}]}
 ];
 
 /* --- 스크롤 테스트용: 마켓/동네생활/채팅 각각 10개로 채우기 (기존 예시 재활용) --- */
@@ -749,7 +771,7 @@ function renderComm(){
     var translated=(p.src!==lang);
     var bodyText=(translated&&p._orig)?p.body[p.src]:L(p.body);
     var trNote=translated?'<div class="tr-note" onclick="toggleCommOrig('+p.id+')">🌐 '+transLabel(p.src)+' · '+(p._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
-    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
+    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+flagName(p.nm,p.src)+' '+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
       '<div class="cat-pill">'+L(p.catT)+'</div>'+
       '<div class="post-body">'+bodyText+'</div>'+trNote+
       '<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span><span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span></div>';
@@ -766,7 +788,7 @@ function renderCmt(){
   document.getElementById('cmtHead').textContent=t('comment')+' '+curCmt.comments.length;
   document.getElementById('cmtInput').placeholder=t('cmtPlaceholder');
   var l=document.getElementById('cmtList');l.innerHTML='';
-  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
+  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+flagName(c.nm,c.src)+' '+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
 }
 function sendComment(){var i=document.getElementById('cmtInput');if(!i.value.trim())return;curCmt.comments.push({ava:'🧑🏻',nm:'Mankil J.',plain:i.value.trim()});i.value='';renderCmt();renderComm()}
 function renderChatList(){
@@ -774,7 +796,7 @@ function renderChatList(){
   chats.forEach(function(c){
     var el=document.createElement('div');el.className='chatrow';el.onclick=function(){openRoom(c.id)};
     var last=c.msgs[c.msgs.length-1];
-    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+TM(c.time)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
+    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+flagName(c.nm,c.partnerSrc)+' '+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+TM(c.time)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
     cl.appendChild(el);
   });
 }
@@ -794,7 +816,7 @@ function openDetail(id,keepOrig){
   document.getElementById('detImg').style.background=l.bg;
   document.getElementById('detImg').innerHTML='<button class="det-back" onclick="history.back()">←</button>'+l.emoji;
   document.getElementById('detAva').textContent=l.ava;
-  document.getElementById('detSeller').textContent=l.seller;
+  document.getElementById('detSeller').textContent=flagName(l.seller,l.src)+' '+l.seller;
   document.getElementById('detLoc').textContent='📍 '+l.loc;
   document.getElementById('detTemp').textContent='⭐ '+l.rating+' / 10';
   document.getElementById('detStars').innerHTML=starsHTML(l.rating);
@@ -835,7 +857,7 @@ function startChatFromDetail(){
 /* ============ CHAT ROOM ============ */
 function openRoom(id){
   var c=chats.find(function(x){return x.id===id});curRoom=c;c.unread=0;if(!_replay)pushView({v:'room',id:id});
-  document.getElementById('roomNm').textContent=c.nm;
+  document.getElementById('roomNm').textContent=flagName(c.nm,c.partnerSrc)+' '+c.nm;
   document.getElementById('roomTemp').textContent='⭐ '+c.rating+' / 10 · '+c.reviews+' '+t('reviewWord');
   document.getElementById('roomTh').textContent=c.th;
   document.getElementById('roomPrice').textContent=c.price;
