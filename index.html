@@ -215,6 +215,9 @@ textarea.wf-in{min-height:110px;resize:none}
 .sheet-item.sel{color:var(--coral);font-weight:800}
 .sheet-item .fl{font-size:22px}
 .sheet-item .ck{margin-left:auto;color:var(--coral);font-weight:800}
+.delb{flex-shrink:0;font-size:16px;padding:4px 6px;border-radius:8px;cursor:pointer}
+.delb:active{opacity:.5}
+.delb.armed{background:#FDE8E4}
 
 /* login */
 .login{position:absolute;inset:0;z-index:400;background:linear-gradient(160deg,#FF8A6B 0%,#E8543A 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;text-align:center}
@@ -583,6 +586,9 @@ var UI={
  save:{ko:'저장',en:'Save',zh:'保存',ja:'保存',id:'Simpan'},
  needLogin:{ko:'로그인이 필요해요',en:'Please log in first',zh:'请先登录',ja:'ログインが必要です',id:'Silakan masuk dulu'},
  myEmpty:{ko:'아직 없어요',en:'Nothing here yet',zh:'暂时没有内容',ja:'まだありません',id:'Belum ada apa-apa'},
+ deleted:{ko:'삭제됐어요',en:'Deleted',zh:'已删除',ja:'削除しました',id:'Terhapus'},
+ editDone:{ko:'수정 완료',en:'Save changes',zh:'保存修改',ja:'修正を保存',id:'Simpan perubahan'},
+ edited:{ko:'✅ 수정됐어요',en:'✅ Updated',zh:'✅ 已修改',ja:'✅ 修正しました',id:'✅ Diperbarui'},
  needTitle:{ko:'제목을 입력해주세요',en:'Please enter a title',zh:'请输入标题',ja:'タイトルを入力してください',id:'Masukkan judul'},
  needBody:{ko:'내용을 입력해주세요',en:'Please write something',zh:'请输入内容',ja:'内容を入力してください',id:'Tulis sesuatu'},
  postedReal:{ko:'✅ 등록됐어요!',en:'✅ Posted!',zh:'✅ 已发布！',ja:'✅ 投稿しました！',id:'✅ Terposting!'},
@@ -1018,6 +1024,7 @@ function submitListing(){
   if(!CUR_USER||!sbClient){toast(t('needLogin'));showLoginScreen();return}
   var desc=(document.getElementById('wfDesc').value||'').trim();
   var btn=document.getElementById('wfSubmit');
+  if(editTarget){submitEdit(desc,btn);return}
   if(wfType==='sell'){
     var title=(document.getElementById('wfTitle').value||'').trim();
     var price=(document.getElementById('wfPrice').value||'').trim();
@@ -1042,13 +1049,33 @@ function submitListing(){
     }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
   }
 }
+function submitEdit(desc,btn){
+  var tgt=editTarget;btn.disabled=true;
+  var done=function(dest){btn.disabled=false;editTarget=null;btn.textContent=t('wfSubmit');document.getElementById('wfTitle').value='';document.getElementById('wfPrice').value='';document.getElementById('wfDesc').value='';clearPhoto();toast(t('edited'));loadData();go(dest)};
+  if(tgt.type==='listing'){
+    var title=(document.getElementById('wfTitle').value||'').trim();
+    if(!title){btn.disabled=false;toast(t('needTitle'));return}
+    uploadPhotoThen(function(imageUrl){
+      var o={title:title,descr:desc,price:(document.getElementById('wfPrice').value||'').trim(),category:wfCatSel,emoji:CAT_EMOJI[wfCatSel]||'📦'};
+      if(imageUrl)o.image_url=imageUrl;
+      sbClient.from('listings').update(o).eq('id',tgt.id).eq('user_id',CUR_USER.id).then(function(r){
+        if(r.error){btn.disabled=false;toast(r.error.message);return}done('home');
+      }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+    });
+  }else{
+    if(!desc){btn.disabled=false;toast(t('needBody'));return}
+    sbClient.from('posts').update({category:wfPostCatSel,body:desc}).eq('id',tgt.id).eq('user_id',CUR_USER.id).then(function(r){
+      if(r.error){btn.disabled=false;toast(r.error.message);return}done('comm');
+    }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+  }
+}
 
 /* ============ NAV ============ */
 var screens={home:'s-home',comm:'s-comm',chat:'s-chat',prof:'s-prof',write:'s-write'};
 function showScreen(sid){[].forEach.call(document.querySelectorAll('.screen'),function(s){s.classList.remove('active')});document.getElementById(sid).classList.add('active');document.getElementById(sid).scrollTop=0;
   var ownBar=(sid==='s-detail'||sid==='s-room'||sid==='s-write'||sid==='s-talk');
   document.querySelector('.tabs').style.display=ownBar?'none':'flex';}
-function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(name==='prof')updateProfileView();if(appVisible())pushView({v:'app',tab:name})}}
+function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(name==='prof')updateProfileView();if(name==='write'&&typeof editTarget!=='undefined'){editTarget=null;var bt=document.getElementById('wfSubmit');if(bt)bt.textContent=t('wfSubmit')}if(appVisible())pushView({v:'app',tab:name})}}
 
 /* ============ SHEETS ============ */
 function renderSheet(type){
@@ -1164,17 +1191,55 @@ function openMyList(kind){
   if(kind==='selling')rows=myListings().filter(function(l){return !l.sold});
   else if(kind==='done')rows=myListings().filter(function(l){return l.sold});
   else if(kind==='likes')rows=listings.filter(function(l){return l.liked});
+  myListKind=kind;
   if(kind==='myposts'){
     var ps=CUR_USER?comm.filter(function(p){return p.uid===CUR_USER.id}):[];
     if(!ps.length)h+='<div style="padding:28px 20px;text-align:center;color:var(--gray);font-size:13.5px">'+t('myEmpty')+'</div>';
-    else ps.forEach(function(p){h+='<div class="sheet-item" onclick="closeSheet();go(\'comm\');openComments('+p.id+')"><span class="fl">📝</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+L(p.body)+'</span><span style="color:var(--gray);font-size:11px;flex-shrink:0">👍 '+p.likes+'</span></div>'});
+    else ps.forEach(function(p){h+='<div class="sheet-item" onclick="closeSheet();go(\'comm\');openComments('+p.id+')"><span class="fl">📝</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+L(p.body)+'</span><span style="color:var(--gray);font-size:11px;flex-shrink:0">👍 '+p.likes+'</span><span class="delb" onclick="event.stopPropagation();editPost('+p.id+')">✏️</span><span class="delb" onclick="event.stopPropagation();askDel(\'post\','+p.id+',this)">🗑️</span></div>'});
   }else if(kind==='purchases'||kind==='reviews'||!rows.length){
     h+='<div style="padding:28px 20px;text-align:center;color:var(--gray);font-size:13.5px">'+t('myEmpty')+'</div>';
   }else{
-    rows.forEach(function(l){h+='<div class="sheet-item" onclick="closeSheet();openDetail('+l.id+')"><span class="fl">'+l.emoji+'</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+L(l.title)+'</span><span style="color:var(--gray);font-size:12px;flex-shrink:0">Rp '+l.price+'</span></div>'});
+    var canDel=(kind==='selling'||kind==='done');
+    rows.forEach(function(l){h+='<div class="sheet-item" onclick="closeSheet();openDetail('+l.id+')"><span class="fl">'+l.emoji+'</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+L(l.title)+'</span><span style="color:var(--gray);font-size:12px;flex-shrink:0">Rp '+l.price+'</span>'+(canDel?'<span class="delb" onclick="event.stopPropagation();editListing('+l.id+')">✏️</span><span class="delb" onclick="event.stopPropagation();askDel(\'listing\','+l.id+',this)">🗑️</span>':'')+'</div>'});
   }
   document.getElementById('sheetInner').innerHTML=h;
   document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'});
+}
+var myListKind='selling';
+function askDel(type,id,el){
+  if(el.getAttribute('data-armed')){doDel(type,id);return}
+  el.setAttribute('data-armed','1');el.textContent='❗';el.classList.add('armed');
+  setTimeout(function(){if(el&&el.parentNode){el.removeAttribute('data-armed');el.textContent='🗑️';el.classList.remove('armed')}},2600);
+}
+function doDel(type,id){
+  if(!CUR_USER||!sbClient){toast(t('needLogin'));return}
+  var tb=(type==='listing')?'listings':'posts';
+  sbClient.from(tb).delete().eq('id',id).eq('user_id',CUR_USER.id).then(function(r){
+    if(r.error){toast(r.error.message);return}
+    if(type==='listing'){var i=listings.findIndex(function(l){return l.id===id});if(i>=0)listings.splice(i,1);renderFeed()}
+    else{var j=comm.findIndex(function(p){return p.id===id});if(j>=0)comm.splice(j,1);renderComm()}
+    updateMyStats();toast(t('deleted'));openMyList(myListKind);
+  }).catch(function(e){toast('오류: '+(e&&e.message||''))});
+}
+/* ---- 편집 ---- */
+var editTarget=null;
+function editListing(id){
+  var l=listings.find(function(x){return x.id===id});if(!l)return;
+  closeSheet();go('write');setWfType('sell');
+  document.getElementById('wfTitle').value=L(l.title);
+  document.getElementById('wfPrice').value=l.price||'';
+  document.getElementById('wfDesc').value=L(l.desc);
+  wfCatSel=l.cat||'etc';renderWfCats();clearPhoto();
+  editTarget={type:'listing',id:id};
+  document.getElementById('wfSubmit').textContent=t('editDone');
+}
+function editPost(id){
+  var p=comm.find(function(x){return x.id===id});if(!p)return;
+  closeSheet();go('write');setWfType('post');
+  document.getElementById('wfDesc').value=L(p.body);
+  wfPostCatSel=p.catKey||'question';renderWfCats();
+  editTarget={type:'post',id:id};
+  document.getElementById('wfSubmit').textContent=t('editDone');
 }
 function showLoginScreen(){document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function checkSession(){
@@ -1191,7 +1256,7 @@ function relTime(iso){try{var d=(Date.now()-new Date(iso).getTime())/1000;var L=
 function tlabel(o){return o&&o._db?relTime(o.created_at):TM(o.time)}
 function mapListing(r){return {id:r.id,_db:true,uid:r.user_id||null,img:r.image_url||null,created_at:r.created_at,emoji:r.emoji||'📦',bg:bgFor(r.id),cat:r.category||'etc',price:r.price||'',rp:krw(r.price),loc:r.loc||r.city||'',city:r.city||'Cikarang',seller:r.seller_name||'',ava:r.seller_avatar||'🧑',rating:Number(r.seller_rating)||0,reviews:r.seller_reviews||0,likes:r.likes||0,chats:r.chats||0,nego:false,fresh:false,sold:r.sold||false,src:r.src_lang||'ko',title:mono(r.title||''),desc:mono(r.descr||'')}}
 function mapComment(r){return {ava:r.author_avatar||'🧑',nm:r.author_name||'',src:r.src_lang||'ko',plain:r.body||''}}
-function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],body:mono(r.body||'')}}
+function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,catKey:r.category||'talk',created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],body:mono(r.body||'')}}
 function loadData(){
   Promise.all([sbGet('listings?select=*&order=id.desc'),sbGet('posts?select=*&order=id.desc'),sbGet('comments?select=*&order=id.asc')]).then(function(res){
     var ls=res[0],ps=res[1],cs=res[2];
