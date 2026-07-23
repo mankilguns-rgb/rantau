@@ -274,6 +274,7 @@ textarea.wf-in{min-height:110px;resize:none}
   <div id="loginForm" style="width:100%">
     <input class="lginput" id="emailInput" type="email" inputmode="email" placeholder="이메일 주소" autocomplete="email">
     <input class="lginput" id="pwInput" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <input class="lginput" id="pwConfirmInput" type="password" placeholder="비밀번호 확인" autocomplete="new-password" style="display:none">
     <input class="lginput" id="nickInputSignup" type="text" placeholder="닉네임" autocomplete="nickname" style="display:none">
     <button class="gbtn" onclick="doAuth()"><span id="loginBtnTxt">로그인</span></button>
     <div class="authswitch" id="authSwitch" onclick="toggleAuthMode()" style="color:#fff;font-size:13px;margin-top:15px;text-decoration:underline;cursor:pointer;opacity:.95">처음이신가요? 회원가입</div>
@@ -284,8 +285,8 @@ textarea.wf-in{min-height:110px;resize:none}
   <div class="terms" id="loginTerms">계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.</div>
 </div>
 
-<!-- HOME -->
-<div class="screen active" id="s-home">
+<!-- HOME (마켓 제거됨 — 접근 경로 없음, DOM만 유지) -->
+<div class="screen" id="s-home">
   <div class="topbar">
     <div class="loc" onclick="openSheet('loc')"><span class="pin">📍</span> <span id="homeLoc">Cikarang</span> <span class="chev">▾</span></div>
     <div class="sp"></div>
@@ -297,7 +298,7 @@ textarea.wf-in{min-height:110px;resize:none}
 </div>
 
 <!-- COMMUNITY -->
-<div class="screen" id="s-comm">
+<div class="screen active" id="s-comm">
   <div class="topbar">
     <div class="loc"><span class="pin">📍</span> <span id="commTitle">동네생활</span></div>
     <button class="citysel" onclick="openSheet('loc')"><span id="commLoc">Cikarang</span> <span class="chev">▾</span></button>
@@ -332,15 +333,7 @@ textarea.wf-in{min-height:110px;resize:none}
         <div class="prof-loc" id="profVerified">📍 Lippo Cikarang · 인증 회원 ✓</div>
       </div>
     </div>
-    <div class="temp-card">
-      <div class="row"><span class="t1" id="profTempLbl">평균 별점</span><span class="t2" id="profRatingVal">⭐ 9.3 / 10</span></div>
-      <div style="font-size:11px;color:var(--gray);margin-top:8px" id="profReviews">받은 후기 24</div>
-    </div>
-  </div>
-  <div class="stat-row">
-    <div class="stat-cell" style="cursor:pointer" onclick="openMyList('selling')"><div class="n" id="stSellingN">0</div><div class="l" id="stSelling">판매중</div></div>
-    <div class="stat-cell" style="cursor:pointer" onclick="openMyList('done')"><div class="n" id="stDoneN">0</div><div class="l" id="stDone">거래완료</div></div>
-    <div class="stat-cell" style="cursor:pointer" onclick="openMyList('reviews')"><div class="n" id="stReviewN">0</div><div class="l" id="stReview">받은 후기</div></div>
+    <div id="profAdminBadge" style="display:none;margin-top:10px;font-size:12px;font-weight:800;color:#B45309;background:#FEF3C7;padding:8px 10px;border-radius:10px;text-align:center">🛡️ 관리자 모드 · 모든 글 삭제 가능</div>
   </div>
   <div class="menu-list" id="profMenu"></div>
   </div>
@@ -423,30 +416,14 @@ textarea.wf-in{min-height:110px;resize:none}
     <div style="font-weight:800;font-size:16px" id="wfHead">내 물건 팔기</div>
   </div>
   <div class="wf">
-    <div class="wf-cats" style="margin-bottom:4px">
-      <div class="wf-cat on" id="wfTypeSell" onclick="setWfType('sell')">🏷️ 팔기</div>
-      <div class="wf-cat" id="wfTypePost" onclick="setWfType('post')">🏘️ 동네생활</div>
-    </div>
-    <div id="wfMarket">
-      <div class="wf-photos" style="margin-top:12px">
-        <div class="wf-add" onclick="pickPhoto()">📷<span id="wfPhotoCnt">0/1</span></div>
-        <div class="wf-ph" id="wfPhotoPreview" style="display:none;background-size:cover;background-position:center;cursor:pointer" onclick="clearPhoto()"></div>
-      </div>
-      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="onPhotoChosen(event)">
-      <div class="wf-label" id="wfLTitle">제목</div>
-      <input class="wf-in" id="wfTitle">
-      <div class="wf-label" id="wfLCat">카테고리</div>
-      <div class="wf-cats" id="wfcats"></div>
-      <div class="wf-label" id="wfLPrice">가격 (Rp)</div>
-      <input class="wf-in" id="wfPrice" inputmode="numeric">
-      <div style="margin-top:10px;font-size:13px;color:var(--gray);display:flex;align-items:center;gap:8px"><input type="checkbox" id="nego"> <label for="nego" id="wfNego">가격 제안 받기</label></div>
-    </div>
-    <div id="wfPostFields" style="display:none">
-      <div class="wf-label" id="wfLPostCat">주제</div>
-      <div class="wf-cats" id="wfpostcats"></div>
-    </div>
-    <div class="wf-label" id="wfLDesc">설명</div>
-    <textarea class="wf-in" id="wfDesc"></textarea>
+    <div class="wf-label" id="wfLPostCat">카테고리</div>
+    <div class="wf-cats" id="wfpostcats"></div>
+    <div style="font-size:12px;color:var(--gray);margin:10px 0 0;line-height:1.5" id="wfTradeHint"></div>
+    <div class="wf-label" id="wfLDesc">내용</div>
+    <textarea class="wf-in" id="wfDesc" style="min-height:150px"></textarea>
+    <div class="wf-label" id="wfLPhotos">사진 (최대 3장)</div>
+    <div class="wf-photos" id="wfPhotoStrip" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <input type="file" id="photoFile" accept="image/*" multiple style="display:none" onchange="onPhotosChosen(event)">
     <button class="wf-submit" onclick="submitListing()" id="wfSubmit">작성 완료</button>
   </div>
 </div>
@@ -488,13 +465,13 @@ textarea.wf-in{min-height:110px;resize:none}
   </div>
 </div>
 
+<div id="lightbox" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;padding:20px"><img id="lightboxImg" alt="" style="max-width:100%;max-height:100%;border-radius:8px"></div>
 <div class="toast" id="toast"></div>
 
 <!-- TABS -->
 <div class="tabs">
   <div class="tab on" id="t-comm" onclick="go('comm')"><span class="ti">🏘️</span><span id="tabComm">동네생활</span></div>
-  <div class="tab" id="t-home" onclick="go('home')"><span class="ti">🏠</span><span id="tabHome">마켓</span></div>
-  <div class="tab write" onclick="go('write')"><span class="ti">＋</span><span id="tabWrite">팔기</span></div>
+  <div class="tab write" onclick="go('write')"><span class="ti">＋</span><span id="tabWrite">글쓰기</span></div>
   <div class="tab" id="t-chat" onclick="go('chat')"><span class="ti">💬</span><span id="tabChat">채팅</span></div>
   <div class="tab" id="t-prof" onclick="go('prof')"><span class="ti">👤</span><span id="tabProf">내정보</span></div>
 </div>
@@ -518,7 +495,7 @@ function langTag(name,src){var m={ko:'KR',en:'EN',zh:'CN',ja:'JP',id:'ID'}[MEMBE
 var UI={
  tabHome:{ko:'마켓',en:'Market',zh:'市场',ja:'マーケット',id:'Pasar'},
  tabComm:{ko:'동네생활',en:'Community',zh:'社区',ja:'コミュニティ',id:'Komunitas'},
- tabWrite:{ko:'팔기',en:'Sell',zh:'出售',ja:'売る',id:'Jual'},
+ tabWrite:{ko:'글쓰기',en:'Post',zh:'发帖',ja:'投稿',id:'Tulis'},
  tabChat:{ko:'채팅',en:'Chat',zh:'聊天',ja:'チャット',id:'Chat'},
  tabProf:{ko:'내정보',en:'Profile',zh:'我的',ja:'マイ',id:'Profil'},
  commTitle:{ko:'동네생활',en:'Community',zh:'邻里社区',ja:'ご近所さん',id:'Komunitas'},
@@ -548,7 +525,7 @@ var UI={
  badgeNew:{ko:'NEW',en:'NEW',zh:'最新',ja:'新着',id:'BARU'},
  today:{ko:'오늘',en:'Today',zh:'今天',ja:'今日',id:'Hari ini'},
  msgPlaceholder:{ko:'메시지 보내기…',en:'Send a message…',zh:'发送消息…',ja:'メッセージを送信…',id:'Kirim pesan…'},
- wfHead:{ko:'내 물건 팔기',en:'Sell my item',zh:'出售我的物品',ja:'商品を売る',id:'Jual barang saya'},
+ wfHead:{ko:'글쓰기',en:'New post',zh:'发帖',ja:'投稿する',id:'Tulis postingan'},
  wfLTitle:{ko:'제목',en:'Title',zh:'标题',ja:'タイトル',id:'Judul'},
  wfLCat:{ko:'카테고리',en:'Category',zh:'分类',ja:'カテゴリー',id:'Kategori'},
  wfLPrice:{ko:'가격 (Rp)',en:'Price (Rp)',zh:'价格 (Rp)',ja:'価格 (Rp)',id:'Harga (Rp)'},
@@ -557,11 +534,11 @@ var UI={
  wfSubmit:{ko:'작성 완료',en:'Post item',zh:'发布',ja:'出品する',id:'Posting'},
  wfPhTitle:{ko:'예: 캘러웨이 아이언 세트 (거의 새것)',en:'e.g. Callaway iron set (like new)',zh:'例：卡拉威铁杆套装（近全新）',ja:'例：キャロウェイ アイアンセット（ほぼ新品）',id:'cth: Set iron Callaway (seperti baru)'},
  wfPhPrice:{ko:'예: 3.500.000',en:'e.g. 3,500,000',zh:'例：3.500.000',ja:'例：3.500.000',id:'cth: 3.500.000'},
- wfPhDesc:{ko:'상품 상태, 구매 시기, 거래 희망 지역(예: Lippo Cikarang, Jababeka)을 적어주세요.',
-   en:'Describe condition, when you bought it, and preferred meet-up area (e.g. Lippo Cikarang, Jababeka).',
-   zh:'请写明物品状态、购买时间和希望交易地点（如 Lippo Cikarang、Jababeka）。',
-   ja:'商品の状態、購入時期、取引希望エリア（例：Lippo Cikarang, Jababeka）をご記入ください。',
-   id:'Tuliskan kondisi barang, kapan dibeli, dan area COD yang diinginkan (cth: Lippo Cikarang, Jababeka).'},
+ wfPhDesc:{ko:'이웃과 나누고 싶은 이야기를 적어보세요. 팝니다/삽니다/나눔이면 물건·가격·희망 지역(예: Lippo Cikarang)을 함께 적어주세요.',
+   en:'Share something with your neighbors. For buy/sell/giveaway, include the item, price, and preferred area (e.g. Lippo Cikarang).',
+   zh:'和邻居分享点什么吧。若是出售/求购/赠送，请写明物品、价格和希望地点（如 Lippo Cikarang）。',
+   ja:'ご近所とシェアしたいことを書いてください。売ります/買います/ゆずりますの場合は、品物・価格・希望エリア（例：Lippo Cikarang）も書いてください。',
+   id:'Bagikan sesuatu dengan tetangga. Untuk jual/beli/gratis, sertakan barang, harga, dan area (cth: Lippo Cikarang).'},
  setArea:{ko:'내 동네 설정',en:'Set my area',zh:'设置我的地区',ja:'エリアを設定',id:'Atur area saya'},
  setTitle:{ko:'설정',en:'Settings',zh:'设置',ja:'設定',id:'Pengaturan'},
  setLangLbl:{ko:'언어 / Language',en:'Language',zh:'语言 / Language',ja:'言語 / Language',id:'Bahasa / Language'},
@@ -603,6 +580,15 @@ var UI={
  newPwPh:{ko:'새 비밀번호 (6자 이상)',en:'New password (6+ chars)',zh:'新密码（至少6位）',ja:'新しいパスワード（6文字以上）',id:'Kata sandi baru (min. 6)'},
  newPwSaveBtn:{ko:'변경하기',en:'Change password',zh:'修改密码',ja:'変更する',id:'Ubah kata sandi'},
  pwChanged:{ko:'✅ 비밀번호가 변경됐어요',en:'✅ Password changed',zh:'✅ 密码已修改',ja:'✅ パスワードを変更しました',id:'✅ Kata sandi diubah'},
+ chatGuestTitle:{ko:'로그인하고 채팅을 시작하세요',en:'Log in to start chatting',zh:'登录后开始聊天',ja:'ログインしてチャットを始めましょう',id:'Masuk untuk mulai chat'},
+ chatGuestSub:{ko:'로그인하면 판매자와 안전하게 대화할 수 있어요.',en:'Log in to chat safely with sellers.',zh:'登录后可与卖家安全聊天。',ja:'ログインすると出品者と安全に会話できます。',id:'Masuk untuk chat aman dengan penjual.'},
+ chatEmpty:{ko:'아직 채팅이 없어요',en:'No chats yet',zh:'还没有聊天',ja:'まだチャットがありません',id:'Belum ada chat'},
+ pwConfirmPh:{ko:'비밀번호 확인',en:'Confirm password',zh:'确认密码',ja:'パスワード確認',id:'Konfirmasi kata sandi'},
+ pwMismatch:{ko:'비밀번호가 일치하지 않아요',en:'Passwords do not match',zh:'两次密码不一致',ja:'パスワードが一致しません',id:'Kata sandi tidak cocok'},
+ chatBtnShort:{ko:'채팅',en:'Chat',zh:'聊天',ja:'チャット',id:'Chat'},
+ commEmpty:{ko:'아직 글이 없어요. 첫 글을 남겨보세요!',en:'No posts yet. Be the first to post!',zh:'还没有帖子。来发第一条吧！',ja:'まだ投稿がありません。最初の投稿をどうぞ！',id:'Belum ada postingan. Jadilah yang pertama!'},
+ ownPost:{ko:'내가 쓴 글이에요',en:'This is your own post',zh:'这是你自己的帖子',ja:'自分の投稿です',id:'Ini postingan Anda sendiri'},
+ tradeHint:{ko:'직거래만 가능합니다. 앱은 결제·배송을 대행하지 않으니 안전하게 만나서 거래하세요.',en:'Direct deals only. The app does not handle payment or delivery — meet safely to trade.',zh:'仅限面交。App不代理支付或配送，请安全见面交易。',ja:'直接取引のみ。アプリは決済・配送を代行しません。安全に会って取引してください。',id:'Hanya COD. Aplikasi tidak menangani pembayaran/pengiriman — bertemu dengan aman untuk transaksi.'},
  sending:{ko:'보내는 중…',en:'Sending…',zh:'发送中…',ja:'送信中…',id:'Mengirim…'},
  checkEmail:{ko:'메일함을 확인해 로그인 링크를 눌러주세요',en:'Check your inbox and tap the login link',zh:'请查收邮件并点击登录链接',ja:'メールを確認してログインリンクをタップ',id:'Cek email Anda dan klik link login'},
  badEmail:{ko:'이메일 주소를 확인해주세요',en:'Please check the email address',zh:'请检查邮箱地址',ja:'メールアドレスを確認してください',id:'Periksa alamat email Anda'},
@@ -629,7 +615,10 @@ var UI={
  postedReal:{ko:'✅ 등록됐어요!',en:'✅ Posted!',zh:'✅ 已发布！',ja:'✅ 投稿しました！',id:'✅ Terposting!'},
  wfTypeSell:{ko:'🏷️ 팔기',en:'🏷️ Sell',zh:'🏷️ 出售',ja:'🏷️ 売る',id:'🏷️ Jual'},
  wfTypePost:{ko:'🏘️ 동네생활',en:'🏘️ Community',zh:'🏘️ 社区',ja:'🏘️ コミュニティ',id:'🏘️ Komunitas'},
- wfLPostCat:{ko:'주제',en:'Topic',zh:'主题',ja:'トピック',id:'Topik'},
+ wfLPostCat:{ko:'카테고리',en:'Category',zh:'分类',ja:'カテゴリー',id:'Kategori'},
+ wfLDescPost:{ko:'내용',en:'Content',zh:'内容',ja:'内容',id:'Isi'},
+ wfLPhotos:{ko:'사진 (최대 3장)',en:'Photos (up to 3)',zh:'照片（最多3张）',ja:'写真（最大3枚）',id:'Foto (maks 3)'},
+ maxPhotos:{ko:'사진은 최대 3장까지예요',en:'Up to 3 photos only',zh:'最多只能3张照片',ja:'写真は最大3枚までです',id:'Maksimal 3 foto saja'},
  loginTerms:{ko:'계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.',en:'By continuing, you agree to the Terms of Service and Privacy Policy.',zh:'继续即表示您同意服务条款和隐私政策。',ja:'続行すると、利用規約とプライバシーポリシーに同意したものとみなされます。',id:'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi.'},
  talkEntry:{ko:'만나서 대화 (통역)',en:'Talk in person (interpreter)',zh:'见面对话（翻译）',ja:'対面で会話（通訳）',id:'Ngobrol langsung (penerjemah)'},
  talkHintText:{ko:'⌨️ 텍스트 모드 · 문구를 눌러 상대에게 화면을 보여주세요',en:'⌨️ Text mode · Tap a phrase, then show your screen to them',zh:'⌨️ 文字模式 · 点击短语后把屏幕给对方看',ja:'⌨️ テキストモード · フレーズを押して画面を相手に見せましょう',id:'⌨️ Mode teks · Ketuk frasa, lalu tunjukkan layar ke lawan bicara'},
@@ -643,11 +632,7 @@ function transLabel(srcCode){var n=srcName(srcCode);var p={ko:n+'에서 번역�
 
 /* profile menu */
 var MENU=[
- {i:'🏷️',key:'selling',k:{ko:'판매 내역',en:'My listings',zh:'我的出售',ja:'販売履歴',id:'Barang saya'}},
  {i:'📝',key:'myposts',k:{ko:'내가 쓴 글',en:'My posts',zh:'我的帖子',ja:'投稿した記事',id:'Tulisan saya'}},
- {i:'🛍️',key:'purchases',k:{ko:'구매 내역',en:'Purchases',zh:'购买记录',ja:'購入履歴',id:'Pembelian'}},
- {i:'❤️',key:'likes',k:{ko:'관심 목록',en:'Wishlist',zh:'关注列表',ja:'お気に入り',id:'Favorit'}},
- {i:'⭐',key:'reviews',k:{ko:'받은 거래 후기',en:'My reviews',zh:'收到的评价',ja:'受け取った評価',id:'Ulasan diterima'}},
  {i:'🌐',key:'lang',k:{ko:'언어 / Language',en:'Language',zh:'语言 / Language',ja:'言語 / Language',id:'Bahasa / Language'}}
 ];
 
@@ -704,7 +689,19 @@ var listings=[
 ];
 
 /* ============ COMMUNITY ============ */
-var COMMCATS=[{ko:'전체',en:'All',zh:'全部',ja:'すべて',id:'Semua'},{ko:'질문',en:'Questions',zh:'提问',ja:'質問',id:'Tanya'},{ko:'모임',en:'Meetups',zh:'聚会',ja:'集まり',id:'Kumpul'},{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'}];
+var COMMCATS=[
+ {key:'all',t:{ko:'전체',en:'All',zh:'全部',ja:'すべて',id:'Semua'}},
+ {key:'question',t:{ko:'질문',en:'Questions',zh:'提问',ja:'質問',id:'Tanya'}},
+ {key:'meetup',t:{ko:'모임',en:'Meetups',zh:'聚会',ja:'集まり',id:'Kumpul'}},
+ {key:'info',t:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'}},
+ {key:'talk',t:{ko:'잡담',en:'Chat',zh:'闲聊',ja:'雑談',id:'Obrolan'}},
+ {key:'sell',t:{ko:'팝니다',en:'For sale',zh:'出售',ja:'売ります',id:'Dijual'}},
+ {key:'buy',t:{ko:'삽니다',en:'Want to buy',zh:'求购',ja:'買います',id:'Mau beli'}},
+ {key:'give',t:{ko:'나눔',en:'Giveaway',zh:'赠送',ja:'ゆずります',id:'Gratis'}}
+];
+var commCat='all';
+var TRADE_CATS=['sell','buy','give'];
+var POST_EMOJI={question:'❓',meetup:'👥',info:'ℹ️',talk:'💬',sell:'🏷️',buy:'🛒',give:'🎁'};
 var comm=[
  {id:1,liked:false,ava:'👩🏼',nm:'Emma',loc:'Lippo Cikarang',city:'Cikarang',time:'m20',src:'en',likes:8,cmt:12,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
   comments:[{ava:'🧑🏻',nm:'GolfDad_Kim',tx:{ko:'세나요CC 프로님 추천해요!',en:'I recommend the pro at Sena CC!',zh:'推荐Sena CC的教练！',ja:'セナCCのプロがおすすめです！',id:'Rekomendasi pro di Sena CC!'}},{ava:'👩🏼',nm:'Sarah_Exp',tx:{ko:'저도 배우고 싶어요, 같이 가요',en:'I want to learn too, let us go together',zh:'我也想学，一起去吧',ja:'私も習いたいです、一緒に行きましょう',id:'Saya juga mau belajar, ayo bareng'}}],
@@ -725,36 +722,7 @@ var comm=[
 ];
 
 /* ============ CHATS ============ */
-var chats=[
- {id:1,item:1,nm:'GolfDad_Kim',ava:'🧑🏻',th:'🏌️',price:'Rp 4.200.000',titleObj:listings[0].title,rating:9.4,reviews:32,unread:2,time:'now',partnerSrc:'ko',
-  msgs:[{f:'them',src:'ko',tx:{ko:'안녕하세요! 아이언 세트 아직 판매하시나요?',en:'Hi! Is the iron set still available?',zh:'你好！铁杆套装还在卖吗？',ja:'こんにちは！アイアンセットはまだ販売中ですか？',id:'Halo! Set iron-nya masih ada?'}},
-        {f:'me',src:'ko',tx:{ko:'네, 아직 있습니다~',en:'Yes, still available~',zh:'在的，还有哦~',ja:'はい、まだあります〜',id:'Iya, masih ada~'}},
-        {f:'them',src:'ko',tx:{ko:'상태 실물 사진 좀 더 볼 수 있을까요? 그리고 직거래는 어디서 가능하세요?',en:'Could I see more real photos of the condition? And where can we meet up?',zh:'能多看几张实物照片吗？还有面交在哪里方便？',ja:'実物の状態写真をもう少し見せていただけますか？あと直接取引はどこで可能ですか？',id:'Boleh lihat foto asli kondisinya lebih banyak? Dan COD-nya bisa di mana?'}},
-        {f:'them',src:'ko',tx:{ko:'네 리포에서 직거래 가능합니다 :)',en:'Sure, we can meet at Lippo :)',zh:'可以的，Lippo 面交没问题 :)',ja:'はい、リッポーで直接取引できます :)',id:'Bisa kok, COD di Lippo :)'}}]},
- {id:2,item:4,nm:'Mike_R',ava:'🧔🏽',th:'📺',price:'Rp 3.100.000',titleObj:listings[3].title,rating:8.5,reviews:21,unread:0,time:'h1',partnerSrc:'en',
-  msgs:[{f:'me',src:'en',tx:{ko:'TV 아직 있나요?',en:'Is the TV still available?',zh:'电视还在吗？',ja:'TVはまだありますか？',id:'TV-nya masih ada?'}},
-        {f:'them',src:'en',tx:{ko:'네, 있습니다. 화면 깨끗해요.',en:'Yes, it is. The screen is clean.',zh:'在的。屏幕很干净。',ja:'はい、あります。画面はきれいです。',id:'Masih ada. Layarnya bersih.'}},
-        {f:'me',src:'en',tx:{ko:'그럼 내일 오후에 보러 갈게요.',en:'Then I\'ll come see it tomorrow afternoon.',zh:'那我明天下午过去看看。',ja:'では明日の午後、見に行きます。',id:'Kalau begitu besok sore saya lihat ya.'}}]},
- {id:3,item:3,nm:'Yuki_T',ava:'🧑🏻',th:'🛋️',price:'Rp 1.800.000',titleObj:listings[2].title,rating:8.1,reviews:9,unread:0,time:'yest',partnerSrc:'ja',
-  msgs:[{f:'them',src:'ja',tx:{ko:'소파에 관심 있으신가요?',en:'Are you interested in the sofa?',zh:'您对沙发感兴趣吗？',ja:'ソファにご興味ありますか？',id:'Apakah Anda tertarik dengan sofanya?'}},
-        {f:'me',src:'ja',tx:{ko:'네! 배송도 되나요?',en:'Yes! Do you offer delivery?',zh:'感兴趣！可以配送吗？',ja:'はい！配送も可能ですか？',id:'Iya! Apakah bisa dikirim?'}},
-        {f:'me',src:'ja',tx:{ko:'배송비는 트럭 부르면 얼마 정도 나올까요?',en:'Roughly how much would delivery cost if we hire a truck?',zh:'如果叫货车，配送费大概多少？',ja:'トラックを頼んだ場合、配送料はどのくらいになりますか？',id:'Kira-kira biaya kirim kalau pakai truk berapa ya?'}}]},
- {id:21,item:21,nm:'Chen_L',ava:'🧑🏻',th:'🪑',price:'Rp 900.000',titleObj:{ko:'이케아 화이트 책상',en:'IKEA White Desk',zh:'宜家白色书桌',ja:'IKEA 白いデスク',id:'Meja Putih IKEA'},rating:8.9,reviews:12,unread:1,time:'now',partnerSrc:'zh',
-  msgs:[{f:'them',src:'zh',tx:{ko:'책상 아직 있나요?',en:'Is the desk still available?',zh:'书桌还在吗？',ja:'デスクはまだありますか？',id:'Mejanya masih ada?'}},
-        {f:'me',src:'zh',tx:{ko:'네, 있습니다. 리포에서 직거래 가능해요.',en:'Yes, still here. Meet-up at Lippo works.',zh:'在的，可以在Lippo面交。',ja:'はい、あります。リッポーで直接取引できます。',id:'Masih ada. Bisa COD di Lippo.'}}]},
- {id:22,item:5,nm:'Budi_S',ava:'🧑🏽',th:'🚲',price:'Rp 900.000',titleObj:listings[4].title,rating:8.3,reviews:7,unread:0,time:'h2',partnerSrc:'id',
-  msgs:[{f:'them',src:'id',tx:{ko:'자전거 상태 어때요? 흠집 있나요?',en:'How is the bike condition? Any scratches?',zh:'自行车状态怎么样？有划痕吗？',ja:'自転車の状態はどうですか？傷はありますか？',id:'Sepedanya kondisinya gimana? Ada lecet?'}},
-        {f:'me',src:'id',tx:{ko:'거의 새것이에요. 흠집 없습니다.',en:'Almost new. No scratches.',zh:'几乎全新，没有划痕。',ja:'ほぼ新品です。傷はありません。',id:'Hampir baru. Tidak ada lecet.'}}]}
-];
-
-/* --- 스크롤 테스트용: 마켓/동네생활/채팅 각각 10개로 채우기 (기존 예시 재활용) --- */
-(function(){
-  var hBase=chats.slice(),hId=101;
-  while(chats.length<10){
-    var r=hBase[chats.length%hBase.length];
-    chats.push(Object.assign({},r,{id:hId++,unread:0,msgs:(r.msgs||[]).slice()}));
-  }
-})();
+var chats=[]; /* 데모 채팅 제거 — 실제 DB 채팅만 표시 */
 
 /* ============ STATE ============ */
 var activeCat='all', curDetail=null, curRoom=null, detShowOrig=false;
@@ -771,7 +739,6 @@ function applyLang(){
   document.getElementById('langCode').textContent=cur.label;
   ['langFlag2','langFlag3'].forEach(function(id){document.getElementById(id).textContent=cur.flag});
   // static labels
-  document.getElementById('tabHome').textContent=t('tabHome');
   document.getElementById('tabComm').textContent=t('tabComm');
   document.getElementById('tabWrite').textContent=t('tabWrite');
   document.getElementById('tabChat').textContent=t('tabChat');
@@ -784,35 +751,22 @@ function applyLang(){
   document.getElementById('profGuestSub').textContent=t('profGuestSub');
   document.getElementById('profLoginBtn').textContent=t('profLoginBtn');
   if(CUR_USER)applyMyName();
-  document.getElementById('profTempLbl').textContent=t('avgRating');
-  document.getElementById('stSelling').textContent=t('selling');
-  document.getElementById('stDone').textContent=t('done');
-  document.getElementById('stReview').textContent=t('reviews');
-  document.getElementById('profRatingVal').textContent='⭐ '+MY_RATING+' / 10';
-  document.getElementById('profReviews').textContent=t('reviews')+' '+MY_REVIEWS;
   document.getElementById('detTempLbl').textContent=t('avgRating');
   document.getElementById('detChatBtn').textContent=t('chatBtn');
   document.getElementById('detSafety').textContent=t('safety');
   document.getElementById('roomStatus').textContent=t('onSale');
   document.getElementById('msgInput').placeholder=t('msgPlaceholder');
   document.getElementById('wfHead').textContent=t('wfHead');
-  document.getElementById('wfLTitle').textContent=t('wfLTitle');
-  document.getElementById('wfLCat').textContent=t('wfLCat');
-  document.getElementById('wfLPrice').textContent=t('wfLPrice');
-  document.getElementById('wfNego').textContent=t('wfNego');
-  document.getElementById('wfLDesc').textContent=t('wfLDesc');
+  document.getElementById('wfLDesc').textContent=t('wfLDescPost');
+  document.getElementById('wfLPhotos').textContent=t('wfLPhotos');
   document.getElementById('wfSubmit').textContent=t('wfSubmit');
-  document.getElementById('wfTypeSell').textContent=t('wfTypeSell');
-  document.getElementById('wfTypePost').textContent=t('wfTypePost');
   document.getElementById('wfLPostCat').textContent=t('wfLPostCat');
-  document.getElementById('wfHead').textContent=t('wfHead');
-  document.getElementById('wfTitle').placeholder=t('wfPhTitle');
-  document.getElementById('wfPrice').placeholder=t('wfPhPrice');
   document.getElementById('wfDesc').placeholder=t('wfPhDesc');
   document.getElementById('loginTag').textContent=t('loginTag');
   document.getElementById('loginSub').textContent=t('loginSub');
   document.getElementById('emailInput').placeholder=t('emailPlaceholder');
   document.getElementById('pwInput').placeholder=t('pwPlaceholder');
+  document.getElementById('pwConfirmInput').placeholder=t('pwConfirmPh');
   document.getElementById('nickInputSignup').placeholder=t('nickPlaceholder');
   applyAuthModeText();
   document.getElementById('forgotLink').textContent=t('forgotPw');
@@ -831,7 +785,7 @@ function applyLang(){
   if(curRoom&&document.getElementById('s-room').classList.contains('active'))renderMsgs();
 }
 function renderLoginLangs(){var c=document.getElementById('loginLangs');c.innerHTML='';LANGS.forEach(function(l){var b=document.createElement('button');b.className='lgc'+(l.code===lang?' on':'');b.textContent=l.flag;b.onclick=function(){lang=l.code;applyLang()};c.appendChild(b)})}
-function enterApp(){document.getElementById('loginScreen').classList.add('hide');pushView({v:'app',tab:'comm'})}
+function enterApp(){document.getElementById('loginScreen').classList.add('hide');go('comm')}
 
 /* meet & talk (interpreter) */
 var talkMode='text',talkMy='id',talkPartner='en',_tv=0;
@@ -869,7 +823,8 @@ function renderChips(){
   CATS.forEach(function(cat){var d=document.createElement('div');d.className='chip'+(cat.key===activeCat?' on':'');d.textContent=L(cat.t);d.onclick=function(){activeCat=cat.key;renderChips();renderFeed()};c.appendChild(d)});
 }
 function renderFeed(skipTr){
-  var f=document.getElementById('feed');f.innerHTML='';
+  var f=document.getElementById('feed');if(!f)return;f.innerHTML='';return; /* 마켓 제거 — 커뮤니티 전용 (매물 렌더/번역 안 함) */
+  /* eslint-disable */
   if(!skipTr&&typeof ensureFeedTranslations==='function')setTimeout(ensureFeedTranslations,10);
   listings.filter(function(l){return (activeCat==='all'||l.cat===activeCat)&&l.city===currentCity}).forEach(function(l){
     var el=document.createElement('div');el.className='item';el.onclick=function(){openDetail(l.id)};
@@ -884,20 +839,37 @@ function renderFeed(skipTr){
     f.appendChild(el);
   });
 }
+function postCat(p){
+  if(p.catKey)return p.catKey;
+  if(p.catT){for(var k in POSTCAT){if(POSTCAT[k].ko===p.catT.ko)return k;}}
+  return 'talk';
+}
 function renderComm(skipTr){
   var cc=document.getElementById('commchips');cc.innerHTML='';
   if(!skipTr&&typeof ensureCommTranslations==='function')setTimeout(ensureCommTranslations,10);
-  COMMCATS.forEach(function(cat,i){var d=document.createElement('div');d.className='chip'+(i===0?' on':'');d.textContent=L(cat);d.onclick=function(){[].forEach.call(cc.children,function(x){x.classList.remove('on')});d.classList.add('on')};cc.appendChild(d)});
+  COMMCATS.forEach(function(cat){var d=document.createElement('div');d.className='chip'+(cat.key===commCat?' on':'');d.textContent=L(cat.t);d.onclick=function(){commCat=cat.key;renderComm(true)};cc.appendChild(d)});
   var cf=document.getElementById('commfeed');cf.innerHTML='';
-  comm.filter(function(p){return p.city===currentCity}).forEach(function(p){
+  var rows=comm.filter(function(p){return p.city===currentCity&&(commCat==='all'||postCat(p)===commCat)});
+  if(!rows.length){cf.innerHTML='<div style="padding:48px 24px;text-align:center;color:var(--gray);font-size:13.5px">'+t('commEmpty')+'</div>';return}
+  rows.forEach(function(p){
     var el=document.createElement('div');el.className='post';
+    var ck=postCat(p);
     var translated=(p.src!==lang&&(!p._db||p._tr));
     var bodyText=(translated&&p._orig)?p.body[p.src]:L(p.body);
     var trNote=translated?'<div class="tr-note" onclick="toggleCommOrig('+p.id+')">🌐 '+transLabel(p.src)+' · '+(p._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
+    var pill=(POST_EMOJI[ck]?POST_EMOJI[ck]+' ':'')+L(POSTCAT[ck]||p.catT||POSTCAT.talk);
+    var isTrade=TRADE_CATS.indexOf(ck)>=0;
+    var canChat=isTrade&&p._db&&p.uid&&!(CUR_USER&&p.uid===CUR_USER.id);
+    var canDel=CUR_USER&&p._db&&(p.uid===CUR_USER.id||isAdmin());
+    var foot='<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span>'+
+      '<span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span>'+
+      (canChat?'<span class="pf-act" style="color:#2563EB;font-weight:800" onclick="startChatFromPost('+p.id+')">💬 '+t('chatBtnShort')+'</span>':'')+
+      (canDel?'<span class="pf-act" style="margin-left:auto;color:var(--coral-dark)" onclick="askDel(\'post\','+p.id+',this)">🗑️</span>':'')+
+      '</div>';
+    var imgs=(p.images&&p.images.length)?'<div style="display:flex;gap:6px;margin-top:8px">'+p.images.slice(0,3).map(function(u){return '<div onclick="openLightbox(\''+u+'\')" style="flex:1;max-width:33%;aspect-ratio:1;border-radius:10px;background:#eee center/cover no-repeat;background-image:url('+u+');cursor:pointer"></div>'}).join('')+'</div>':'';
     el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+langTag(p.nm,p.src)+p.nm+'</div><div class="sub">'+p.loc+' · '+tlabel(p)+'</div></div></div>'+
-      '<div class="cat-pill">'+L(p.catT)+'</div>'+
-      '<div class="post-body">'+bodyText+'</div>'+trNote+
-      '<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span><span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span></div>';
+      '<div class="cat-pill" style="'+(isTrade?'background:#DBEAFE;color:#1E40AF':'')+'">'+pill+'</div>'+
+      '<div class="post-body">'+bodyText+'</div>'+imgs+trNote+foot;
     cf.appendChild(el);
   });
 }
@@ -930,7 +902,8 @@ function sendComment(){
 function msgText(x){if(!x)return '';if(x.tx)return x._orig?x.tx[x.src]:L(x.tx);if(x.trText&&!x._orig)return x.trText;return x.plain}
 function renderChatList(){
   var cl=document.getElementById('chatlist');cl.innerHTML='';
-  if(!chats.length){cl.innerHTML='<div style="padding:44px 24px;text-align:center;color:var(--gray);font-size:13.5px">'+t('myEmpty')+'</div>';return}
+  if(!CUR_USER){cl.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 32px;text-align:center;gap:14px"><div style="font-size:54px">🔑</div><div style="font-size:18px;font-weight:800">'+t('chatGuestTitle')+'</div><div style="font-size:13.5px;color:var(--gray);line-height:1.55">'+t('chatGuestSub')+'</div><button class="wf-submit" style="margin-top:12px;max-width:220px" onclick="showLoginScreen()">'+t('profLoginBtn')+'</button></div>';return}
+  if(!chats.length){cl.innerHTML='<div style="padding:44px 24px;text-align:center;color:var(--gray);font-size:13.5px">'+t('chatEmpty')+'</div>';return}
   chats.forEach(function(c){
     var el=document.createElement('div');el.className='chatrow';el.onclick=function(){openRoom(c.id)};
     var last=c.msgs[c.msgs.length-1];
@@ -944,13 +917,15 @@ function renderProfMenu(){
   var m=document.getElementById('profMenu');m.innerHTML='';
   MENU.forEach(function(it){var d=document.createElement('div');d.className='menu-item';d.innerHTML='<span class="mi">'+it.i+'</span> '+L(it.k)+' <span class="ar">›</span>';d.onclick=function(){if(it.key==='lang'){openSheet('lang')}else{openMyList(it.key)}};m.appendChild(d)});
 }
-var wfType='sell',wfCatSel='etc',wfPostCatSel='question';
-function setWfType(tp){wfType=tp;document.getElementById('wfTypeSell').classList.toggle('on',tp==='sell');document.getElementById('wfTypePost').classList.toggle('on',tp==='post');document.getElementById('wfMarket').style.display=(tp==='sell')?'block':'none';document.getElementById('wfPostFields').style.display=(tp==='post')?'block':'none'}
+var wfType='post',wfCatSel='etc',wfPostCatSel='question';
+function setWfType(tp){wfType='post'; /* 마켓 제거 — 항상 게시글 */}
 function renderWfCats(){
-  var w=document.getElementById('wfcats');w.innerHTML='';
-  ['golf','hobby','elec','furn','kids','etc'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat'+(k===wfCatSel?' on':'');d.textContent=L(CATNAME[k]);d.onclick=function(){wfCatSel=k;[].forEach.call(w.children,function(x){x.classList.remove('on')});d.classList.add('on')};w.appendChild(d)});
-  var w2=document.getElementById('wfpostcats');if(w2){w2.innerHTML='';['question','meetup','info'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat'+(k===wfPostCatSel?' on':'');d.textContent=L(POSTCAT[k]);d.onclick=function(){wfPostCatSel=k;[].forEach.call(w2.children,function(x){x.classList.remove('on')});d.classList.add('on')};w2.appendChild(d)})}
+  var w=document.getElementById('wfcats');
+  if(w){w.innerHTML='';['golf','hobby','elec','furn','kids','etc'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat'+(k===wfCatSel?' on':'');d.textContent=L(CATNAME[k]);d.onclick=function(){wfCatSel=k;[].forEach.call(w.children,function(x){x.classList.remove('on')});d.classList.add('on')};w.appendChild(d)});}
+  var w2=document.getElementById('wfpostcats');if(w2){w2.innerHTML='';['question','meetup','info','talk','sell','buy','give'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat'+(k===wfPostCatSel?' on':'');d.textContent=(POST_EMOJI[k]?POST_EMOJI[k]+' ':'')+L(POSTCAT[k]);d.onclick=function(){wfPostCatSel=k;[].forEach.call(w2.children,function(x){x.classList.remove('on')});d.classList.add('on');updateTradeHint()};w2.appendChild(d)})}
+  updateTradeHint();
 }
+function updateTradeHint(){var el=document.getElementById('wfTradeHint');if(!el)return;el.textContent=(TRADE_CATS.indexOf(wfPostCatSel)>=0)?t('tradeHint'):'';}
 
 /* ============ DETAIL ============ */
 function openDetail(id,keepOrig){
@@ -1013,15 +988,30 @@ function startChatFromDetail(){
   renderChatList();openRoom(nid);
 }
 
+/* ---- 동네생활 글(팝니다/삽니다/나눔)에서 1:1 채팅 시작 ---- */
+function startChatFromPost(id){
+  if(!requireLogin())return;
+  var p=commById(id);if(!p)return;
+  if(!p._db||!p.uid){toast(t('demoNoChat'));return}
+  if(p.uid===CUR_USER.id){toast(t('ownPost'));return}
+  var exd=chats.find(function(c){return c._db&&c.post_id===p.id});
+  if(exd){openRoom(exd.id);return}
+  sbClient.from('chats').insert({post_id:p.id,buyer_id:CUR_USER.id,seller_id:p.uid,partner_name:p.nm,partner_lang:p.src,partner_avatar:p.ava,buyer_name:MY_NAME,buyer_lang:MY_LANG||lang}).select().single().then(function(r){
+    if(r.error){toast(r.error.message);return}
+    var row=r.data;row.posts={body:L(p.body),category:postCat(p)};
+    var c=mapDbChat(row);chats.unshift(c);renderChatList();openRoom(c.id);
+  }).catch(function(e){toast('오류: '+(e&&e.message||''))});
+}
+
 /* ============ CHAT ROOM ============ */
 function openRoom(id){
   var c=chats.find(function(x){return x.id===id});if(!c)return;curRoom=c;c.unread=0;if(!_replay)pushView({v:'room',id:id});
   document.getElementById('roomNm').innerHTML=langTag(c.nm,c.partnerSrc)+c.nm;
   document.getElementById('roomTemp').textContent=c.rating?('⭐ '+c.rating+' / 10 · '+c.reviews+' '+t('reviewWord')):(LPNAMES[c.partnerSrc]||'');
   document.getElementById('roomTh').textContent=c.th;
-  document.getElementById('roomPrice').textContent=c.price;
+  document.getElementById('roomPrice').textContent=c.price||'';
   document.getElementById('roomTitle').textContent=L(c.titleObj);
-  document.getElementById('roomStatus').textContent=t('onSale');
+  document.getElementById('roomStatus').textContent=c.post_id?((c.catKey&&POSTCAT[c.catKey])?L(POSTCAT[c.catKey]):t('tabComm')):t('onSale');
   renderMsgs();renderChatList();showScreen('s-room');
   if(c._db){loadRoomMsgs(c);startPoll()}else stopPoll();
 }
@@ -1040,16 +1030,19 @@ function startPoll(){stopPoll();pollT=setInterval(function(){if(curRoom&&curRoom
 function stopPoll(){if(pollT){clearInterval(pollT);pollT=null}}
 function mapDbChat(r){
   var iAmBuyer=CUR_USER&&r.buyer_id===CUR_USER.id;
-  var li=r.listings||{};
-  return {id:r.id,_db:true,created_at:r.created_at,item:r.listing_id,
+  var li=r.listings||{}; var po=r.posts||{};
+  var isPost=!!r.post_id;
+  var th=isPost?(POST_EMOJI[po.category]||'💬'):(li.emoji||'💬');
+  var snippet=isPost?String(po.body||'').replace(/\n/g,' ').slice(0,40):(li.title||'');
+  return {id:r.id,_db:true,created_at:r.created_at,item:r.listing_id,post_id:r.post_id||null,
     nm:iAmBuyer?(r.partner_name||'?'):(r.buyer_name||'?'),
     ava:iAmBuyer?(r.partner_avatar||'🧑'):'🧑',
-    th:li.emoji||'💬',price:li.price?('Rp '+li.price):'',titleObj:mono(li.title||''),
+    th:th,price:(!isPost&&li.price)?('Rp '+li.price):'',titleObj:mono(snippet),catKey:isPost?(po.category||''):'',
     rating:0,reviews:0,unread:0,partnerSrc:iAmBuyer?(r.partner_lang||'en'):(r.buyer_lang||'en'),msgs:[]};
 }
 function loadChats(cb){
   if(!CUR_USER||!sbClient){if(cb)cb();return}
-  sbClient.from('chats').select('*, listings(title,emoji,price)').order('id',{ascending:false}).then(function(r){
+  sbClient.from('chats').select('*, listings(title,emoji,price), posts(body,category)').order('id',{ascending:false}).then(function(r){
     if(r.error||!r.data){if(cb)cb();return}
     chats.length=0;r.data.forEach(function(row){chats.push(mapDbChat(row))});
     var ids=chats.map(function(c){return c.id});
@@ -1096,35 +1089,68 @@ function sendMsg(){
 
 /* ============ PHOTO (사진 선택→축소→업로드) ============ */
 var wfPhotoBlob=null;
-function pickPhoto(){document.getElementById('photoFile').click()}
-function clearPhoto(){wfPhotoBlob=null;var pv=document.getElementById('wfPhotoPreview');pv.style.display='none';pv.style.backgroundImage='';document.getElementById('wfPhotoCnt').textContent='0/1';document.getElementById('photoFile').value=''}
-function onPhotoChosen(ev){
-  var f=ev.target.files&&ev.target.files[0];if(!f)return;
-  var img=new Image(),url=URL.createObjectURL(f);
-  img.onload=function(){
-    var mx=1280,sc=Math.min(1,mx/Math.max(img.width,img.height));
-    var cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
-    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-    cv.toBlob(function(bl){
-      wfPhotoBlob=bl;
-      var pv=document.getElementById('wfPhotoPreview');
-      pv.style.display='flex';pv.style.backgroundImage='url('+cv.toDataURL('image/jpeg',0.6)+')';pv.textContent='';
-      document.getElementById('wfPhotoCnt').textContent='1/1';
-      URL.revokeObjectURL(url);
-    },'image/jpeg',0.8);
-  };
-  img.onerror=function(){toast('사진을 읽을 수 없어요');URL.revokeObjectURL(url)};
-  img.src=url;
+/* ---- 사진 첨부 (글당 최대 3장) ---- */
+var wfPhotos=[]; /* [{url?:string, blob?:Blob, dataUrl?:string}] */
+var MAX_PHOTOS=3;
+function renderPhotoStrip(){
+  var s=document.getElementById('wfPhotoStrip');if(!s)return;s.innerHTML='';
+  wfPhotos.forEach(function(p,i){
+    var d=document.createElement('div');
+    d.style.cssText='position:relative;width:76px;height:76px;border-radius:12px;background:#eee center/cover no-repeat;background-image:url('+(p.url||p.dataUrl)+')';
+    d.innerHTML='<span onclick="removePhoto('+i+')" style="position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:#111;color:#fff;font-size:13px;line-height:22px;text-align:center;cursor:pointer">✕</span>';
+    s.appendChild(d);
+  });
+  if(wfPhotos.length<MAX_PHOTOS){
+    var a=document.createElement('div');
+    a.style.cssText='width:76px;height:76px;border-radius:12px;border:1.5px dashed #C9C2BA;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#8A817A;font-size:12px;cursor:pointer;gap:2px';
+    a.innerHTML='<div style="font-size:22px">📷</div><div>'+wfPhotos.length+'/'+MAX_PHOTOS+'</div>';
+    a.onclick=pickPhotos;
+    s.appendChild(a);
+  }
 }
-function uploadPhotoThen(cb){
-  if(!wfPhotoBlob||!sbClient||!CUR_USER){cb(null);return}
-  var path=CUR_USER.id+'/'+Date.now()+'.jpg';
-  sbClient.storage.from('photos').upload(path,wfPhotoBlob,{contentType:'image/jpeg'}).then(function(r){
-    if(r.error){toast(r.error.message);cb(null);return}
-    var pu=sbClient.storage.from('photos').getPublicUrl(path);
-    cb(pu&&pu.data&&pu.data.publicUrl||null);
-  }).catch(function(){cb(null)});
+function pickPhotos(){if(wfPhotos.length>=MAX_PHOTOS){toast(t('maxPhotos'));return}document.getElementById('photoFile').click()}
+function removePhoto(i){wfPhotos.splice(i,1);renderPhotoStrip()}
+function resetPhotos(){wfPhotos=[];var f=document.getElementById('photoFile');if(f)f.value='';renderPhotoStrip()}
+function onPhotosChosen(ev){
+  var files=ev.target.files?[].slice.call(ev.target.files):[];
+  ev.target.value='';
+  var room=MAX_PHOTOS-wfPhotos.length;
+  if(room<=0){toast(t('maxPhotos'));return}
+  files.slice(0,room).forEach(function(f){
+    var img=new Image(),url=URL.createObjectURL(f);
+    img.onload=function(){
+      var mx=1280,sc=Math.min(1,mx/Math.max(img.width,img.height));
+      var cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      cv.toBlob(function(bl){
+        if(wfPhotos.length<MAX_PHOTOS)wfPhotos.push({blob:bl,dataUrl:cv.toDataURL('image/jpeg',0.6)});
+        renderPhotoStrip();URL.revokeObjectURL(url);
+      },'image/jpeg',0.8);
+    };
+    img.onerror=function(){toast('사진을 읽을 수 없어요');URL.revokeObjectURL(url)};
+    img.src=url;
+  });
 }
+function uploadPhotosThen(cb){
+  if(!wfPhotos.length){cb([]);return}
+  if(!sbClient||!CUR_USER){cb([]);return}
+  var out=new Array(wfPhotos.length),pending=0,done=false;
+  function finish(){if(!done){done=true;cb(out.filter(Boolean))}}
+  wfPhotos.forEach(function(p,i){
+    if(p.url){out[i]=p.url;return}
+    pending++;
+    var path=CUR_USER.id+'/'+Date.now()+'_'+i+'_'+Math.floor(Math.random()*99999)+'.jpg';
+    sbClient.storage.from('photos').upload(path,p.blob,{contentType:'image/jpeg'}).then(function(r){
+      if(!r.error){var pu=sbClient.storage.from('photos').getPublicUrl(path);out[i]=pu&&pu.data&&pu.data.publicUrl||null}
+      if(--pending===0)finish();
+    }).catch(function(){if(--pending===0)finish()});
+  });
+  if(pending===0)finish();
+}
+/* 구버전 단일 사진 함수 호환 */
+function clearPhoto(){resetPhotos()}
+function uploadPhotoThen(cb){uploadPhotosThen(function(a){cb(a[0]||null)})}
+function openLightbox(u){var lb=document.getElementById('lightbox');if(!lb)return;document.getElementById('lightboxImg').src=u;lb.style.display='flex'}
 
 /* ============ WRITE (실제 DB 저장) ============ */
 var CAT_EMOJI={golf:'⛳',hobby:'🚲',elec:'📺',furn:'🛋️',kids:'🍼',etc:'📦'};
@@ -1133,33 +1159,20 @@ function submitListing(){
   var desc=(document.getElementById('wfDesc').value||'').trim();
   var btn=document.getElementById('wfSubmit');
   if(editTarget){submitEdit(desc,btn);return}
-  if(wfType==='sell'){
-    var title=(document.getElementById('wfTitle').value||'').trim();
-    var price=(document.getElementById('wfPrice').value||'').trim();
-    if(!title){toast(t('needTitle'));return}
-    btn.disabled=true;
-    uploadPhotoThen(function(imageUrl){
-      sbClient.from('listings').insert({user_id:CUR_USER.id,seller_name:MY_NAME,seller_lang:MY_LANG||lang,seller_avatar:'🧑',title:title,descr:desc,price:price,category:wfCatSel,city:currentCity,loc:currentCity,emoji:CAT_EMOJI[wfCatSel]||'📦',src_lang:lang,image_url:imageUrl}).then(function(r){
-        btn.disabled=false;
-        if(r.error){toast(r.error.message);return}
-        document.getElementById('wfTitle').value='';document.getElementById('wfPrice').value='';document.getElementById('wfDesc').value='';clearPhoto();
-        toast(t('postedReal'));loadData();go('home');
-      }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
-    });
-  }else{
-    if(!desc){toast(t('needBody'));return}
-    btn.disabled=true;
-    sbClient.from('posts').insert({user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',category:wfPostCatSel,body:desc,city:currentCity,loc:currentCity,src_lang:lang}).then(function(r){
+  if(!desc){toast(t('needBody'));return}
+  btn.disabled=true;
+  uploadPhotosThen(function(urls){
+    sbClient.from('posts').insert({user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',category:wfPostCatSel,body:desc,city:currentCity,loc:currentCity,src_lang:lang,images:urls.length?urls:null}).then(function(r){
       btn.disabled=false;
       if(r.error){toast(r.error.message);return}
-      document.getElementById('wfDesc').value='';
+      document.getElementById('wfDesc').value='';resetPhotos();
       toast(t('postedReal'));loadData();go('comm');
     }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
-  }
+  });
 }
 function submitEdit(desc,btn){
   var tgt=editTarget;btn.disabled=true;
-  var done=function(dest){btn.disabled=false;editTarget=null;btn.textContent=t('wfSubmit');document.getElementById('wfTitle').value='';document.getElementById('wfPrice').value='';document.getElementById('wfDesc').value='';clearPhoto();toast(t('edited'));loadData();go(dest)};
+  var done=function(dest){btn.disabled=false;editTarget=null;btn.textContent=t('wfSubmit');document.getElementById('wfDesc').value='';resetPhotos();toast(t('edited'));loadData();go(dest)};
   if(tgt.type==='listing'){
     var title=(document.getElementById('wfTitle').value||'').trim();
     if(!title){btn.disabled=false;toast(t('needTitle'));return}
@@ -1172,9 +1185,11 @@ function submitEdit(desc,btn){
     });
   }else{
     if(!desc){btn.disabled=false;toast(t('needBody'));return}
-    sbClient.from('posts').update({category:wfPostCatSel,body:desc}).eq('id',tgt.id).eq('user_id',CUR_USER.id).then(function(r){
-      if(r.error){btn.disabled=false;toast(r.error.message);return}done('comm');
-    }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+    uploadPhotosThen(function(urls){
+      sbClient.from('posts').update({category:wfPostCatSel,body:desc,images:urls.length?urls:null}).eq('id',tgt.id).eq('user_id',CUR_USER.id).then(function(r){
+        if(r.error){btn.disabled=false;toast(r.error.message);return}done('comm');
+      }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+    });
   }
 }
 
@@ -1184,7 +1199,7 @@ function showScreen(sid){[].forEach.call(document.querySelectorAll('.screen'),fu
   var ownBar=(sid==='s-detail'||sid==='s-room'||sid==='s-write'||sid==='s-talk');
   document.querySelector('.tabs').style.display=ownBar?'none':'flex';
   if(sid!=='s-room'&&typeof stopPoll==='function')stopPoll();}
-function go(name){if(name==='write'&&!CUR_USER){requireLogin();return}if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(name==='prof')updateProfileView();if(name==='chat'&&CUR_USER)loadChats();if(name==='write'&&typeof editTarget!=='undefined'){editTarget=null;var bt=document.getElementById('wfSubmit');if(bt)bt.textContent=t('wfSubmit')}if(appVisible())pushView({v:'app',tab:name})}}
+function go(name){if(name==='write'&&!CUR_USER){requireLogin();return}if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(name==='prof')updateProfileView();if(name==='chat'&&CUR_USER)loadChats();if(name==='write'&&typeof editTarget!=='undefined'){editTarget=null;resetPhotos();var bt=document.getElementById('wfSubmit');if(bt)bt.textContent=t('wfSubmit')}if(appVisible())pushView({v:'app',tab:name})}}
 
 /* ============ SHEETS ============ */
 function renderSheet(type){
@@ -1210,7 +1225,7 @@ function renderSheet(type){
   }
 }
 function openSheet(type){renderSheet(type);document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'})}
-function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;MY_NAME='';updateProfileView();document.getElementById('sheetBg').classList.remove('show');showLoginScreen()}
+function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;MY_NAME='';chats.length=0;renderChatList();updateProfileView();document.getElementById('sheetBg').classList.remove('show');showLoginScreen()}
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
 function setLang(code){lang=code;applyLang();toast(t('langSet'));history.back()}
 var currentCity='Cikarang';
@@ -1246,6 +1261,9 @@ function sbGet(path){return fetch(SB_URL+'/rest/v1/'+path,{headers:{apikey:SB_KE
 /* ---- 이메일 링크 로그인 ---- */
 var sbClient=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY):null;
 var CUR_USER=null,MY_NAME='',MY_LANG='',nickForced=false;
+/* 관리자: 이 이메일로 로그인하면 모든 글을 삭제할 수 있음 (서버 RLS로도 잠금) */
+var ADMIN_EMAILS=['mankilguns@gmail.com'];
+function isAdmin(){return !!(CUR_USER&&CUR_USER.email&&ADMIN_EMAILS.indexOf(String(CUR_USER.email).toLowerCase())>=0)}
 var LCODE={ko:'KR',en:'EN',zh:'CN',ja:'JP',id:'ID'};
 function applyMyName(){var pn=document.getElementById('profName');if(pn&&MY_NAME)pn.textContent=MY_NAME;var lt=document.getElementById('profLtag');if(lt)lt.textContent=LCODE[MY_LANG||lang]||'';}
 function openNick(force){nickForced=!!force;document.getElementById('nickInput').value=MY_NAME||'';document.getElementById('nickTitle').textContent=t('nickTitle');document.getElementById('nickSub').textContent=force?t('nickFirst'):t('nickSub');document.getElementById('nickSaveBtn').textContent=t('save');document.getElementById('nickBg').classList.add('show')}
@@ -1258,6 +1276,7 @@ var authMode='login',pendingNick='';
 function applyAuthModeText(){
   var isSignup=authMode==='signup';
   var nk=document.getElementById('nickInputSignup');if(nk)nk.style.display=isSignup?'':'none';
+  var pc=document.getElementById('pwConfirmInput');if(pc)pc.style.display=isSignup?'':'none';
   var fl=document.getElementById('forgotLink');if(fl)fl.style.display=isSignup?'none':'';
   var bt=document.getElementById('loginBtnTxt');if(bt)bt.textContent=isSignup?t('signupBtn'):t('loginBtnPw');
   var sw=document.getElementById('authSwitch');if(sw)sw.textContent=isSignup?t('toLogin'):t('toSignup');
@@ -1272,6 +1291,8 @@ function doAuth(){
   if(!sbClient){toast('연결 준비 중입니다. 잠시 후 다시 시도해주세요.');return}
   var btn=document.getElementById('loginBtnTxt');btn.textContent=t('sending');
   if(authMode==='signup'){
+    var pwc=document.getElementById('pwConfirmInput').value||'';
+    if(pw!==pwc){btn.textContent=t('signupBtn');toast(t('pwMismatch'));return}
     var nick=(document.getElementById('nickInputSignup').value||'').trim();
     if(nick.length<2){btn.textContent=t('signupBtn');toast(t('nickReq'));return}
     pendingNick=nick;
@@ -1329,6 +1350,7 @@ function updateProfileView(){
   var g=document.getElementById('profGuest'),bd=document.getElementById('profBody');
   if(g)g.style.display=guest?'flex':'none';
   if(bd)bd.style.display=guest?'none':'block';
+  var ab=document.getElementById('profAdminBadge');if(ab)ab.style.display=isAdmin()?'block':'none';
   updateMyStats();
 }
 function myListings(){return CUR_USER?listings.filter(function(l){return l.uid===CUR_USER.id}):[]}
@@ -1371,11 +1393,14 @@ function askDel(type,id,el){
 function doDel(type,id){
   if(!CUR_USER||!sbClient){toast(t('needLogin'));return}
   var tb=(type==='listing')?'listings':'posts';
-  sbClient.from(tb).delete().eq('id',id).eq('user_id',CUR_USER.id).then(function(r){
+  var q=sbClient.from(tb).delete().eq('id',id);
+  if(!isAdmin())q=q.eq('user_id',CUR_USER.id); /* 관리자면 소유자 제한 없이(서버 RLS가 최종 판단) */
+  q.then(function(r){
     if(r.error){toast(r.error.message);return}
     if(type==='listing'){var i=listings.findIndex(function(l){return l.id===id});if(i>=0)listings.splice(i,1);renderFeed()}
-    else{var j=comm.findIndex(function(p){return p.id===id});if(j>=0)comm.splice(j,1);renderComm()}
-    updateMyStats();toast(t('deleted'));openMyList(myListKind);
+    else{var j=comm.findIndex(function(p){return p.id===id});if(j>=0)comm.splice(j,1);renderComm(true)}
+    updateMyStats();toast(t('deleted'));
+    if(document.getElementById('sheetBg').classList.contains('show'))openMyList(myListKind);
   }).catch(function(e){toast('오류: '+(e&&e.message||''))});
 }
 /* ---- 편집 ---- */
@@ -1395,10 +1420,11 @@ function editPost(id){
   closeSheet();go('write');setWfType('post');
   document.getElementById('wfDesc').value=L(p.body);
   wfPostCatSel=p.catKey||'question';renderWfCats();
+  wfPhotos=(p.images||[]).slice(0,MAX_PHOTOS).map(function(u){return {url:u}});renderPhotoStrip();
   editTarget={type:'post',id:id};
   document.getElementById('wfSubmit').textContent=t('editDone');
 }
-function showLoginScreen(){authMode='login';applyAuthModeText();var p=document.getElementById('pwInput');if(p)p.value='';document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
+function showLoginScreen(){authMode='login';applyAuthModeText();['pwInput','pwConfirmInput','nickInputSignup'].forEach(function(id){var e=document.getElementById(id);if(e)e.value=''});document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function requireLogin(){if(CUR_USER)return true;toast(t('needLogin'));showLoginScreen();return false}
 function checkSession(){
   if(!sbClient)return;
@@ -1409,12 +1435,12 @@ function mono(tx){return {ko:tx,en:tx,zh:tx,ja:tx,id:tx}}
 var BGS=['linear-gradient(135deg,#2FB36B,#1f7a49)','linear-gradient(135deg,#3B82F6,#1e40af)','linear-gradient(135deg,#8B5CF6,#6d28d9)','linear-gradient(135deg,#374151,#111827)','linear-gradient(135deg,#F59E0B,#b45309)','linear-gradient(135deg,#EC4899,#be185d)','linear-gradient(135deg,#10B981,#047857)','linear-gradient(135deg,#6366F1,#4338ca)','linear-gradient(135deg,#0EA5E9,#0369a1)','linear-gradient(135deg,#EF4444,#991b1b)'];
 function bgFor(id){return BGS[(id||0)%BGS.length]}
 function krw(price){var n=parseInt(String(price||'').replace(/[^0-9]/g,''),10);if(!n)return '';var w=Math.round(n*0.084/1000)*1000;return '≈ ₩'+w.toLocaleString('en-US')}
-var POSTCAT={question:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},meetup:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},info:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},talk:{ko:'잡담',en:'Chat',zh:'闲聊',ja:'雑談',id:'Obrolan'}};
+var POSTCAT={question:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},meetup:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},info:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},talk:{ko:'잡담',en:'Chat',zh:'闲聊',ja:'雑談',id:'Obrolan'},sell:{ko:'팝니다',en:'For sale',zh:'出售',ja:'売ります',id:'Dijual'},buy:{ko:'삽니다',en:'Want to buy',zh:'求购',ja:'買います',id:'Mau beli'},give:{ko:'나눔',en:'Giveaway',zh:'赠送',ja:'ゆずります',id:'Gratis'}};
 function relTime(iso){try{var d=(Date.now()-new Date(iso).getTime())/1000;var L={ko:{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'},en:{n:'just now',mi:' min ago',h:' hr ago',d:' day ago'},zh:{n:'刚刚',mi:'分钟前',h:'小时前',d:'天前'},ja:{n:'たった今',mi:'分前',h:'時間前',d:'日前'},id:{n:'baru saja',mi:' menit lalu',h:' jam lalu',d:' hari lalu'}}[lang]||{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'};if(d<60)return L.n;if(d<3600)return Math.floor(d/60)+L.mi;if(d<86400)return Math.floor(d/3600)+L.h;return Math.floor(d/86400)+L.d}catch(e){return ''}}
 function tlabel(o){return o&&o._db?relTime(o.created_at):TM(o.time)}
 function mapListing(r){return {id:r.id,_db:true,uid:r.user_id||null,img:r.image_url||null,created_at:r.created_at,emoji:r.emoji||'📦',bg:bgFor(r.id),cat:r.category||'etc',price:r.price||'',rp:krw(r.price),loc:r.loc||r.city||'',city:r.city||'Cikarang',seller:r.seller_name||'',ava:r.seller_avatar||'🧑',rating:Number(r.seller_rating)||0,reviews:r.seller_reviews||0,likes:r.likes||0,chats:r.chats||0,nego:false,fresh:false,sold:r.sold||false,src:r.src_lang||'ko',title:mono(r.title||''),desc:mono(r.descr||'')}}
 function mapComment(r){return {ava:r.author_avatar||'🧑',nm:r.author_name||'',src:r.src_lang||'ko',plain:r.body||''}}
-function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,catKey:r.category||'talk',created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],body:mono(r.body||'')}}
+function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,catKey:r.category||'talk',created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],images:Array.isArray(r.images)?r.images:[],body:mono(r.body||'')}}
 function loadData(){
   Promise.all([sbGet('listings?select=*&order=id.desc'),sbGet('posts?select=*&order=id.desc'),sbGet('comments?select=*&order=id.asc')]).then(function(res){
     var ls=res[0],ps=res[1],cs=res[2];
