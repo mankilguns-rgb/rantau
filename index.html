@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rantau — 찌까랑 외국인 중고장터</title>
+<style>
+:root{
+  --coral:#FF6B4A; --coral-dark:#E8543A; --coral-light:#FFF0EC;
+  --ink:#1C1B1A; --gray:#8A8580; --line:#EFEBE7; --bg:#FBFAF8; --white:#fff;
+  --green:#2FB36B; --gold:#F5A623; --blue:#3B82F6;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:#e5e2de;color:var(--ink);display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.35);border:10px solid #111}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:30px;background:#111;border-radius:0 0 18px 18px;z-index:200}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:78px;display:none}
+.screen.active{display:block}
+.screen::-webkit-scrollbar{display:none}
+
+.topbar{position:sticky;top:0;z-index:100;background:var(--white);padding:44px 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.loc{display:flex;align-items:center;gap:4px;font-weight:800;font-size:18px;cursor:pointer}
+.loc .pin{color:var(--coral)}
+.loc .chev{font-size:12px;color:var(--gray)}
+.topbar .sp{flex:1}
+.ic-btn{width:38px;height:38px;border-radius:12px;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer}
+.lang{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:6px 11px;background:var(--white);cursor:pointer}
+.lang .fl{font-size:15px}
+
+.chips{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;background:var(--white);border-bottom:1px solid var(--line)}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;font-size:13px;font-weight:600;padding:7px 14px;border-radius:20px;background:var(--bg);color:var(--gray);border:1px solid transparent;cursor:pointer}
+.chip.on{background:var(--coral-light);color:var(--coral-dark);border-color:#FFD9CF}
+
+.feed{padding:4px 0}
+.item{display:flex;gap:14px;padding:16px;border-bottom:1px solid var(--line);cursor:pointer;background:var(--white)}
+.item:active{background:var(--bg)}
+.thumb{width:104px;height:104px;border-radius:14px;flex-shrink:0;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.thumb .emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:46px}
+.tag-sold{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.info{flex:1;min-width:0;display:flex;flex-direction:column}
+.title{font-size:15px;font-weight:600;line-height:1.35;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:12px;color:var(--gray);margin-bottom:6px}
+.price{font-size:16px;font-weight:800;margin-top:auto}
+.price .rp{font-size:12px;font-weight:600;color:var(--gray)}
+.badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.b{font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:6px}
+.b.golf{background:#EAF7F0;color:var(--green)}
+.b.nego{background:#FEF3E2;color:var(--gold)}
+.b.new{background:var(--coral-light);color:var(--coral-dark)}
+.b.tr{background:#EEF2FF;color:#4F63D2}
+.react{display:flex;gap:12px;margin-top:6px;font-size:12px;color:var(--gray)}
+
+.post{background:var(--white);border-bottom:1px solid var(--line);padding:16px}
+.post-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ava{width:38px;height:38px;border-radius:50%;background:var(--coral-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.post-h .nm{font-weight:700;font-size:13px}
+.post-h .sub{font-size:11px;color:var(--gray)}
+.cat-pill{font-size:11px;font-weight:700;color:var(--coral-dark);background:var(--coral-light);padding:3px 9px;border-radius:14px;display:inline-block;margin-bottom:8px}
+.post-body{font-size:14px;line-height:1.55;color:#33302d}
+.tr-note{font-size:11px;color:#4F63D2;background:#EEF2FF;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;margin-top:8px;cursor:pointer}
+.post-f{display:flex;gap:18px;margin-top:12px;font-size:12.5px;color:var(--gray);font-weight:600}
+
+.tabs{position:absolute;bottom:0;left:0;right:0;height:78px;background:var(--white);border-top:1px solid var(--line);display:flex;padding-bottom:14px;z-index:150}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--gray);cursor:pointer;font-weight:600}
+.tab.on{color:var(--coral)}
+.tab .ti{font-size:22px;line-height:1}
+.tab.write .ti{position:relative;top:-14px;width:54px;height:54px;background:var(--coral);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 16px rgba(255,107,74,.45)}
+.tab.write span{position:relative;top:-10px}
+
+.det-img{width:100%;height:380px;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:120px;position:relative}
+.det-back{position:absolute;top:50px;left:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);color:#fff;border:none;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+.seller{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--line)}
+.seller .nm{font-weight:700;font-size:15px}
+.seller .lc{font-size:12px;color:var(--gray)}
+.temp{margin-left:auto;text-align:right}
+.temp .val{font-weight:800;font-size:15px;color:var(--gold)}
+.temp .lb{font-size:10px;color:var(--gray)}
+.temp-bar{width:70px;height:5px;border-radius:3px;background:var(--line);margin-top:3px;overflow:hidden}
+.temp-bar i{display:block;height:100%;background:linear-gradient(90deg,#FFD54F,var(--green))}
+.stars{position:relative;display:inline-block;font-size:15px;line-height:1;letter-spacing:1px}
+.stars .bg{color:#E3DFDA}
+.stars .fg{position:absolute;left:0;top:0;color:#F5A623;overflow:hidden;white-space:nowrap}
+.det-body{padding:18px}
+.det-title{font-size:20px;font-weight:800;line-height:1.3}
+.det-cat{font-size:12.5px;color:var(--gray);margin:8px 0 14px}
+.det-price{font-size:24px;font-weight:900;margin-bottom:14px}
+.tr-bar{display:flex;align-items:center;gap:8px;background:#EEF2FF;color:#4F63D2;font-size:12px;font-weight:600;padding:9px 12px;border-radius:10px;margin-bottom:14px;cursor:pointer}
+.tr-bar .o{margin-left:auto;font-weight:700;text-decoration:underline}
+.det-desc{font-size:14.5px;line-height:1.65;color:#33302d;white-space:pre-line}
+.det-stats{display:flex;gap:16px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--gray)}
+.bottom-bar{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:12px 16px 26px;display:flex;align-items:center;gap:14px;z-index:150}
+.heart{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--white);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chat-btn{flex:1;background:var(--coral);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
+.pill-info{font-size:11px;color:var(--gray);text-align:center;padding:0 16px 6px;line-height:1.4}
+
+.chatrow{display:flex;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line);cursor:pointer;background:var(--white)}
+.chatrow:active{background:var(--bg)}
+.chatrow .body{flex:1;min-width:0}
+.chatrow .top{display:flex;justify-content:space-between;align-items:baseline}
+.chatrow .nm{font-weight:700;font-size:14.5px}
+.chatrow .tm{font-size:11px;color:var(--gray)}
+.chatrow .last{font-size:13px;color:var(--gray);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatrow .th{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--coral-light)}
+.unread{width:18px;height:18px;border-radius:50%;background:var(--coral);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:8px;flex-shrink:0}
+
+.cr-head{position:sticky;top:0;z-index:100;background:var(--white);padding:44px 14px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.cr-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--coral-light);border-bottom:1px solid var(--line)}
+.cr-item .th{width:40px;height:40px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
+.cr-item .pr{font-weight:800;font-size:14px}
+.cr-item .tt{font-size:12px;color:var(--gray)}
+.msgs{padding:14px}
+.mrow{display:flex;flex-direction:column;margin-bottom:10px}
+.mrow.me{align-items:flex-end}
+.bubble{max-width:78%;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.45}
+.bubble.them{background:var(--white);border:1px solid var(--line);border-bottom-left-radius:4px}
+.bubble.me{background:var(--coral);color:#fff;border-bottom-right-radius:4px}
+.mtr{font-size:10.5px;color:#4F63D2;margin-top:3px;cursor:pointer}
+.mtr.me{color:#B84A34}
+.daydiv{text-align:center;font-size:11px;color:var(--gray);margin:8px 0 12px}
+.cr-input{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:10px 14px 24px;display:flex;gap:10px;align-items:center}
+.cr-input input{flex:1;border:1px solid var(--line);border-radius:22px;padding:11px 16px;font-size:14px;background:var(--bg);outline:none}
+.send{width:42px;height:42px;border-radius:50%;background:var(--coral);color:#fff;border:none;font-size:18px;cursor:pointer}
+
+/* meet & talk (interpreter) */
+.talk-entry{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#EEF2FF;color:#4F63D2;font-size:13.5px;font-weight:800;cursor:pointer;border-bottom:1px solid var(--line)}
+.talk-entry:active{background:#E2E8FF}
+#s-talk.active{display:flex;flex-direction:column;padding-bottom:0;overflow:hidden}
+.talk-head-mode{margin-left:auto;display:flex;gap:6px}
+.tmbtn{border:1px solid var(--line);background:#fff;border-radius:16px;padding:6px 11px;font-size:14px;font-weight:700;color:var(--gray);cursor:pointer}
+.tmbtn.on{background:var(--coral-light);color:var(--coral-dark);border-color:#FFD9CF}
+.tpanel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 18px;text-align:center;position:relative;min-height:0}
+.tpanel.top{background:#EEF2FF;transform:rotate(180deg)}
+.tpanel .plang{font-size:12px;font-weight:800;position:absolute;top:14px;letter-spacing:.5px}
+.tbig{font-size:23px;font-weight:800;line-height:1.35;color:var(--ink);margin-bottom:16px;min-height:32px;word-break:break-word}
+.tctrl{width:100%;display:flex;justify-content:center}
+.chips-row{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:320px}
+.tchip{background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+.tchip:active{background:var(--bg)}
+.tmic{width:64px;height:64px;border-radius:50%;background:var(--coral);color:#fff;border:none;font-size:27px;cursor:pointer;box-shadow:0 6px 16px rgba(255,107,74,.4)}
+.tmic:active{transform:scale(.95)}
+.tdiv{min-height:42px;background:var(--white);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:11.5px;color:var(--gray);font-weight:600;padding:6px 14px;text-align:center}
+
+.prof-top{background:var(--white);padding:24px 18px;border-bottom:8px solid var(--bg)}
+.prof-row{display:flex;align-items:center;gap:16px}
+.prof-ava{width:64px;height:64px;border-radius:50%;background:var(--coral-light);display:flex;align-items:center;justify-content:center;font-size:30px}
+.prof-nm{font-size:19px;font-weight:800}
+.prof-loc{font-size:13px;color:var(--gray);margin-top:2px}
+.temp-card{margin-top:18px;background:var(--bg);border-radius:14px;padding:14px}
+.temp-card .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.temp-card .t1{font-size:13px;color:var(--gray)}
+.temp-card .t2{font-weight:800;color:var(--gold);font-size:15px}
+.temp-track{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.temp-track i{display:block;height:100%;background:linear-gradient(90deg,#FFD54F,var(--green))}
+.menu-list{background:var(--white)}
+.menu-item{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line);font-size:14.5px;cursor:pointer}
+.menu-item .mi{font-size:20px;width:24px;text-align:center}
+.menu-item .ar{margin-left:auto;color:#D9D3CD;font-size:18px}
+.stat-row{display:flex;background:var(--white);border-bottom:8px solid var(--bg)}
+.stat-cell{flex:1;text-align:center;padding:18px 0;border-right:1px solid var(--line)}
+.stat-cell:last-child{border-right:none}
+.stat-cell .n{font-size:20px;font-weight:800}
+.stat-cell .l{font-size:11.5px;color:var(--gray);margin-top:3px}
+
+.wf{padding:16px}
+.wf-label{font-size:13px;font-weight:700;margin:16px 0 8px}
+.wf-photos{display:flex;gap:10px;overflow-x:auto}
+.wf-add{width:76px;height:76px;border-radius:12px;border:1.5px dashed #D9D3CD;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:22px;color:var(--gray);flex-shrink:0}
+.wf-add span{font-size:11px}
+.wf-ph{width:76px;height:76px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:34px;background:var(--coral-light)}
+.wf-in{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;background:var(--white);outline:none;font-family:inherit}
+.wf-in:focus{border-color:var(--coral)}
+textarea.wf-in{min-height:110px;resize:none}
+.wf-cats{display:flex;flex-wrap:wrap;gap:8px}
+.wf-cat{font-size:13px;font-weight:600;padding:9px 14px;border-radius:20px;background:var(--white);color:var(--gray);border:1px solid var(--line);cursor:pointer}
+.wf-cat.on{background:var(--coral-light);color:var(--coral-dark);border-color:#FFD9CF}
+.wf-submit{width:100%;background:var(--coral);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;margin-top:24px;cursor:pointer}
+
+.toast{position:absolute;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(28,27,26,.94);color:#fff;padding:12px 20px;border-radius:24px;font-size:13.5px;font-weight:600;opacity:0;transition:.3s;z-index:300;white-space:nowrap;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:250;display:none;align-items:flex-end}
+.sheet-bg.show{display:flex}
+.sheet{width:100%;background:var(--white);border-radius:22px 22px 0 0;padding:10px 0 30px;max-height:75%;overflow-y:auto}
+.sheet-grab{width:40px;height:4px;background:var(--line);border-radius:2px;margin:8px auto 14px}
+.sheet-h{font-size:16px;font-weight:800;padding:0 20px 12px}
+.sheet-item{padding:15px 20px;font-size:15px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;align-items:center;gap:12px}
+.sheet-item.sel{color:var(--coral);font-weight:800}
+.sheet-item .fl{font-size:22px}
+.sheet-item .ck{margin-left:auto;color:var(--coral);font-weight:800}
+
+/* login */
+.login{position:absolute;inset:0;z-index:400;background:linear-gradient(160deg,#FF8A6B 0%,#E8543A 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;text-align:center}
+.login.hide{display:none}
+.login .logo-emoji{font-size:60px;margin-bottom:8px}
+.login .brand{font-size:46px;font-weight:900;color:#fff;letter-spacing:-1px}
+.login .tag{color:#fff;font-size:16px;margin-top:12px;line-height:1.5;font-weight:700}
+.login .sub{color:#fff;opacity:.9;font-size:13px;margin-top:6px;font-weight:500}
+.gbtn{margin-top:42px;width:100%;background:#fff;border:none;border-radius:14px;padding:15px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:16px;font-weight:700;color:#1f1f1f;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.gbtn:active{transform:scale(.98)}
+.login .terms{color:#fff;opacity:.82;font-size:11px;margin-top:20px;line-height:1.55}
+.login .langsel{position:absolute;top:56px;right:18px;display:flex;gap:6px}
+.login .lgc{background:rgba(255,255,255,.22);color:#fff;border:none;border-radius:16px;padding:6px 9px;font-size:15px;cursor:pointer}
+.login .lgc.on{background:#fff}
+
+/* language picker (first screen) */
+.langpick{position:absolute;inset:0;z-index:500;background:#fff;display:flex;flex-direction:column;align-items:center;padding:84px 26px 28px;text-align:center;overflow-y:auto}
+.langpick.hide{display:none}
+.lp-brand{font-size:22px;font-weight:900;color:var(--coral);letter-spacing:-.5px}
+.lp-globe{font-size:50px;margin-top:22px}
+.lp-hello{font-size:30px;font-weight:900;color:var(--ink);margin-top:12px;min-height:38px}
+.lp-sub{font-size:12px;color:var(--gray);margin-top:10px;line-height:1.7;font-weight:600;max-width:290px}
+.lp-list{width:100%;margin-top:24px;display:flex;flex-direction:column;gap:10px}
+.lp-item{display:flex;align-items:center;gap:14px;width:100%;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:15px 18px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;transition:transform .12s,border-color .12s}
+.lp-item:active{transform:scale(.98)}
+.lp-item:hover{border-color:#FFD9CF}
+.lp-item .fl{font-size:24px}
+.lp-item .go{margin-left:auto;color:var(--coral);font-size:18px;font-weight:800}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="notch"></div>
+
+<!-- LANGUAGE PICKER (first screen) -->
+<div class="langpick" id="langPick">
+  <div class="lp-brand">Rantau</div>
+  <div class="lp-globe">🌐</div>
+  <div class="lp-hello" id="lpHello">Halo 👋</div>
+  <div class="lp-sub">Pilih bahasa Anda · Choose your language<br>언어를 선택하세요 · 言語を選択 · 选择语言</div>
+  <div class="lp-list" id="lpList"></div>
+</div>
+
+<!-- LOGIN -->
+<div class="login" id="loginScreen">
+  <div class="langsel" id="loginLangs"></div>
+  <div class="logo-emoji">🛍️</div>
+  <div class="brand">Rantau</div>
+  <div class="tag" id="loginTag">찌까랑 외국인들의 중고장터</div>
+  <div class="sub" id="loginSub">5개 언어 자동 번역 · 이웃과 안전하게 거래</div>
+  <button class="gbtn" onclick="enterApp()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    <span id="googleBtnTxt">Google로 계속하기</span>
+  </button>
+  <div class="terms" id="loginTerms">계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.</div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="topbar">
+    <div class="loc" onclick="openSheet('loc')"><span class="pin">📍</span> <span id="homeLoc">Cikarang</span> <span class="chev">▾</span></div>
+    <div class="sp"></div>
+    <button class="lang" onclick="openSheet('lang')"><span class="fl" id="langFlag">🇰🇷</span><span id="langCode">한국어</span> ▾</button>
+    <button class="ic-btn" onclick="toast(t('toastSearch'))">🔍</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="feed" id="feed"></div>
+</div>
+
+<!-- COMMUNITY -->
+<div class="screen" id="s-comm">
+  <div class="topbar">
+    <div class="loc"><span class="pin">📍</span> <span id="commTitle">동네생활</span> <span id="commLoc" style="font-size:13px;color:var(--gray);font-weight:600">· Cikarang</span></div>
+    <div class="sp"></div>
+    <button class="lang" onclick="openSheet('lang')"><span class="fl" id="langFlag2">🇰🇷</span> ▾</button>
+  </div>
+  <div class="chips" id="commchips"></div>
+  <div id="commfeed"></div>
+</div>
+
+<!-- CHAT LIST -->
+<div class="screen" id="s-chat">
+  <div class="topbar"><div class="loc" id="chatTitle">채팅</div><div class="sp"></div><button class="lang" onclick="openSheet('lang')"><span class="fl" id="langFlag3">🇰🇷</span> ▾</button></div>
+  <div id="chatlist"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="s-prof">
+  <div class="topbar"><div class="loc" id="profTitle">내 정보</div><div class="sp"></div><button class="ic-btn" onclick="toast(t('soon'))">⚙️</button></div>
+  <div class="prof-top">
+    <div class="prof-row">
+      <div class="prof-ava">🧑🏻</div>
+      <div>
+        <div class="prof-nm">Mankil J.</div>
+        <div class="prof-loc" id="profVerified">📍 Lippo Cikarang · 인증 회원 ✓</div>
+      </div>
+    </div>
+    <div class="temp-card">
+      <div class="row"><span class="t1" id="profTempLbl">평균 별점</span><span class="t2" id="profRatingVal">⭐ 9.3 / 10</span></div>
+      <div id="profStars" style="margin-top:2px"></div>
+      <div style="font-size:11px;color:var(--gray);margin-top:8px" id="profReviews">받은 후기 24</div>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-cell"><div class="n">7</div><div class="l" id="stSelling">판매중</div></div>
+    <div class="stat-cell"><div class="n">12</div><div class="l" id="stDone">거래완료</div></div>
+    <div class="stat-cell"><div class="n">24</div><div class="l" id="stReview">받은 후기</div></div>
+  </div>
+  <div class="menu-list" id="profMenu"></div>
+</div>
+
+<!-- DETAIL -->
+<div class="screen" id="s-detail">
+  <div class="det-img" id="detImg"><button class="det-back" onclick="go('home')">←</button></div>
+  <div class="seller">
+    <div class="ava" id="detAva">🧑🏻</div>
+    <div><div class="nm" id="detSeller">—</div><div class="lc" id="detLoc">—</div></div>
+    <div class="temp"><div class="val" id="detTemp">—</div><div id="detStars"></div><div class="lb" id="detTempLbl">평균 별점</div></div>
+  </div>
+  <div class="det-body">
+    <div class="det-title" id="detTitle">—</div>
+    <div class="det-cat" id="detCat">—</div>
+    <div class="det-price" id="detPrice">—</div>
+    <div class="tr-bar" id="detTrBar" onclick="toggleDetOrig()"><span>🌐</span><span id="detTrText">—</span><span class="o" id="detTrToggle">원문</span></div>
+    <div class="det-desc" id="detDesc">—</div>
+    <div class="det-stats" id="detStats"></div>
+  </div>
+  <div class="pill-info" id="detSafety" style="position:absolute;bottom:78px;width:100%"></div>
+  <div class="bottom-bar">
+    <button class="heart" onclick="likeToggle(this)">🤍</button>
+    <button class="chat-btn" id="detChatBtn" onclick="startChatFromDetail()">💬 채팅하기</button>
+  </div>
+</div>
+
+<!-- CHAT ROOM -->
+<div class="screen" id="s-room">
+  <div class="cr-head">
+    <button class="ic-btn" onclick="go('chat')" style="background:transparent">←</button>
+    <div><div style="font-weight:700;font-size:15px" id="roomNm">—</div><div style="font-size:11px;color:var(--gray)" id="roomTemp">—</div></div>
+  </div>
+  <div class="cr-item">
+    <div class="th" id="roomTh">🏌️</div>
+    <div style="flex:1;min-width:0"><div class="pr" id="roomPrice">—</div><div class="tt" id="roomTitle">—</div></div>
+    <div style="font-size:11px;color:var(--gray);border:1px solid var(--line);padding:5px 9px;border-radius:8px" id="roomStatus">판매중</div>
+  </div>
+  <div class="talk-entry" onclick="openTalk()">🗣️ <span id="talkEntryTxt">만나서 대화 (통역)</span></div>
+  <div class="msgs" id="roomMsgs"></div>
+  <div class="cr-input">
+    <button class="ic-btn" onclick="toast(t('soon'))" style="background:var(--bg)">＋</button>
+    <input id="msgInput" placeholder="메시지 보내기…" onkeydown="if(event.key==='Enter')sendMsg()">
+    <button class="send" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- MEET & TALK (interpreter) -->
+<div class="screen" id="s-talk">
+  <div class="cr-head">
+    <button class="ic-btn" onclick="backToRoom()" style="background:transparent">←</button>
+    <div style="font-weight:800;font-size:15px" id="talkTitle">만나서 대화 (통역)</div>
+    <div class="talk-head-mode">
+      <button class="tmbtn on" id="tmText" onclick="setTalkMode('text')">⌨️</button>
+      <button class="tmbtn" id="tmVoice" onclick="setTalkMode('voice')">🎤</button>
+    </div>
+  </div>
+  <div class="tpanel top" id="tPanelTop">
+    <div class="plang" id="tLangTop" style="color:var(--coral-dark)">Bahasa</div>
+    <div class="tbig" id="tBigTop"></div>
+    <div class="tctrl" id="tCtrlTop"></div>
+  </div>
+  <div class="tdiv" id="talkModeHint">텍스트 모드</div>
+  <div class="tpanel bottom" id="tPanelBot">
+    <div class="plang" id="tLangBot" style="color:var(--blue)">한국어</div>
+    <div class="tbig" id="tBigBot"></div>
+    <div class="tctrl" id="tCtrlBot"></div>
+  </div>
+</div>
+
+<!-- WRITE -->
+<div class="screen" id="s-write">
+  <div class="cr-head">
+    <button class="ic-btn" onclick="go('home')" style="background:transparent">✕</button>
+    <div style="font-weight:800;font-size:16px" id="wfHead">내 물건 팔기</div>
+  </div>
+  <div class="wf">
+    <div class="wf-photos">
+      <div class="wf-add" onclick="toast(t('soon'))">📷<span>0/10</span></div>
+      <div class="wf-ph">🏌️</div><div class="wf-ph">👟</div>
+    </div>
+    <div class="wf-label" id="wfLTitle">제목</div>
+    <input class="wf-in" id="wfTitle">
+    <div class="wf-label" id="wfLCat">카테고리</div>
+    <div class="wf-cats" id="wfcats"></div>
+    <div class="wf-label" id="wfLPrice">가격 (Rp)</div>
+    <input class="wf-in" id="wfPrice" inputmode="numeric">
+    <div style="margin-top:10px;font-size:13px;color:var(--gray);display:flex;align-items:center;gap:8px"><input type="checkbox" id="nego"> <label for="nego" id="wfNego">가격 제안 받기</label></div>
+    <div class="wf-label" id="wfLDesc">설명</div>
+    <textarea class="wf-in" id="wfDesc"></textarea>
+    <button class="wf-submit" onclick="submitListing()" id="wfSubmit">작성 완료</button>
+  </div>
+</div>
+
+<!-- SHEET (location + language) -->
+<div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheetInner"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" id="t-comm" onclick="go('comm')"><span class="ti">🏘️</span><span id="tabComm">동네생활</span></div>
+  <div class="tab" id="t-home" onclick="go('home')"><span class="ti">🏠</span><span id="tabHome">마켓</span></div>
+  <div class="tab write" onclick="go('write')"><span class="ti">＋</span><span id="tabWrite">팔기</span></div>
+  <div class="tab" id="t-chat" onclick="go('chat')"><span class="ti">💬</span><span id="tabChat">채팅</span></div>
+  <div class="tab" id="t-prof" onclick="go('prof')"><span class="ti">👤</span><span id="tabProf">내정보</span></div>
+</div>
+
+</div>
+<script>
+/* ============ LANGUAGES ============ */
+var LANGS=[
+ {code:'id',label:'Bahasa',flag:'🇮🇩'},
+ {code:'en',label:'English',flag:'🇬🇧'},
+ {code:'zh',label:'中文',flag:'🇨🇳'},
+ {code:'ko',label:'한국어',flag:'🇰🇷'},
+ {code:'ja',label:'日本語',flag:'🇯🇵'}
+];
+var lang='id';
+function L(o){return o[lang]||o.ko}
+
+/* ============ UI STRINGS ============ */
+var UI={
+ tabHome:{ko:'마켓',en:'Market',zh:'市场',ja:'マーケット',id:'Pasar'},
+ tabComm:{ko:'동네생활',en:'Community',zh:'社区',ja:'コミュニティ',id:'Komunitas'},
+ tabWrite:{ko:'팔기',en:'Sell',zh:'出售',ja:'売る',id:'Jual'},
+ tabChat:{ko:'채팅',en:'Chat',zh:'聊天',ja:'チャット',id:'Chat'},
+ tabProf:{ko:'내정보',en:'Profile',zh:'我的',ja:'マイ',id:'Profil'},
+ commTitle:{ko:'동네생활',en:'Community',zh:'邻里社区',ja:'ご近所さん',id:'Komunitas'},
+ chatTitle:{ko:'채팅',en:'Chat',zh:'聊天',ja:'チャット',id:'Chat'},
+ profTitle:{ko:'내 정보',en:'Profile',zh:'我的',ja:'マイページ',id:'Profil'},
+ verified:{ko:'구글 계정 연결',en:'Google connected',zh:'已连接 Google',ja:'Google 連携済み',id:'Terhubung Google'},
+ avgRating:{ko:'평균 별점',en:'Average rating',zh:'平均评分',ja:'平均評価',id:'Rating rata-rata'},
+ reviewWord:{ko:'리뷰',en:'reviews',zh:'条评价',ja:'件レビュー',id:'ulasan'},
+ selling:{ko:'판매중',en:'Selling',zh:'在售',ja:'販売中',id:'Dijual'},
+ done:{ko:'거래완료',en:'Completed',zh:'已完成',ja:'取引完了',id:'Selesai'},
+ reviews:{ko:'받은 후기',en:'Reviews',zh:'收到评价',ja:'レビュー',id:'Ulasan'},
+ onSale:{ko:'판매중',en:'On sale',zh:'在售',ja:'販売中',id:'Dijual'},
+ soldOut:{ko:'거래완료',en:'Sold',zh:'已售出',ja:'売却済み',id:'Terjual'},
+ category:{ko:'카테고리',en:'Category',zh:'分类',ja:'カテゴリー',id:'Kategori'},
+ negoOk:{ko:'가격제안 가능',en:'Offers OK',zh:'可议价',ja:'価格交渉可',id:'Bisa nego'},
+ likes:{ko:'관심',en:'Likes',zh:'关注',ja:'いいね',id:'Suka'},
+ chatsN:{ko:'채팅',en:'Chats',zh:'聊天',ja:'チャット',id:'Chat'},
+ views:{ko:'조회',en:'Views',zh:'浏览',ja:'閲覧',id:'Dilihat'},
+ chatBtn:{ko:'💬 채팅하기',en:'💬 Chat',zh:'💬 聊一聊',ja:'💬 チャットする',id:'💬 Chat'},
+ safety:{ko:'🔒 안전을 위해 앱 채팅으로만 연락하세요 · 플랫폼은 결제·배송에 관여하지 않습니다',
+   en:'🔒 For safety, contact only via in-app chat · The platform is not involved in payment or delivery',
+   zh:'🔒 为了安全，请仅通过应用内聊天联系 · 平台不参与付款或配送',
+   ja:'🔒 安全のためアプリ内チャットのみでご連絡ください · プラットフォームは決済・配送に関与しません',
+   id:'🔒 Demi keamanan, hubungi hanya lewat chat aplikasi · Platform tidak terlibat pembayaran atau pengiriman'},
+ badgeGolf:{ko:'⛳ 골프',en:'⛳ Golf',zh:'⛳ 高尔夫',ja:'⛳ ゴルフ',id:'⛳ Golf'},
+ badgeNego:{ko:'가격제안',en:'Offers',zh:'可议价',ja:'交渉可',id:'Nego'},
+ badgeNew:{ko:'NEW',en:'NEW',zh:'最新',ja:'新着',id:'BARU'},
+ today:{ko:'오늘',en:'Today',zh:'今天',ja:'今日',id:'Hari ini'},
+ msgPlaceholder:{ko:'메시지 보내기…',en:'Send a message…',zh:'发送消息…',ja:'メッセージを送信…',id:'Kirim pesan…'},
+ wfHead:{ko:'내 물건 팔기',en:'Sell my item',zh:'出售我的物品',ja:'商品を売る',id:'Jual barang saya'},
+ wfLTitle:{ko:'제목',en:'Title',zh:'标题',ja:'タイトル',id:'Judul'},
+ wfLCat:{ko:'카테고리',en:'Category',zh:'分类',ja:'カテゴリー',id:'Kategori'},
+ wfLPrice:{ko:'가격 (Rp)',en:'Price (Rp)',zh:'价格 (Rp)',ja:'価格 (Rp)',id:'Harga (Rp)'},
+ wfNego:{ko:'가격 제안 받기',en:'Accept offers',zh:'接受议价',ja:'価格交渉を受ける',id:'Terima tawaran'},
+ wfLDesc:{ko:'설명',en:'Description',zh:'描述',ja:'説明',id:'Deskripsi'},
+ wfSubmit:{ko:'작성 완료',en:'Post item',zh:'发布',ja:'出品する',id:'Posting'},
+ wfPhTitle:{ko:'예: 캘러웨이 아이언 세트 (거의 새것)',en:'e.g. Callaway iron set (like new)',zh:'例：卡拉威铁杆套装（近全新）',ja:'例：キャロウェイ アイアンセット（ほぼ新品）',id:'cth: Set iron Callaway (seperti baru)'},
+ wfPhPrice:{ko:'예: 3.500.000',en:'e.g. 3,500,000',zh:'例：3.500.000',ja:'例：3.500.000',id:'cth: 3.500.000'},
+ wfPhDesc:{ko:'상품 상태, 구매 시기, 거래 희망 지역(예: Lippo Cikarang, Jababeka)을 적어주세요.',
+   en:'Describe condition, when you bought it, and preferred meet-up area (e.g. Lippo Cikarang, Jababeka).',
+   zh:'请写明物品状态、购买时间和希望交易地点（如 Lippo Cikarang、Jababeka）。',
+   ja:'商品の状態、購入時期、取引希望エリア（例：Lippo Cikarang, Jababeka）をご記入ください。',
+   id:'Tuliskan kondisi barang, kapan dibeli, dan area COD yang diinginkan (cth: Lippo Cikarang, Jababeka).'},
+ setArea:{ko:'내 동네 설정',en:'Set my area',zh:'设置我的地区',ja:'エリアを設定',id:'Atur area saya'},
+ setLang:{ko:'언어 선택',en:'Choose language',zh:'选择语言',ja:'言語を選択',id:'Pilih bahasa'},
+ like:{ko:'공감',en:'Like',zh:'点赞',ja:'共感',id:'Suka'},
+ comment:{ko:'댓글',en:'Comment',zh:'评论',ja:'コメント',id:'Komentar'},
+ transFrom:{ko:'에서 자동 번역됨',en:'Auto-translated from ',zh:'自动翻译自 ',ja:'から自動翻訳',id:'Diterjemahkan otomatis dari '},
+ seeOrig:{ko:'원문',en:'Original',zh:'原文',ja:'原文',id:'Asli'},
+ seeTrans:{ko:'번역',en:'Translation',zh:'译文',ja:'翻訳',id:'Terjemahan'},
+ soon:{ko:'준비 중입니다',en:'Coming soon',zh:'即将推出',ja:'準備中です',id:'Segera hadir'},
+ toastSearch:{ko:'검색은 준비 중입니다',en:'Search coming soon',zh:'搜索功能即将推出',ja:'検索は準備中です',id:'Pencarian segera hadir'},
+ posted:{ko:'✅ 등록되었습니다! (프로토타입)',en:'✅ Posted! (prototype)',zh:'✅ 已发布！（原型）',ja:'✅ 出品しました！（プロトタイプ）',id:'✅ Terposting! (prototipe)'},
+ areaSet:{ko:' 동네로 설정했어요',en:' set as your area',zh:' 已设为你的地区',ja:' をエリアに設定しました',id:' diatur sebagai area Anda'},
+ langSet:{ko:'한국어로 표시합니다',en:'Showing in English',zh:'以中文显示',ja:'日本語で表示します',id:'Ditampilkan dalam Bahasa Indonesia'},
+ startChat:{ko:'대화를 시작해보세요',en:'Start the conversation',zh:'开始聊天吧',ja:'会話を始めましょう',id:'Mulai percakapan'},
+ loginTag:{ko:'떠나온 사람들의 쉼터',en:'A haven for those far from home',zh:'漂泊异乡者的港湾',ja:'故郷を離れた人の憩いの場',id:'Tempat singgah para perantau'},
+ loginSub:{ko:'5개 언어 자동 번역 · 이웃과 안전하게 거래',en:'Auto-translated in 5 languages · Trade safely with neighbors',zh:'5种语言自动翻译 · 与邻里安全交易',ja:'5言語に自動翻訳 · ご近所と安全に取引',id:'Terjemahan otomatis 5 bahasa · Transaksi aman dengan tetangga'},
+ googleBtn:{ko:'Google로 계속하기',en:'Continue with Google',zh:'使用 Google 继续',ja:'Google で続ける',id:'Lanjut dengan Google'},
+ loginTerms:{ko:'계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.',en:'By continuing, you agree to the Terms of Service and Privacy Policy.',zh:'继续即表示您同意服务条款和隐私政策。',ja:'続行すると、利用規約とプライバシーポリシーに同意したものとみなされます。',id:'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi.'},
+ talkEntry:{ko:'만나서 대화 (통역)',en:'Talk in person (interpreter)',zh:'见面对话（翻译）',ja:'対面で会話（通訳）',id:'Ngobrol langsung (penerjemah)'},
+ talkHintText:{ko:'⌨️ 텍스트 모드 · 문구를 눌러 상대에게 화면을 보여주세요',en:'⌨️ Text mode · Tap a phrase, then show your screen to them',zh:'⌨️ 文字模式 · 点击短语后把屏幕给对方看',ja:'⌨️ テキストモード · フレーズを押して画面を相手に見せましょう',id:'⌨️ Mode teks · Ketuk frasa, lalu tunjukkan layar ke lawan bicara'},
+ talkHintVoice:{ko:'🎤 음성 모드 · 마이크를 누르고 말하면 상대 언어로 읽어줍니다',en:'🎤 Voice mode · Tap the mic and speak — it reads out in their language',zh:'🎤 语音模式 · 点击麦克风说话，会用对方语言朗读',ja:'🎤 音声モード · マイクを押して話すと相手の言語で読み上げます',id:'🎤 Mode suara · Ketuk mik lalu bicara — dibacakan dalam bahasa lawan'},
+ talkListening:{ko:'듣는 중…',en:'Listening…',zh:'聆听中…',ja:'聞き取り中…',id:'Mendengar…'}
+};
+function t(k){return (UI[k]&&(UI[k][lang]||UI[k].ko))||k}
+var LNAME={ko:{ko:'한국어',en:'Korean',zh:'韩语',ja:'韓国語',id:'Korea'},en:{ko:'영어',en:'English',zh:'英语',ja:'英語',id:'Inggris'},zh:{ko:'중국어',en:'Chinese',zh:'中文',ja:'中国語',id:'Mandarin'},ja:{ko:'일본어',en:'Japanese',zh:'日语',ja:'日本語',id:'Jepang'},id:{ko:'인도네시아어',en:'Indonesian',zh:'印尼语',ja:'インドネシア語',id:'Indonesia'}};
+function srcName(code){return LNAME[code]?(LNAME[code][lang]||LNAME[code].ko):code}
+function transLabel(srcCode){var n=srcName(srcCode);var p={ko:n+'에서 번역됨',en:'Translated from '+n,zh:'译自'+n,ja:n+'から翻訳',id:'Diterjemahkan dari '+n};return p[lang]||p.ko}
+
+/* profile menu */
+var MENU=[
+ {i:'🏷️',k:{ko:'판매 내역',en:'My listings',zh:'我的出售',ja:'販売履歴',id:'Barang saya'}},
+ {i:'🛍️',k:{ko:'구매 내역',en:'Purchases',zh:'购买记录',ja:'購入履歴',id:'Pembelian'}},
+ {i:'❤️',k:{ko:'관심 목록',en:'Wishlist',zh:'关注列表',ja:'お気に入り',id:'Favorit'}},
+ {i:'⭐',k:{ko:'받은 거래 후기',en:'My reviews',zh:'收到的评价',ja:'受け取った評価',id:'Ulasan diterima'}},
+ {i:'🌐',k:{ko:'언어 / Language',en:'Language',zh:'语言 / Language',ja:'言語 / Language',id:'Bahasa / Language'}}
+];
+
+/* categories */
+var CATS=[
+ {key:'all',t:{ko:'전체',en:'All',zh:'全部',ja:'すべて',id:'Semua'}},
+ {key:'golf',t:{ko:'골프',en:'Golf',zh:'高尔夫',ja:'ゴルフ',id:'Golf'}},
+ {key:'hobby',t:{ko:'취미·스포츠',en:'Hobby·Sports',zh:'兴趣·运动',ja:'趣味·スポーツ',id:'Hobi·Olahraga'}},
+ {key:'elec',t:{ko:'전자기기',en:'Electronics',zh:'电子产品',ja:'電子機器',id:'Elektronik'}},
+ {key:'furn',t:{ko:'가구·생활',en:'Furniture·Home',zh:'家具·生活',ja:'家具·生活',id:'Furnitur·Rumah'}},
+ {key:'kids',t:{ko:'유아·아동',en:'Baby·Kids',zh:'母婴·儿童',ja:'ベビー·キッズ',id:'Bayi·Anak'}},
+ {key:'etc',t:{ko:'기타',en:'Others',zh:'其他',ja:'その他',id:'Lainnya'}}
+];
+var CATNAME={golf:{ko:'골프',en:'Golf',zh:'高尔夫',ja:'ゴルフ',id:'Golf'},hobby:{ko:'취미·스포츠',en:'Hobby·Sports',zh:'兴趣·运动',ja:'趣味·スポーツ',id:'Hobi·Olahraga'},elec:{ko:'전자기기',en:'Electronics',zh:'电子产品',ja:'電子機器',id:'Elektronik'},furn:{ko:'가구·생활',en:'Furniture·Home',zh:'家具·生活',ja:'家具·生活',id:'Furnitur·Rumah'},kids:{ko:'유아·아동',en:'Baby·Kids',zh:'母婴·儿童',ja:'ベビー·キッズ',id:'Bayi·Anak'},etc:{ko:'기타',en:'Others',zh:'其他',ja:'その他',id:'Lainnya'}};
+
+/* time labels */
+function TM(k){var d={m3:{ko:'3분 전',en:'3 min ago',zh:'3分钟前',ja:'3分前',id:'3 menit lalu'},m20:{ko:'20분 전',en:'20 min ago',zh:'20分钟前',ja:'20分前',id:'20 menit lalu'},m22:{ko:'22분 전',en:'22 min ago',zh:'22分钟前',ja:'22分前',id:'22 menit lalu'},h1:{ko:'1시간 전',en:'1 hr ago',zh:'1小时前',ja:'1時間前',id:'1 jam lalu'},h2:{ko:'2시간 전',en:'2 hr ago',zh:'2小时前',ja:'2時間前',id:'2 jam lalu'},h3:{ko:'3시간 전',en:'3 hr ago',zh:'3小时前',ja:'3時間前',id:'3 jam lalu'},h4:{ko:'4시간 전',en:'4 hr ago',zh:'4小时前',ja:'4時間前',id:'4 jam lalu'},h5:{ko:'5시간 전',en:'5 hr ago',zh:'5小时前',ja:'5時間前',id:'5 jam lalu'},h6:{ko:'6시간 전',en:'6 hr ago',zh:'6小时前',ja:'6時間前',id:'6 jam lalu'},h8:{ko:'8시간 전',en:'8 hr ago',zh:'8小时前',ja:'8時間前',id:'8 jam lalu'},d1:{ko:'1일 전',en:'1 day ago',zh:'1天前',ja:'1日前',id:'1 hari lalu'},now:{ko:'방금',en:'just now',zh:'刚刚',ja:'たった今',id:'baru saja'},yest:{ko:'어제',en:'yesterday',zh:'昨天',ja:'昨日',id:'kemarin'}};return d[k]?(d[k][lang]||d[k].ko):k}
+
+/* ============ LISTINGS ============ */
+var listings=[
+ {id:1,emoji:'🏌️',bg:'linear-gradient(135deg,#2FB36B,#1f7a49)',cat:'golf',price:'4.200.000',rp:'≈ ₩350,000',loc:'Lippo Cikarang',city:'Cikarang',time:'m3',seller:'GolfDad_Kim',ava:'🧑🏻',rating:9.4,reviews:32,likes:12,chats:5,nego:true,fresh:true,src:'ko',
+   title:{ko:'캘러웨이 로그 아이언 5-P 풀세트 (한국서 가져옴)',en:'Callaway Rogue Irons 5-P Full Set (brought from Korea)',zh:'卡拉威 Rogue 铁杆 5-P 全套（从韩国带来）',ja:'キャロウェイ ローグ アイアン 5-P フルセット（韓国から持参）',id:'Set Lengkap Iron Callaway Rogue 5-P (dibawa dari Korea)'},
+   desc:{ko:'한국에서 가져온 캘러웨이 로그 아이언 세트입니다.\n스틸 샤프트 R, 사용감 적고 상태 아주 좋습니다.\n찌까랑 귀국 정리로 내놓습니다. 직거래 선호(리포/자바베카).',en:'Callaway Rogue iron set brought from Korea.\nSteel shaft (R), barely used, excellent condition.\nSelling as I move back home from Cikarang. Prefer meet-up (Lippo/Jababeka).',zh:'从韩国带来的卡拉威 Rogue 铁杆套装。\n钢杆身 R，几乎没用过，状态非常好。\n因从芝卡朗回国清理出售。偏好面交（Lippo/Jababeka）。',ja:'韓国から持ってきたキャロウェイ ローグのアイアンセットです。\nスチールシャフトR、使用感少なく状態はとても良いです。\nチカランからの帰国整理で出品します。手渡し希望（リッポー/ジャバベカ）。',id:'Set iron Callaway Rogue yang dibawa dari Korea.\nShaft baja (R), jarang dipakai, kondisi sangat bagus.\nDijual karena mau pulang dari Cikarang. Lebih suka COD (Lippo/Jababeka).'}},
+ {id:2,emoji:'👟',bg:'linear-gradient(135deg,#3B82F6,#1e40af)',cat:'golf',price:'650.000',rp:'≈ ₩54,000',loc:'Jababeka',city:'Cikarang',time:'m22',seller:'Sarah_Exp',ava:'👩🏼',rating:8.7,reviews:15,likes:4,chats:2,nego:false,fresh:true,src:'en',
+   title:{ko:'나이키 골프화 US 9.5 / 265mm',en:'Nike Golf Shoes US 9.5 / 265mm',zh:'耐克高尔夫球鞋 US 9.5 / 265mm',ja:'ナイキ ゴルフシューズ US 9.5 / 265mm',id:'Sepatu Golf Nike US 9.5 / 265mm'},
+   desc:{ko:'딱 두 번 신은 골프화입니다. 사이즈가 안 맞아서 판매해요. 박스 있습니다.',en:'Golf shoes worn only twice. Selling because the size doesn\'t fit me. Box included.',zh:'只穿过两次的高尔夫球鞋。因为尺码不合适出售。带原盒。',ja:'2回だけ履いたゴルフシューズです。サイズが合わないので販売します。箱あり。',id:'Sepatu golf hanya dipakai dua kali. Dijual karena ukurannya tidak pas. Ada boksnya.'}},
+ {id:3,emoji:'🛋️',bg:'linear-gradient(135deg,#8B5CF6,#6d28d9)',cat:'furn',price:'1.800.000',rp:'≈ ₩150,000',loc:'Jakarta Selatan',city:'Jakarta',time:'h1',seller:'Yuki_T',ava:'🧑🏻',rating:8.1,reviews:9,likes:9,chats:7,nego:true,fresh:false,src:'ja',
+   title:{ko:'이케아 3인용 소파 (회색) - 이사정리',en:'IKEA 3-Seat Sofa (Grey) - Moving Sale',zh:'宜家三人沙发（灰色）- 搬家出清',ja:'IKEA 3人掛けソファ（グレー）- 引越し整理',id:'Sofa IKEA 3 Dudukan (Abu-abu) - Pindahan'},
+   desc:{ko:'2년 사용한 이케아 소파입니다. 배송 도와드릴 수 있어요(트럭 비용 별도). 상태는 사진 참고해 주세요.',en:'IKEA sofa used for 2 years. I can help arrange delivery (truck cost separate). Please check the photos for condition.',zh:'使用了两年的宜家沙发。可以帮忙安排配送（货车费用另计）。状态请参考照片。',ja:'2年使用したIKEAのソファです。配送のお手伝いも可能です（トラック代別途）。状態は写真をご確認ください。',id:'Sofa IKEA yang dipakai 2 tahun. Bisa bantu atur pengiriman (biaya truk terpisah). Kondisi lihat di foto ya.'}},
+ {id:4,emoji:'📺',bg:'linear-gradient(135deg,#374151,#111827)',cat:'elec',price:'3.100.000',rp:'≈ ₩258,000',loc:'Lippo Cikarang',city:'Cikarang',time:'h2',seller:'Mike_R',ava:'🧔🏽',rating:8.5,reviews:21,likes:15,chats:9,nego:false,fresh:false,src:'en',
+   title:{ko:'LG 55인치 4K TV + 벽걸이 브라켓',en:'LG 55" 4K TV + Wall Mount Bracket',zh:'LG 55英寸 4K 电视 + 壁挂支架',ja:'LG 55インチ 4K TV + 壁掛けブラケット',id:'TV LG 55" 4K + Bracket Dinding'},
+   desc:{ko:'220V TV라 인도네시아에서 바로 사용 가능합니다. 화면 깨끗해요.',en:'220V TV, ready to use in Indonesia right away. Screen is clean.',zh:'220V 电视，在印尼可直接使用。屏幕干净。',ja:'220VのTVなのでインドネシアですぐ使えます。画面はきれいです。',id:'TV 220V, langsung bisa dipakai di Indonesia. Layar bersih.'}},
+ {id:5,emoji:'🚲',bg:'linear-gradient(135deg,#F59E0B,#b45309)',cat:'hobby',price:'900.000',rp:'≈ ₩75,000',loc:'Semarang Tengah',city:'Semarang',time:'h4',seller:'Anita',ava:'👩🏻',rating:9.1,reviews:18,likes:6,chats:3,nego:true,fresh:false,src:'id',
+   title:{ko:'접이식 자전거 (브롬톤 카피) 상태 좋음',en:'Folding Bike (Brompton copy) Good Condition',zh:'折叠自行车（Brompton 仿款）状态良好',ja:'折りたたみ自転車（ブロンプトン風）状態良好',id:'Sepeda Lipat (mirip Brompton) Kondisi Bagus'},
+   desc:{ko:'단지 안에서만 타던 접이식 자전거예요. 브레이크는 최근에 교체했습니다.',en:'Folding bike ridden only inside the complex. Brakes recently replaced.',zh:'只在小区里骑过的折叠车。刹车最近刚换过。',ja:'団地内でだけ乗っていた折りたたみ自転車です。ブレーキは最近交換しました。',id:'Sepeda lipat yang cuma dipakai di dalam komplek. Rem baru diganti.'}},
+ {id:6,emoji:'🍼',bg:'linear-gradient(135deg,#EC4899,#be185d)',cat:'kids',price:'750.000',rp:'≈ ₩62,000',loc:'Jakarta Barat',city:'Jakarta',time:'h6',seller:'JennyMom',ava:'👩🏼',rating:9.6,reviews:27,likes:3,chats:1,nego:false,fresh:false,sold:true,src:'en',
+   title:{ko:'유아 카시트 (0-4세) 세척 완료',en:'Baby Car Seat (0-4 yrs) Freshly Cleaned',zh:'婴儿安全座椅（0-4岁）已清洗',ja:'ベビーカーシート（0-4歳）洗浄済み',id:'Car Seat Bayi (0-4 thn) Sudah Dicuci'},
+   desc:{ko:'아이가 커서 판매합니다. 깨끗하게 세척 완료했어요.',en:'Selling as my child has outgrown it. Cleaned thoroughly.',zh:'孩子长大了所以出售。已彻底清洗。',ja:'子どもが大きくなったので販売します。きれいに洗浄済みです。',id:'Dijual karena anak sudah besar. Sudah dicuci bersih.'}},
+ {id:7,emoji:'⛳',bg:'linear-gradient(135deg,#10B981,#047857)',cat:'golf',price:'2.400.000',rp:'≈ ₩200,000',loc:'Lippo Cikarang',city:'Cikarang',time:'h8',seller:'GolfDad_Kim',ava:'🧑🏻',rating:9.4,reviews:32,likes:8,chats:4,nego:true,fresh:false,src:'ko',
+   title:{ko:'타이틀리스트 드라이버 + 우드 3종',en:'Titleist Driver + 3 Woods',zh:'泰特利斯特发球杆 + 3支球道木',ja:'タイトリスト ドライバー + ウッド3本',id:'Driver Titleist + 3 Wood'},
+   desc:{ko:'타이틀리스트 드라이버 10.5도 + 페어웨이 우드 3번, 5번입니다. 헤드커버 포함이에요.',en:'Titleist driver 10.5° + fairway woods #3 and #5. Head covers included.',zh:'泰特利斯特发球杆 10.5度 + 球道木 3号、5号。含杆头套。',ja:'タイトリスト ドライバー10.5度 + フェアウェイウッド3番・5番です。ヘッドカバー付き。',id:'Driver Titleist 10.5° + fairway wood no.3 dan no.5. Termasuk head cover.'}},
+ {id:8,emoji:'🧳',bg:'linear-gradient(135deg,#6366F1,#4338ca)',cat:'etc',price:'1.500.000',rp:'≈ ₩125,000',loc:'Semarang',city:'Semarang',time:'d1',seller:'David_L',ava:'🧑🏽',rating:7.8,reviews:6,likes:5,chats:2,nego:false,fresh:false,src:'en',
+   title:{ko:'리모와 대형 캐리어 (귀국 정리)',en:'RIMOWA Large Suitcase (Moving Sale)',zh:'RIMOWA 大号行李箱（回国清理）',ja:'RIMOWA 大型スーツケース（帰国整理）',id:'Koper Besar RIMOWA (Jual Pindahan)'},
+   desc:{ko:'출장용으로 쓰던 리모와 대형 캐리어입니다. 바퀴 멀쩡합니다.',en:'RIMOWA large suitcase used for business trips. Wheels are in good shape.',zh:'出差用的 RIMOWA 大号行李箱。轮子完好。',ja:'出張で使っていたRIMOWAの大型スーツケースです。キャスターは問題ありません。',id:'Koper besar RIMOWA yang dipakai untuk perjalanan dinas. Roda masih bagus.'}}
+];
+
+/* ============ COMMUNITY ============ */
+var COMMCATS=[{ko:'전체',en:'All',zh:'全部',ja:'すべて',id:'Semua'},{ko:'질문',en:'Questions',zh:'提问',ja:'質問',id:'Tanya'},{ko:'모임',en:'Meetups',zh:'聚会',ja:'集まり',id:'Kumpul'},{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'}];
+var comm=[
+ {ava:'👩🏼',nm:'Emma',loc:'Lippo Cikarang',city:'Cikarang',time:'m20',src:'en',likes:8,cmt:12,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
+  body:{ko:'찌까랑에서 골프 레슨 받을 만한 곳 아시는 분 계세요? 주말에 배우고 싶은데 영어 되는 프로님 추천해 주세요 🙏',en:'Does anyone know a good place for golf lessons in Cikarang? I want to learn on weekends — please recommend an English-speaking pro 🙏',zh:'有人知道芝卡朗哪里可以上高尔夫课吗？想周末学，请推荐会说英语的教练 🙏',ja:'チカランでゴルフレッスンを受けられる良い所をご存知の方いますか？週末に習いたいので、英語が通じるプロを教えてください 🙏',id:'Ada yang tahu tempat les golf yang bagus di Cikarang? Mau belajar tiap akhir pekan — tolong rekomendasi pro yang bisa bahasa Inggris 🙏'}},
+ {ava:'🧑🏻',nm:'GolfDad_Kim',loc:'Jababeka',city:'Cikarang',time:'h1',src:'ko',likes:14,cmt:6,catT:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},
+  body:{ko:'이번 토요일 아침 세나요 골프장 라운딩 같이 하실 두 분 구합니다. 초보 환영이에요!',en:'Looking for 2 people to join a round at Sena Yeo golf course this Saturday morning. Beginners welcome!',zh:'找两位这周六早上一起去 Sena Yeo 球场打球的球友。欢迎新手！',ja:'今週土曜の朝、セナヨゴルフ場のラウンドを一緒に回る方2名募集します。初心者歓迎です！',id:'Mencari 2 orang untuk main golf bareng di lapangan Sena Yeo Sabtu pagi ini. Pemula welcome!'}},
+ {ava:'🧔🏽',nm:'Mike_R',loc:'Jakarta Pusat',city:'Jakarta',time:'h3',src:'en',likes:22,cmt:9,catT:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},
+  body:{ko:'델타마스 쪽에 새로 생긴 한인마트 가봤는데 물건 종류가 꽤 많네요. 라면이랑 고추장 재고도 많습니다.',en:'Checked out the new Korean mart near Deltamas — quite a wide selection. Plenty of ramen and gochujang in stock too.',zh:'去了 Deltamas 附近新开的韩国超市，种类挺多的。泡面和辣椒酱库存也很足。',ja:'デルタマス付近に新しくできた韓国系スーパーに行きましたが、品揃えがかなり豊富です。ラーメンやコチュジャンの在庫も多いです。',id:'Coba mampir ke Korean mart baru dekat Deltamas — pilihannya cukup banyak. Stok ramyeon dan gochujang juga melimpah.'}},
+ {ava:'👩🏻',nm:'Anita',loc:'Semarang',city:'Semarang',time:'h5',src:'id',likes:5,cmt:7,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
+  body:{ko:'자바베카 근처에 믿을 만한 에어컨 수리 기사님 아시는 분? 어젯밤에 고장 났어요 🥵 (영어 가능!)',en:'Anyone know a trustworthy AC repair guy around Jababeka? Mine broke last night 🥵 (English ok!)',zh:'有人知道 Jababeka 附近靠谱的空调维修师傅吗？昨晚坏了 🥵（会英语！）',ja:'ジャバベカ周辺で信頼できるエアコン修理業者をご存知の方いますか？昨夜壊れてしまいました 🥵（英語OK！）',id:'Ada yang tahu tukang servis AC yang terpercaya di sekitar Jababeka? Punya saya rusak semalam 🥵 (bisa bahasa Inggris!)'}}
+];
+
+/* ============ CHATS ============ */
+var chats=[
+ {id:1,item:1,nm:'GolfDad_Kim',ava:'🧑🏻',th:'🏌️',price:'Rp 4.200.000',titleObj:listings[0].title,rating:9.4,reviews:32,unread:2,time:'now',partnerSrc:'ko',
+  msgs:[{f:'them',src:'ko',tx:{ko:'안녕하세요! 아이언 세트 아직 판매하시나요?',en:'Hi! Is the iron set still available?',zh:'你好！铁杆套装还在卖吗？',ja:'こんにちは！アイアンセットはまだ販売中ですか？',id:'Halo! Set iron-nya masih ada?'}},
+        {f:'me',src:'ko',tx:{ko:'네, 아직 있습니다~',en:'Yes, still available~',zh:'在的，还有哦~',ja:'はい、まだあります〜',id:'Iya, masih ada~'}},
+        {f:'them',src:'ko',tx:{ko:'상태 실물 사진 좀 더 볼 수 있을까요? 그리고 직거래는 어디서 가능하세요?',en:'Could I see more real photos of the condition? And where can we meet up?',zh:'能多看几张实物照片吗？还有面交在哪里方便？',ja:'実物の状態写真をもう少し見せていただけますか？あと直接取引はどこで可能ですか？',id:'Boleh lihat foto asli kondisinya lebih banyak? Dan COD-nya bisa di mana?'}},
+        {f:'them',src:'ko',tx:{ko:'네 리포에서 직거래 가능합니다 :)',en:'Sure, we can meet at Lippo :)',zh:'可以的，Lippo 面交没问题 :)',ja:'はい、リッポーで直接取引できます :)',id:'Bisa kok, COD di Lippo :)'}}]},
+ {id:2,item:4,nm:'Mike_R',ava:'🧔🏽',th:'📺',price:'Rp 3.100.000',titleObj:listings[3].title,rating:8.5,reviews:21,unread:0,time:'h1',partnerSrc:'en',
+  msgs:[{f:'me',src:'en',tx:{ko:'TV 아직 있나요?',en:'Is the TV still available?',zh:'电视还在吗？',ja:'TVはまだありますか？',id:'TV-nya masih ada?'}},
+        {f:'them',src:'en',tx:{ko:'네, 있습니다. 화면 깨끗해요.',en:'Yes, it is. The screen is clean.',zh:'在的。屏幕很干净。',ja:'はい、あります。画面はきれいです。',id:'Masih ada. Layarnya bersih.'}},
+        {f:'me',src:'en',tx:{ko:'그럼 내일 오후에 보러 갈게요.',en:'Then I\'ll come see it tomorrow afternoon.',zh:'那我明天下午过去看看。',ja:'では明日の午後、見に行きます。',id:'Kalau begitu besok sore saya lihat ya.'}}]},
+ {id:3,item:3,nm:'Yuki_T',ava:'🧑🏻',th:'🛋️',price:'Rp 1.800.000',titleObj:listings[2].title,rating:8.1,reviews:9,unread:0,time:'yest',partnerSrc:'ja',
+  msgs:[{f:'them',src:'ja',tx:{ko:'소파에 관심 있으신가요?',en:'Are you interested in the sofa?',zh:'您对沙发感兴趣吗？',ja:'ソファにご興味ありますか？',id:'Apakah Anda tertarik dengan sofanya?'}},
+        {f:'me',src:'ja',tx:{ko:'네! 배송도 되나요?',en:'Yes! Do you offer delivery?',zh:'感兴趣！可以配送吗？',ja:'はい！配送も可能ですか？',id:'Iya! Apakah bisa dikirim?'}},
+        {f:'me',src:'ja',tx:{ko:'배송비는 트럭 부르면 얼마 정도 나올까요?',en:'Roughly how much would delivery cost if we hire a truck?',zh:'如果叫货车，配送费大概多少？',ja:'トラックを頼んだ場合、配送料はどのくらいになりますか？',id:'Kira-kira biaya kirim kalau pakai truk berapa ya?'}}]}
+];
+
+/* ============ STATE ============ */
+var activeCat='all', curDetail=null, curRoom=null, detShowOrig=false;
+
+/* ============ RENDER ============ */
+function starsHTML(r){var pct=Math.max(0,Math.min(100,r/10*100));return '<span class="stars"><span class="bg">★★★★★</span><span class="fg" style="width:'+pct+'%">★★★★★</span></span>'}
+var MY_RATING=9.3,MY_REVIEWS=24;
+function langLabel(code){var l=LANGS.find(function(x){return x.code===code});return l?l.label:code}
+
+function applyLang(){
+  document.documentElement.lang=lang;
+  var cur=LANGS.find(function(x){return x.code===lang});
+  document.getElementById('langFlag').textContent=cur.flag;
+  document.getElementById('langCode').textContent=cur.label;
+  ['langFlag2','langFlag3'].forEach(function(id){document.getElementById(id).textContent=cur.flag});
+  // static labels
+  document.getElementById('tabHome').textContent=t('tabHome');
+  document.getElementById('tabComm').textContent=t('tabComm');
+  document.getElementById('tabWrite').textContent=t('tabWrite');
+  document.getElementById('tabChat').textContent=t('tabChat');
+  document.getElementById('tabProf').textContent=t('tabProf');
+  document.getElementById('commTitle').textContent=t('commTitle');
+  document.getElementById('chatTitle').textContent=t('chatTitle');
+  document.getElementById('profTitle').textContent=t('profTitle');
+  document.getElementById('profVerified').textContent='📍 Lippo Cikarang · '+t('verified')+' ✓';
+  document.getElementById('profTempLbl').textContent=t('avgRating');
+  document.getElementById('stSelling').textContent=t('selling');
+  document.getElementById('stDone').textContent=t('done');
+  document.getElementById('stReview').textContent=t('reviews');
+  document.getElementById('profRatingVal').textContent='⭐ '+MY_RATING+' / 10';
+  document.getElementById('profStars').innerHTML=starsHTML(MY_RATING);
+  document.getElementById('profReviews').textContent=t('reviews')+' '+MY_REVIEWS;
+  document.getElementById('detTempLbl').textContent=t('avgRating');
+  document.getElementById('detChatBtn').textContent=t('chatBtn');
+  document.getElementById('detSafety').textContent=t('safety');
+  document.getElementById('roomStatus').textContent=t('onSale');
+  document.getElementById('msgInput').placeholder=t('msgPlaceholder');
+  document.getElementById('wfHead').textContent=t('wfHead');
+  document.getElementById('wfLTitle').textContent=t('wfLTitle');
+  document.getElementById('wfLCat').textContent=t('wfLCat');
+  document.getElementById('wfLPrice').textContent=t('wfLPrice');
+  document.getElementById('wfNego').textContent=t('wfNego');
+  document.getElementById('wfLDesc').textContent=t('wfLDesc');
+  document.getElementById('wfSubmit').textContent=t('wfSubmit');
+  document.getElementById('wfHead').textContent=t('wfHead');
+  document.getElementById('wfTitle').placeholder=t('wfPhTitle');
+  document.getElementById('wfPrice').placeholder=t('wfPhPrice');
+  document.getElementById('wfDesc').placeholder=t('wfPhDesc');
+  document.getElementById('loginTag').textContent=t('loginTag');
+  document.getElementById('loginSub').textContent=t('loginSub');
+  document.getElementById('googleBtnTxt').textContent=t('googleBtn');
+  document.getElementById('loginTerms').textContent=t('loginTerms');
+  document.getElementById('talkEntryTxt').textContent=t('talkEntry');
+  document.getElementById('talkTitle').textContent=t('talkEntry');
+  renderLoginLangs();
+  renderChips();renderFeed();renderComm();renderChatList();renderProfMenu();renderWfCats();
+  if(curDetail&&document.getElementById('s-detail').classList.contains('active'))openDetail(curDetail.id,true);
+  if(curRoom&&document.getElementById('s-room').classList.contains('active'))renderMsgs();
+}
+function renderLoginLangs(){var c=document.getElementById('loginLangs');c.innerHTML='';LANGS.forEach(function(l){var b=document.createElement('button');b.className='lgc'+(l.code===lang?' on':'');b.textContent=l.flag;b.onclick=function(){lang=l.code;applyLang()};c.appendChild(b)})}
+function enterApp(){document.getElementById('loginScreen').classList.add('hide')}
+
+/* meet & talk (interpreter) */
+var talkMode='text',talkMy='id',talkPartner='en',_tv=0;
+var TALK_PHRASES=[
+ {ko:'안녕하세요 😊',en:'Hello 😊',zh:'你好 😊',ja:'こんにちは 😊',id:'Halo 😊'},
+ {ko:'이거 얼마예요?',en:'How much is this?',zh:'这个多少钱？',ja:'これはいくらですか？',id:'Ini berapa harganya?'},
+ {ko:'상태가 좋네요',en:"It's in good condition",zh:'状态很好',ja:'状態がいいですね',id:'Kondisinya bagus'},
+ {ko:'조금 깎아주세요',en:'Can you lower it a bit?',zh:'能便宜点吗？',ja:'少し安くしてください',id:'Bisa kurang sedikit?'},
+ {ko:'좋아요, 살게요!',en:"Okay, I'll take it!",zh:'好的，我要了！',ja:'いいですね、買います！',id:'Oke, saya ambil!'},
+ {ko:'현금으로 드릴게요',en:"I'll pay in cash",zh:'我用现金付',ja:'現金で払います',id:'Saya bayar tunai'},
+ {ko:'어디서 만날까요?',en:'Where should we meet?',zh:'我们在哪见面？',ja:'どこで会いましょうか？',id:'Ketemu di mana?'}
+];
+function speak(text,code){try{if(!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(text);u.lang={ko:'ko-KR',en:'en-US',zh:'zh-CN',ja:'ja-JP',id:'id-ID'}[code]||'en-US';window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}catch(e){}}
+function openTalk(){talkMy=lang;talkPartner=(curRoom?curRoom.partnerSrc:'en');if(talkPartner===talkMy)talkPartner=(talkMy==='id'?'en':'id');document.getElementById('tLangTop').textContent=LPNAMES[talkPartner];document.getElementById('tLangBot').textContent=LPNAMES[talkMy];document.getElementById('tBigTop').textContent='';document.getElementById('tBigBot').textContent='';setTalkMode(talkMode);showScreen('s-talk')}
+function backToRoom(){showScreen('s-room')}
+function setTalkMode(m){talkMode=m;document.getElementById('tmText').classList.toggle('on',m==='text');document.getElementById('tmVoice').classList.toggle('on',m==='voice');document.getElementById('talkModeHint').textContent=(m==='text'?t('talkHintText'):t('talkHintVoice'));renderTalkCtrl()}
+function renderTalkCtrl(){
+  var top=document.getElementById('tCtrlTop'),bot=document.getElementById('tCtrlBot');
+  if(talkMode==='text'){top.innerHTML=chipRow(talkPartner,'top');bot.innerHTML=chipRow(talkMy,'bot');}
+  else{top.innerHTML='<button class="tmic" onclick="talkVoice(\'top\')">🎤</button>';bot.innerHTML='<button class="tmic" onclick="talkVoice(\'bot\')">🎤</button>';}
+}
+function chipRow(code,side){var h='<div class="chips-row">';TALK_PHRASES.forEach(function(p,i){h+='<button class="tchip" onclick="talkSay('+i+',\''+side+'\')">'+p[code]+'</button>'});return h+'</div>'}
+function talkSay(i,side){var p=TALK_PHRASES[i];if(side==='bot'){var o=p[talkPartner];document.getElementById('tBigTop').textContent=o;speak(o,talkPartner)}else{var o2=p[talkMy];document.getElementById('tBigBot').textContent=o2;speak(o2,talkMy)}}
+function talkVoice(side){var hint=document.getElementById('talkModeHint');hint.textContent='🎤 '+t('talkListening');setTimeout(function(){var i=_tv++%TALK_PHRASES.length;talkSay(i,side);hint.textContent=t('talkHintVoice')},1100)}
+
+/* language picker */
+var LPNAMES={id:'Bahasa Indonesia',en:'English',zh:'中文',ko:'한국어',ja:'日本語'};
+function renderLangPick(){var l=document.getElementById('lpList');l.innerHTML='';LANGS.forEach(function(x){var b=document.createElement('div');b.className='lp-item';b.innerHTML='<span class="fl">'+x.flag+'</span> '+LPNAMES[x.code]+'<span class="go">→</span>';b.onclick=function(){pickLang(x.code)};l.appendChild(b)})}
+function pickLang(code){lang=code;applyLang();document.getElementById('langPick').classList.add('hide')}
+var HELLOS=['Halo 👋','Hello 👋','你好 👋','안녕하세요 👋','こんにちは 👋'],_hi=0;
+function cycleHello(){var el=document.getElementById('lpHello');if(el){el.textContent=HELLOS[_hi%HELLOS.length];_hi++}}
+
+function renderChips(){
+  var c=document.getElementById('chips');c.innerHTML='';
+  CATS.forEach(function(cat){var d=document.createElement('div');d.className='chip'+(cat.key===activeCat?' on':'');d.textContent=L(cat.t);d.onclick=function(){activeCat=cat.key;renderChips();renderFeed()};c.appendChild(d)});
+}
+function renderFeed(){
+  var f=document.getElementById('feed');f.innerHTML='';
+  listings.filter(function(l){return (activeCat==='all'||l.cat===activeCat)&&l.city===currentCity}).forEach(function(l){
+    var el=document.createElement('div');el.className='item';el.onclick=function(){openDetail(l.id)};
+    var trBadge=(l.src!==lang)?'<span class="b tr">🌐 '+t('seeTrans')+'</span>':'';
+    el.innerHTML='<div class="thumb" style="background:'+l.bg+'"><div class="emoji">'+l.emoji+'</div>'+(l.sold?'<div class="tag-sold">'+t('soldOut')+'</div>':'')+'</div>'+
+      '<div class="info"><div class="title">'+L(l.title)+'</div>'+
+      '<div class="meta">'+l.loc+' · '+TM(l.time)+'</div>'+
+      '<div class="price">Rp '+l.price+' <span class="rp">'+l.rp+'</span></div>'+
+      '<div class="badges">'+(l.cat==='golf'?'<span class="b golf">'+t('badgeGolf')+'</span>':'')+(l.nego?'<span class="b nego">'+t('badgeNego')+'</span>':'')+(l.fresh?'<span class="b new">'+t('badgeNew')+'</span>':'')+trBadge+'</div>'+
+      '<div class="react">❤️ '+l.likes+'　💬 '+l.chats+'</div></div>';
+    f.appendChild(el);
+  });
+}
+function renderComm(){
+  var cc=document.getElementById('commchips');cc.innerHTML='';
+  COMMCATS.forEach(function(cat,i){var d=document.createElement('div');d.className='chip'+(i===0?' on':'');d.textContent=L(cat);d.onclick=function(){[].forEach.call(cc.children,function(x){x.classList.remove('on')});d.classList.add('on')};cc.appendChild(d)});
+  var cf=document.getElementById('commfeed');cf.innerHTML='';
+  comm.filter(function(p){return p.city===currentCity}).forEach(function(p){
+    var el=document.createElement('div');el.className='post';
+    var trNote=(p.src!==lang)?'<div class="tr-note">🌐 '+transLabel(p.src)+'</div>':'';
+    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
+      '<div class="cat-pill">'+L(p.catT)+'</div>'+
+      '<div class="post-body">'+L(p.body)+'</div>'+trNote+
+      '<div class="post-f"><span>👍 '+t('like')+' '+p.likes+'</span><span>💬 '+t('comment')+' '+p.cmt+'</span></div>';
+    cf.appendChild(el);
+  });
+}
+function renderChatList(){
+  var cl=document.getElementById('chatlist');cl.innerHTML='';
+  chats.forEach(function(c){
+    var el=document.createElement('div');el.className='chatrow';el.onclick=function(){openRoom(c.id)};
+    var last=c.msgs[c.msgs.length-1];
+    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+TM(c.time)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
+    cl.appendChild(el);
+  });
+}
+function renderProfMenu(){
+  var m=document.getElementById('profMenu');m.innerHTML='';
+  MENU.forEach(function(it){var d=document.createElement('div');d.className='menu-item';d.innerHTML='<span class="mi">'+it.i+'</span> '+L(it.k)+' <span class="ar">›</span>';d.onclick=function(){if(it.i==='🌐'){openSheet('lang')}else{toast(t('soon'))}};m.appendChild(d)});
+}
+function renderWfCats(){
+  var w=document.getElementById('wfcats');w.innerHTML='';
+  ['golf','hobby','elec','furn','kids','etc'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat';d.textContent=L(CATNAME[k]);d.onclick=function(){[].forEach.call(w.children,function(x){x.classList.remove('on')});d.classList.add('on')};w.appendChild(d)});
+}
+
+/* ============ DETAIL ============ */
+function openDetail(id,keepOrig){
+  var l=listings.find(function(x){return x.id===id});curDetail=l;
+  if(!keepOrig)detShowOrig=false;
+  document.getElementById('detImg').style.background=l.bg;
+  document.getElementById('detImg').innerHTML='<button class="det-back" onclick="go(\'home\')">←</button>'+l.emoji;
+  document.getElementById('detAva').textContent=l.ava;
+  document.getElementById('detSeller').textContent=l.seller;
+  document.getElementById('detLoc').textContent='📍 '+l.loc;
+  document.getElementById('detTemp').textContent='⭐ '+l.rating+' / 10';
+  document.getElementById('detStars').innerHTML=starsHTML(l.rating);
+  document.getElementById('detTempLbl').textContent=t('avgRating')+' · '+l.reviews+' '+t('reviewWord');
+  document.getElementById('detCat').textContent=t('category')+' · '+L(CATNAME[l.cat])+(l.nego?' · '+t('negoOk'):'');
+  document.getElementById('detPrice').textContent='Rp '+l.price+'  '+l.rp;
+  document.getElementById('detStats').innerHTML='<span>❤️ '+t('likes')+' '+l.likes+'</span><span>💬 '+t('chatsN')+' '+l.chats+'</span><span>👁️ '+t('views')+' '+(l.likes*7+13)+'</span>';
+  var trBar=document.getElementById('detTrBar');
+  if(l.src!==lang){
+    trBar.style.display='flex';
+    document.getElementById('detTrText').textContent=transLabel(l.src);
+    document.getElementById('detTrToggle').textContent=detShowOrig?t('seeTrans'):t('seeOrig');
+    document.getElementById('detTitle').textContent=detShowOrig?l.title[l.src]:L(l.title);
+    document.getElementById('detDesc').textContent=detShowOrig?l.desc[l.src]:L(l.desc);
+  }else{
+    trBar.style.display='none';
+    document.getElementById('detTitle').textContent=L(l.title);
+    document.getElementById('detDesc').textContent=L(l.desc);
+  }
+  document.getElementById('detChatBtn').textContent=t('chatBtn');
+  document.getElementById('detSafety').textContent=t('safety');
+  showScreen('s-detail');
+}
+function toggleDetOrig(){detShowOrig=!detShowOrig;openDetail(curDetail.id,true)}
+function likeToggle(b){b.textContent=b.textContent==='🤍'?'❤️':'🤍'}
+function startChatFromDetail(){
+  var ex=chats.find(function(c){return c.item===curDetail.id});
+  if(ex){openRoom(ex.id);return}
+  var nid=chats.length+1;
+  var greet={ko:'안녕하세요! "'+L(curDetail.title)+'" 문의 주셔서 감사합니다 😊',en:'Hello! Thanks for your interest in "'+L(curDetail.title)+'" 😊',zh:'你好！感谢您对"'+L(curDetail.title)+'"的关注 😊',ja:'こんにちは！「'+L(curDetail.title)+'」にお問い合わせありがとうございます 😊',id:'Halo! Terima kasih sudah menanyakan "'+L(curDetail.title)+'" 😊'};
+  chats.unshift({id:nid,item:curDetail.id,nm:curDetail.seller,ava:curDetail.ava,th:curDetail.emoji,price:'Rp '+curDetail.price,titleObj:curDetail.title,rating:curDetail.rating,reviews:curDetail.reviews,unread:0,time:'now',partnerSrc:curDetail.src,
+    msgs:[{f:'them',src:curDetail.src,tx:greet}]});
+  renderChatList();openRoom(nid);
+}
+
+/* ============ CHAT ROOM ============ */
+function openRoom(id){
+  var c=chats.find(function(x){return x.id===id});curRoom=c;c.unread=0;
+  document.getElementById('roomNm').textContent=c.nm;
+  document.getElementById('roomTemp').textContent='⭐ '+c.rating+' / 10 · '+c.reviews+' '+t('reviewWord');
+  document.getElementById('roomTh').textContent=c.th;
+  document.getElementById('roomPrice').textContent=c.price;
+  document.getElementById('roomTitle').textContent=L(c.titleObj);
+  document.getElementById('roomStatus').textContent=t('onSale');
+  renderMsgs();renderChatList();showScreen('s-room');
+}
+function renderMsgs(){
+  var m=document.getElementById('roomMsgs');m.innerHTML='<div class="daydiv">'+t('today')+'</div>';
+  curRoom.msgs.forEach(function(x,i){
+    var row=document.createElement('div');row.className='mrow '+(x.f==='me'?'me':'them');
+    var showsTrans=(x.src&&x.src!==lang);
+    var trLine=showsTrans?'<div class="mtr'+(x.f==='me'?' me':'')+'" data-i="'+i+'">🌐 '+transLabel(x.src)+' · '+(x._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
+    row.innerHTML='<div class="bubble '+(x.f==='me'?'me':'them')+'">'+(x._orig?x.tx[x.src]:L(x.tx))+'</div>'+trLine;
+    m.appendChild(row);
+  });
+  [].forEach.call(m.querySelectorAll('.mtr'),function(el){el.onclick=function(){var i=+el.getAttribute('data-i');curRoom.msgs[i]._orig=!curRoom.msgs[i]._orig;renderMsgs()}});
+  var sc=document.getElementById('s-room');setTimeout(function(){sc.scrollTop=sc.scrollHeight},30);
+}
+function sendMsg(){
+  var i=document.getElementById('msgInput');if(!i.value.trim())return;
+  var val=i.value.trim();
+  var obj={};LANGS.forEach(function(l){obj[l.code]=val});
+  curRoom.msgs.push({f:'me',src:lang,tx:obj});
+  i.value='';renderMsgs();
+  setTimeout(function(){
+    var replies=[{ko:'네, 확인했습니다!',en:'Got it, thanks!',zh:'好的，收到！',ja:'はい、確認しました！',id:'Oke, sudah saya cek!'},{ko:'좋아요, 직거래 가능합니다 👍',en:'Great, meet-up works 👍',zh:'好的，可以面交 👍',ja:'いいですね、直接取引可能です 👍',id:'Oke, bisa COD 👍'},{ko:'조금 깎아드릴게요~',en:'I can lower it a bit~',zh:'可以给你便宜点~',ja:'少しお安くします〜',id:'Bisa saya kurangi sedikit~'},{ko:'언제 시간 되세요?',en:'When are you free?',zh:'你什么时候方便？',ja:'いつご都合いいですか？',id:'Kapan Anda ada waktu?'}];
+    var r=replies[curRoom.msgs.length%4];
+    curRoom.msgs.push({f:'them',src:curRoom.partnerSrc,tx:r});
+    renderMsgs();renderChatList();
+  },900);
+}
+
+/* ============ WRITE ============ */
+function submitListing(){toast(t('posted'));setTimeout(function(){go('home')},900)}
+
+/* ============ NAV ============ */
+var screens={home:'s-home',comm:'s-comm',chat:'s-chat',prof:'s-prof',write:'s-write'};
+function showScreen(sid){[].forEach.call(document.querySelectorAll('.screen'),function(s){s.classList.remove('active')});document.getElementById(sid).classList.add('active');document.getElementById(sid).scrollTop=0;
+  var ownBar=(sid==='s-detail'||sid==='s-room'||sid==='s-write'||sid==='s-talk');
+  document.querySelector('.tabs').style.display=ownBar?'none':'flex';}
+function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)})}}
+
+/* ============ SHEETS ============ */
+function openSheet(type){
+  var inner=document.getElementById('sheetInner');
+  if(type==='lang'){
+    var h='<div class="sheet-grab"></div><div class="sheet-h">'+t('setLang')+'</div>';
+    LANGS.forEach(function(l){h+='<div class="sheet-item'+(l.code===lang?' sel':'')+'" onclick="setLang(\''+l.code+'\')"><span class="fl">'+l.flag+'</span> '+l.label+(l.code===lang?'<span class="ck">✓</span>':'')+'</div>'});
+    inner.innerHTML=h;
+  }else{
+    var locs=['Jakarta','Cikarang','Semarang'];
+    var cur=document.getElementById('homeLoc').textContent;
+    var h='<div class="sheet-grab"></div><div class="sheet-h">'+t('setArea')+'</div>';
+    locs.forEach(function(l){h+='<div class="sheet-item'+(l===cur?' sel':'')+'" onclick="setLoc(\''+l+'\')"><span class="pin" style="color:var(--coral)">📍</span> '+l+(l===cur?'<span class="ck">✓</span>':'')+'</div>'});
+    inner.innerHTML=h;
+  }
+  document.getElementById('sheetBg').classList.add('show');
+}
+function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
+function setLang(code){lang=code;closeSheet();applyLang();toast(t('langSet'))}
+var currentCity='Cikarang';
+function setLoc(l){currentCity=l;document.getElementById('homeLoc').textContent=l;var cl=document.getElementById('commLoc');if(cl)cl.textContent='· '+l;renderFeed();renderComm();closeSheet();toast('📍 '+l+t('areaSet'))}
+
+/* ============ MISC ============ */
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('show')},1900)}
+
+/* ============ INIT ============ */
+applyLang();
+go('comm');
+renderLangPick();
+cycleHello();setInterval(cycleHello,1400);
+</script>
+</body>
+</html>
