@@ -643,17 +643,6 @@ var chats=[
 
 /* --- 스크롤 테스트용: 마켓/동네생활/채팅 각각 10개로 채우기 (기존 예시 재활용) --- */
 (function(){
-  var cikLocs=['Lippo Cikarang','Jababeka','Cikarang Baru','Kota Deltamas','Cikarang Kota'],li=0;
-  var lBase=listings.slice(),lId=101;
-  while(listings.filter(function(l){return l.city==='Cikarang'}).length<10){
-    var s=lBase[listings.length%lBase.length];
-    listings.push(Object.assign({},s,{id:lId++,city:'Cikarang',loc:cikLocs[li++%cikLocs.length],sold:false,fresh:false}));
-  }
-  var cBase=comm.slice(),cId=101,ci=0;
-  while(comm.filter(function(p){return p.city==='Cikarang'}).length<10){
-    var q=cBase[comm.length%cBase.length];
-    comm.push(Object.assign({},q,{id:cId++,city:'Cikarang',loc:cikLocs[ci++%cikLocs.length],liked:false,comments:(q.comments||[]).slice()}));
-  }
   var hBase=chats.slice(),hId=101;
   while(chats.length<10){
     var r=hBase[chats.length%hBase.length];
@@ -760,10 +749,10 @@ function renderFeed(){
   var f=document.getElementById('feed');f.innerHTML='';
   listings.filter(function(l){return (activeCat==='all'||l.cat===activeCat)&&l.city===currentCity}).forEach(function(l){
     var el=document.createElement('div');el.className='item';el.onclick=function(){openDetail(l.id)};
-    var trBadge=(l.src!==lang)?'<span class="b tr">🌐 '+t('seeTrans')+'</span>':'';
+    var trBadge=(l.src!==lang&&!l._db)?'<span class="b tr">🌐 '+t('seeTrans')+'</span>':'';
     el.innerHTML='<div class="thumb" style="background:'+l.bg+'"><div class="emoji">'+l.emoji+'</div>'+(l.sold?'<div class="tag-sold">'+t('soldOut')+'</div>':'')+'</div>'+
       '<div class="info"><div class="title">'+L(l.title)+'</div>'+
-      '<div class="meta">'+l.loc+' · '+TM(l.time)+'</div>'+
+      '<div class="meta">'+l.loc+' · '+tlabel(l)+'</div>'+
       '<div class="price">Rp '+l.price+' <span class="rp">'+l.rp+'</span></div>'+
       '<div class="badges">'+(l.cat==='golf'?'<span class="b golf">'+t('badgeGolf')+'</span>':'')+(l.nego?'<span class="b nego">'+t('badgeNego')+'</span>':'')+(l.fresh?'<span class="b new">'+t('badgeNew')+'</span>':'')+trBadge+'</div>'+
       '<div class="react">❤️ '+l.likes+'　💬 '+l.chats+'</div></div>';
@@ -776,10 +765,10 @@ function renderComm(){
   var cf=document.getElementById('commfeed');cf.innerHTML='';
   comm.filter(function(p){return p.city===currentCity}).forEach(function(p){
     var el=document.createElement('div');el.className='post';
-    var translated=(p.src!==lang);
+    var translated=(p.src!==lang&&!p._db);
     var bodyText=(translated&&p._orig)?p.body[p.src]:L(p.body);
     var trNote=translated?'<div class="tr-note" onclick="toggleCommOrig('+p.id+')">🌐 '+transLabel(p.src)+' · '+(p._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
-    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+langTag(p.nm,p.src)+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
+    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+langTag(p.nm,p.src)+p.nm+'</div><div class="sub">'+p.loc+' · '+tlabel(p)+'</div></div></div>'+
       '<div class="cat-pill">'+L(p.catT)+'</div>'+
       '<div class="post-body">'+bodyText+'</div>'+trNote+
       '<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span><span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span></div>';
@@ -804,7 +793,7 @@ function renderChatList(){
   chats.forEach(function(c){
     var el=document.createElement('div');el.className='chatrow';el.onclick=function(){openRoom(c.id)};
     var last=c.msgs[c.msgs.length-1];
-    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+langTag(c.nm,c.partnerSrc)+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+TM(c.time)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
+    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+langTag(c.nm,c.partnerSrc)+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+tlabel(c)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
     cl.appendChild(el);
   });
 }
@@ -834,7 +823,7 @@ function openDetail(id,keepOrig){
   renderDetStats();
   document.getElementById('detHeart').textContent=l.liked?'❤️':'🤍';
   var trBar=document.getElementById('detTrBar');
-  if(l.src!==lang){
+  if(l.src!==lang&&!l._db){
     trBar.style.display='flex';
     document.getElementById('detTrText').textContent=transLabel(l.src);
     document.getElementById('detTrToggle').textContent=detShowOrig?t('seeTrans'):t('seeOrig');
@@ -962,11 +951,35 @@ function renderState(s){
 }
 window.addEventListener('popstate',function(e){renderState(e.state)});
 
+/* ============ SUPABASE (실제 DB 연결·읽기) ============ */
+var SB_URL='https://sybionjvpzktbjdcgpki.supabase.co';
+var SB_KEY='sb_publishable_XjLwLcL98X5veuwDpKaxiQ_3EhWaYio';
+function sbGet(path){return fetch(SB_URL+'/rest/v1/'+path,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(function(r){if(!r.ok)throw new Error('sb '+r.status);return r.json()})}
+function mono(tx){return {ko:tx,en:tx,zh:tx,ja:tx,id:tx}}
+var BGS=['linear-gradient(135deg,#2FB36B,#1f7a49)','linear-gradient(135deg,#3B82F6,#1e40af)','linear-gradient(135deg,#8B5CF6,#6d28d9)','linear-gradient(135deg,#374151,#111827)','linear-gradient(135deg,#F59E0B,#b45309)','linear-gradient(135deg,#EC4899,#be185d)','linear-gradient(135deg,#10B981,#047857)','linear-gradient(135deg,#6366F1,#4338ca)','linear-gradient(135deg,#0EA5E9,#0369a1)','linear-gradient(135deg,#EF4444,#991b1b)'];
+function bgFor(id){return BGS[(id||0)%BGS.length]}
+function krw(price){var n=parseInt(String(price||'').replace(/[^0-9]/g,''),10);if(!n)return '';var w=Math.round(n*0.084/1000)*1000;return '≈ ₩'+w.toLocaleString('en-US')}
+var POSTCAT={question:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},meetup:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},info:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},talk:{ko:'잡담',en:'Chat',zh:'闲聊',ja:'雑談',id:'Obrolan'}};
+function relTime(iso){try{var d=(Date.now()-new Date(iso).getTime())/1000;var L={ko:{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'},en:{n:'just now',mi:' min ago',h:' hr ago',d:' day ago'},zh:{n:'刚刚',mi:'分钟前',h:'小时前',d:'天前'},ja:{n:'たった今',mi:'分前',h:'時間前',d:'日前'},id:{n:'baru saja',mi:' menit lalu',h:' jam lalu',d:' hari lalu'}}[lang]||{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'};if(d<60)return L.n;if(d<3600)return Math.floor(d/60)+L.mi;if(d<86400)return Math.floor(d/3600)+L.h;return Math.floor(d/86400)+L.d}catch(e){return ''}}
+function tlabel(o){return o&&o._db?relTime(o.created_at):TM(o.time)}
+function mapListing(r){return {id:r.id,_db:true,created_at:r.created_at,emoji:r.emoji||'📦',bg:bgFor(r.id),cat:r.category||'etc',price:r.price||'',rp:krw(r.price),loc:r.loc||r.city||'',city:r.city||'Cikarang',seller:r.seller_name||'',ava:r.seller_avatar||'🧑',rating:Number(r.seller_rating)||0,reviews:r.seller_reviews||0,likes:r.likes||0,chats:r.chats||0,nego:false,fresh:false,sold:r.sold||false,src:r.src_lang||'ko',title:mono(r.title||''),desc:mono(r.descr||'')}}
+function mapComment(r){return {ava:r.author_avatar||'🧑',nm:r.author_name||'',src:r.src_lang||'ko',plain:r.body||''}}
+function mapPost(r,cmts){return {id:r.id,_db:true,created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],body:mono(r.body||'')}}
+function loadData(){
+  Promise.all([sbGet('listings?select=*&order=id.desc'),sbGet('posts?select=*&order=id.desc'),sbGet('comments?select=*&order=id.asc')]).then(function(res){
+    var ls=res[0],ps=res[1],cs=res[2];
+    if(ls&&ls.length){listings.length=0;ls.forEach(function(r){listings.push(mapListing(r))})}
+    if(ps&&ps.length){var cmap={};(cs||[]).forEach(function(c){(cmap[c.post_id]=cmap[c.post_id]||[]).push(mapComment(c))});comm.length=0;ps.forEach(function(r){comm.push(mapPost(r,cmap[r.id]||[]))})}
+    renderChips();renderFeed();renderComm();
+  }).catch(function(e){console.log('DB 로드 실패, 데모 데이터 사용:',e&&e.message)});
+}
+
 /* ============ INIT ============ */
 applyLang();
 go('comm');
 renderLangPick();
 cycleHello();setInterval(cycleHello,1400);
+loadData();
 </script>
 </body>
 </html>
