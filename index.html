@@ -331,9 +331,9 @@ textarea.wf-in{min-height:110px;resize:none}
     </div>
   </div>
   <div class="stat-row">
-    <div class="stat-cell"><div class="n">7</div><div class="l" id="stSelling">판매중</div></div>
-    <div class="stat-cell"><div class="n">12</div><div class="l" id="stDone">거래완료</div></div>
-    <div class="stat-cell"><div class="n">24</div><div class="l" id="stReview">받은 후기</div></div>
+    <div class="stat-cell" style="cursor:pointer" onclick="openMyList('selling')"><div class="n" id="stSellingN">0</div><div class="l" id="stSelling">판매중</div></div>
+    <div class="stat-cell" style="cursor:pointer" onclick="openMyList('done')"><div class="n" id="stDoneN">0</div><div class="l" id="stDone">거래완료</div></div>
+    <div class="stat-cell" style="cursor:pointer" onclick="openMyList('reviews')"><div class="n" id="stReviewN">0</div><div class="l" id="stReview">받은 후기</div></div>
   </div>
   <div class="menu-list" id="profMenu"></div>
   </div>
@@ -422,8 +422,10 @@ textarea.wf-in{min-height:110px;resize:none}
     </div>
     <div id="wfMarket">
       <div class="wf-photos" style="margin-top:12px">
-        <div class="wf-add" onclick="toast(t('soon'))">📷<span>0/10</span></div>
+        <div class="wf-add" onclick="pickPhoto()">📷<span id="wfPhotoCnt">0/1</span></div>
+        <div class="wf-ph" id="wfPhotoPreview" style="display:none;background-size:cover;background-position:center;cursor:pointer" onclick="clearPhoto()"></div>
       </div>
+      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="onPhotoChosen(event)">
       <div class="wf-label" id="wfLTitle">제목</div>
       <input class="wf-in" id="wfTitle">
       <div class="wf-label" id="wfLCat">카테고리</div>
@@ -580,6 +582,7 @@ var UI={
  nickSaved:{ko:'닉네임이 저장됐어요',en:'Nickname saved',zh:'昵称已保存',ja:'ニックネームを保存しました',id:'Nama panggilan tersimpan'},
  save:{ko:'저장',en:'Save',zh:'保存',ja:'保存',id:'Simpan'},
  needLogin:{ko:'로그인이 필요해요',en:'Please log in first',zh:'请先登录',ja:'ログインが必要です',id:'Silakan masuk dulu'},
+ myEmpty:{ko:'아직 없어요',en:'Nothing here yet',zh:'暂时没有内容',ja:'まだありません',id:'Belum ada apa-apa'},
  needTitle:{ko:'제목을 입력해주세요',en:'Please enter a title',zh:'请输入标题',ja:'タイトルを入力してください',id:'Masukkan judul'},
  needBody:{ko:'내용을 입력해주세요',en:'Please write something',zh:'请输入内容',ja:'内容を入力してください',id:'Tulis sesuatu'},
  postedReal:{ko:'✅ 등록됐어요!',en:'✅ Posted!',zh:'✅ 已发布！',ja:'✅ 投稿しました！',id:'✅ Terposting!'},
@@ -599,11 +602,12 @@ function transLabel(srcCode){var n=srcName(srcCode);var p={ko:n+'에서 번역�
 
 /* profile menu */
 var MENU=[
- {i:'🏷️',k:{ko:'판매 내역',en:'My listings',zh:'我的出售',ja:'販売履歴',id:'Barang saya'}},
- {i:'🛍️',k:{ko:'구매 내역',en:'Purchases',zh:'购买记录',ja:'購入履歴',id:'Pembelian'}},
- {i:'❤️',k:{ko:'관심 목록',en:'Wishlist',zh:'关注列表',ja:'お気に入り',id:'Favorit'}},
- {i:'⭐',k:{ko:'받은 거래 후기',en:'My reviews',zh:'收到的评价',ja:'受け取った評価',id:'Ulasan diterima'}},
- {i:'🌐',k:{ko:'언어 / Language',en:'Language',zh:'语言 / Language',ja:'言語 / Language',id:'Bahasa / Language'}}
+ {i:'🏷️',key:'selling',k:{ko:'판매 내역',en:'My listings',zh:'我的出售',ja:'販売履歴',id:'Barang saya'}},
+ {i:'📝',key:'myposts',k:{ko:'내가 쓴 글',en:'My posts',zh:'我的帖子',ja:'投稿した記事',id:'Tulisan saya'}},
+ {i:'🛍️',key:'purchases',k:{ko:'구매 내역',en:'Purchases',zh:'购买记录',ja:'購入履歴',id:'Pembelian'}},
+ {i:'❤️',key:'likes',k:{ko:'관심 목록',en:'Wishlist',zh:'关注列表',ja:'お気に入り',id:'Favorit'}},
+ {i:'⭐',key:'reviews',k:{ko:'받은 거래 후기',en:'My reviews',zh:'收到的评价',ja:'受け取った評価',id:'Ulasan diterima'}},
+ {i:'🌐',key:'lang',k:{ko:'언어 / Language',en:'Language',zh:'语言 / Language',ja:'言語 / Language',id:'Bahasa / Language'}}
 ];
 
 /* categories */
@@ -716,7 +720,7 @@ var activeCat='all', curDetail=null, curRoom=null, detShowOrig=false;
 
 /* ============ RENDER ============ */
 function starsHTML(r){var pct=Math.max(0,Math.min(100,r/10*100));return '<span class="stars"><span class="bg">★★★★★</span><span class="fg" style="width:'+pct+'%">★★★★★</span></span>'}
-var MY_RATING=9.3,MY_REVIEWS=24;
+var MY_RATING=0,MY_REVIEWS=0;
 function langLabel(code){var l=LANGS.find(function(x){return x.code===code});return l?l.label:code}
 
 function applyLang(){
@@ -821,7 +825,8 @@ function renderFeed(){
   listings.filter(function(l){return (activeCat==='all'||l.cat===activeCat)&&l.city===currentCity}).forEach(function(l){
     var el=document.createElement('div');el.className='item';el.onclick=function(){openDetail(l.id)};
     var trBadge=(l.src!==lang&&!l._db)?'<span class="b tr">🌐 '+t('seeTrans')+'</span>':'';
-    el.innerHTML='<div class="thumb" style="background:'+l.bg+'"><div class="emoji">'+l.emoji+'</div>'+(l.sold?'<div class="tag-sold">'+t('soldOut')+'</div>':'')+'</div>'+
+    var thumbStyle=l.img?'background-image:url('+l.img+');background-size:cover;background-position:center':'background:'+l.bg;
+    el.innerHTML='<div class="thumb" style="'+thumbStyle+'">'+(l.img?'':'<div class="emoji">'+l.emoji+'</div>')+(l.sold?'<div class="tag-sold">'+t('soldOut')+'</div>':'')+'</div>'+
       '<div class="info"><div class="title">'+L(l.title)+'</div>'+
       '<div class="meta">'+l.loc+' · '+tlabel(l)+'</div>'+
       '<div class="price">Rp '+l.price+' <span class="rp">'+l.rp+'</span></div>'+
@@ -882,7 +887,7 @@ function renderChatList(){
 }
 function renderProfMenu(){
   var m=document.getElementById('profMenu');m.innerHTML='';
-  MENU.forEach(function(it){var d=document.createElement('div');d.className='menu-item';d.innerHTML='<span class="mi">'+it.i+'</span> '+L(it.k)+' <span class="ar">›</span>';d.onclick=function(){if(it.i==='🌐'){openSheet('lang')}else{toast(t('soon'))}};m.appendChild(d)});
+  MENU.forEach(function(it){var d=document.createElement('div');d.className='menu-item';d.innerHTML='<span class="mi">'+it.i+'</span> '+L(it.k)+' <span class="ar">›</span>';d.onclick=function(){if(it.key==='lang'){openSheet('lang')}else{openMyList(it.key)}};m.appendChild(d)});
 }
 var wfType='sell',wfCatSel='etc',wfPostCatSel='question';
 function setWfType(tp){wfType=tp;document.getElementById('wfTypeSell').classList.toggle('on',tp==='sell');document.getElementById('wfTypePost').classList.toggle('on',tp==='post');document.getElementById('wfMarket').style.display=(tp==='sell')?'block':'none';document.getElementById('wfPostFields').style.display=(tp==='post')?'block':'none'}
@@ -896,8 +901,9 @@ function renderWfCats(){
 function openDetail(id,keepOrig){
   var l=listings.find(function(x){return x.id===id});curDetail=l;
   if(!keepOrig){detShowOrig=false;pushView({v:'detail',id:id})}
-  document.getElementById('detImg').style.background=l.bg;
-  document.getElementById('detImg').innerHTML='<button class="det-back" onclick="history.back()">←</button>'+l.emoji;
+  var di=document.getElementById('detImg');
+  if(l.img){di.style.background='#111';di.style.backgroundImage='url('+l.img+')';di.style.backgroundSize='cover';di.style.backgroundPosition='center';di.innerHTML='<button class="det-back" onclick="history.back()">←</button>';}
+  else{di.style.backgroundImage='none';di.style.background=l.bg;di.innerHTML='<button class="det-back" onclick="history.back()">←</button>'+l.emoji;}
   document.getElementById('detAva').textContent=l.ava;
   document.getElementById('detSeller').innerHTML=langTag(l.seller,l.src)+l.seller;
   document.getElementById('detLoc').textContent='📍 '+l.loc;
@@ -974,6 +980,38 @@ function sendMsg(){
   },900);
 }
 
+/* ============ PHOTO (사진 선택→축소→업로드) ============ */
+var wfPhotoBlob=null;
+function pickPhoto(){document.getElementById('photoFile').click()}
+function clearPhoto(){wfPhotoBlob=null;var pv=document.getElementById('wfPhotoPreview');pv.style.display='none';pv.style.backgroundImage='';document.getElementById('wfPhotoCnt').textContent='0/1';document.getElementById('photoFile').value=''}
+function onPhotoChosen(ev){
+  var f=ev.target.files&&ev.target.files[0];if(!f)return;
+  var img=new Image(),url=URL.createObjectURL(f);
+  img.onload=function(){
+    var mx=1280,sc=Math.min(1,mx/Math.max(img.width,img.height));
+    var cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    cv.toBlob(function(bl){
+      wfPhotoBlob=bl;
+      var pv=document.getElementById('wfPhotoPreview');
+      pv.style.display='flex';pv.style.backgroundImage='url('+cv.toDataURL('image/jpeg',0.6)+')';pv.textContent='';
+      document.getElementById('wfPhotoCnt').textContent='1/1';
+      URL.revokeObjectURL(url);
+    },'image/jpeg',0.8);
+  };
+  img.onerror=function(){toast('사진을 읽을 수 없어요');URL.revokeObjectURL(url)};
+  img.src=url;
+}
+function uploadPhotoThen(cb){
+  if(!wfPhotoBlob||!sbClient||!CUR_USER){cb(null);return}
+  var path=CUR_USER.id+'/'+Date.now()+'.jpg';
+  sbClient.storage.from('photos').upload(path,wfPhotoBlob,{contentType:'image/jpeg'}).then(function(r){
+    if(r.error){toast(r.error.message);cb(null);return}
+    var pu=sbClient.storage.from('photos').getPublicUrl(path);
+    cb(pu&&pu.data&&pu.data.publicUrl||null);
+  }).catch(function(){cb(null)});
+}
+
 /* ============ WRITE (실제 DB 저장) ============ */
 var CAT_EMOJI={golf:'⛳',hobby:'🚲',elec:'📺',furn:'🛋️',kids:'🍼',etc:'📦'};
 function submitListing(){
@@ -985,12 +1023,14 @@ function submitListing(){
     var price=(document.getElementById('wfPrice').value||'').trim();
     if(!title){toast(t('needTitle'));return}
     btn.disabled=true;
-    sbClient.from('listings').insert({user_id:CUR_USER.id,seller_name:MY_NAME,seller_lang:MY_LANG||lang,seller_avatar:'🧑',title:title,descr:desc,price:price,category:wfCatSel,city:currentCity,loc:currentCity,emoji:CAT_EMOJI[wfCatSel]||'📦',src_lang:lang}).then(function(r){
-      btn.disabled=false;
-      if(r.error){toast(r.error.message);return}
-      document.getElementById('wfTitle').value='';document.getElementById('wfPrice').value='';document.getElementById('wfDesc').value='';
-      toast(t('postedReal'));loadData();go('home');
-    }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+    uploadPhotoThen(function(imageUrl){
+      sbClient.from('listings').insert({user_id:CUR_USER.id,seller_name:MY_NAME,seller_lang:MY_LANG||lang,seller_avatar:'🧑',title:title,descr:desc,price:price,category:wfCatSel,city:currentCity,loc:currentCity,emoji:CAT_EMOJI[wfCatSel]||'📦',src_lang:lang,image_url:imageUrl}).then(function(r){
+        btn.disabled=false;
+        if(r.error){toast(r.error.message);return}
+        document.getElementById('wfTitle').value='';document.getElementById('wfPrice').value='';document.getElementById('wfDesc').value='';clearPhoto();
+        toast(t('postedReal'));loadData();go('home');
+      }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+    });
   }else{
     if(!desc){toast(t('needBody'));return}
     btn.disabled=true;
@@ -1105,6 +1145,36 @@ function updateProfileView(){
   var g=document.getElementById('profGuest'),bd=document.getElementById('profBody');
   if(g)g.style.display=guest?'flex':'none';
   if(bd)bd.style.display=guest?'none':'block';
+  updateMyStats();
+}
+function myListings(){return CUR_USER?listings.filter(function(l){return l.uid===CUR_USER.id}):[]}
+function updateMyStats(){
+  var mine=myListings();
+  var e1=document.getElementById('stSellingN'),e2=document.getElementById('stDoneN'),e3=document.getElementById('stReviewN');
+  if(e1)e1.textContent=mine.filter(function(l){return !l.sold}).length;
+  if(e2)e2.textContent=mine.filter(function(l){return l.sold}).length;
+  if(e3)e3.textContent=MY_REVIEWS;
+}
+function openMyList(kind){
+  var mi=MENU.find(function(x){return x.key===kind});
+  var title=mi?L(mi.k):'';
+  if(kind==='selling')title=t('selling');else if(kind==='done')title=t('done');else if(kind==='reviews')title=t('reviews');
+  var h='<div class="sheet-grab"></div><div class="sheet-h">'+title+'</div>';
+  var rows=[];
+  if(kind==='selling')rows=myListings().filter(function(l){return !l.sold});
+  else if(kind==='done')rows=myListings().filter(function(l){return l.sold});
+  else if(kind==='likes')rows=listings.filter(function(l){return l.liked});
+  if(kind==='myposts'){
+    var ps=CUR_USER?comm.filter(function(p){return p.uid===CUR_USER.id}):[];
+    if(!ps.length)h+='<div style="padding:28px 20px;text-align:center;color:var(--gray);font-size:13.5px">'+t('myEmpty')+'</div>';
+    else ps.forEach(function(p){h+='<div class="sheet-item" onclick="closeSheet();go(\'comm\');openComments('+p.id+')"><span class="fl">📝</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+L(p.body)+'</span><span style="color:var(--gray);font-size:11px;flex-shrink:0">👍 '+p.likes+'</span></div>'});
+  }else if(kind==='purchases'||kind==='reviews'||!rows.length){
+    h+='<div style="padding:28px 20px;text-align:center;color:var(--gray);font-size:13.5px">'+t('myEmpty')+'</div>';
+  }else{
+    rows.forEach(function(l){h+='<div class="sheet-item" onclick="closeSheet();openDetail('+l.id+')"><span class="fl">'+l.emoji+'</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+L(l.title)+'</span><span style="color:var(--gray);font-size:12px;flex-shrink:0">Rp '+l.price+'</span></div>'});
+  }
+  document.getElementById('sheetInner').innerHTML=h;
+  document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'});
 }
 function showLoginScreen(){document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function checkSession(){
@@ -1119,15 +1189,15 @@ function krw(price){var n=parseInt(String(price||'').replace(/[^0-9]/g,''),10);i
 var POSTCAT={question:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},meetup:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},info:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},talk:{ko:'잡담',en:'Chat',zh:'闲聊',ja:'雑談',id:'Obrolan'}};
 function relTime(iso){try{var d=(Date.now()-new Date(iso).getTime())/1000;var L={ko:{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'},en:{n:'just now',mi:' min ago',h:' hr ago',d:' day ago'},zh:{n:'刚刚',mi:'分钟前',h:'小时前',d:'天前'},ja:{n:'たった今',mi:'分前',h:'時間前',d:'日前'},id:{n:'baru saja',mi:' menit lalu',h:' jam lalu',d:' hari lalu'}}[lang]||{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'};if(d<60)return L.n;if(d<3600)return Math.floor(d/60)+L.mi;if(d<86400)return Math.floor(d/3600)+L.h;return Math.floor(d/86400)+L.d}catch(e){return ''}}
 function tlabel(o){return o&&o._db?relTime(o.created_at):TM(o.time)}
-function mapListing(r){return {id:r.id,_db:true,created_at:r.created_at,emoji:r.emoji||'📦',bg:bgFor(r.id),cat:r.category||'etc',price:r.price||'',rp:krw(r.price),loc:r.loc||r.city||'',city:r.city||'Cikarang',seller:r.seller_name||'',ava:r.seller_avatar||'🧑',rating:Number(r.seller_rating)||0,reviews:r.seller_reviews||0,likes:r.likes||0,chats:r.chats||0,nego:false,fresh:false,sold:r.sold||false,src:r.src_lang||'ko',title:mono(r.title||''),desc:mono(r.descr||'')}}
+function mapListing(r){return {id:r.id,_db:true,uid:r.user_id||null,img:r.image_url||null,created_at:r.created_at,emoji:r.emoji||'📦',bg:bgFor(r.id),cat:r.category||'etc',price:r.price||'',rp:krw(r.price),loc:r.loc||r.city||'',city:r.city||'Cikarang',seller:r.seller_name||'',ava:r.seller_avatar||'🧑',rating:Number(r.seller_rating)||0,reviews:r.seller_reviews||0,likes:r.likes||0,chats:r.chats||0,nego:false,fresh:false,sold:r.sold||false,src:r.src_lang||'ko',title:mono(r.title||''),desc:mono(r.descr||'')}}
 function mapComment(r){return {ava:r.author_avatar||'🧑',nm:r.author_name||'',src:r.src_lang||'ko',plain:r.body||''}}
-function mapPost(r,cmts){return {id:r.id,_db:true,created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],body:mono(r.body||'')}}
+function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],body:mono(r.body||'')}}
 function loadData(){
   Promise.all([sbGet('listings?select=*&order=id.desc'),sbGet('posts?select=*&order=id.desc'),sbGet('comments?select=*&order=id.asc')]).then(function(res){
     var ls=res[0],ps=res[1],cs=res[2];
     if(ls&&ls.length){listings.length=0;ls.forEach(function(r){listings.push(mapListing(r))})}
     if(ps&&ps.length){var cmap={};(cs||[]).forEach(function(c){(cmap[c.post_id]=cmap[c.post_id]||[]).push(mapComment(c))});comm.length=0;ps.forEach(function(r){comm.push(mapPost(r,cmap[r.id]||[]))})}
-    renderChips();renderFeed();renderComm();
+    renderChips();renderFeed();renderComm();updateMyStats();
   }).catch(function(e){console.log('DB 로드 실패, 데모 데이터 사용:',e&&e.message)});
 }
 
