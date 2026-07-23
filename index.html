@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Rantau — 찌까랑 외국인 중고장터</title>
+<title>Rantau — 인도네시아 외국인 쉼터</title>
+<meta property="og:title" content="Rantau — 인도네시아 외국인 쉼터">
+<meta property="og:description" content="떠나온 사람들의 쉼터 · 5개 언어 자동 번역 중고장터 (찌까랑·자카르타·스마랑)">
+<meta property="og:type" content="website">
+<meta name="description" content="인도네시아 외국인 쉼터 · 5개 언어 자동 번역 중고장터">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --coral:#FF6B4A; --coral-dark:#E8543A; --coral-light:#FFF0EC;
@@ -217,8 +222,11 @@ textarea.wf-in{min-height:110px;resize:none}
 .login .brand{font-size:46px;font-weight:900;color:#fff;letter-spacing:-1px}
 .login .tag{color:#fff;font-size:16px;margin-top:12px;line-height:1.5;font-weight:700}
 .login .sub{color:#fff;opacity:.9;font-size:13px;margin-top:6px;font-weight:500}
-.gbtn{margin-top:42px;width:100%;background:#fff;border:none;border-radius:14px;padding:15px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:16px;font-weight:700;color:#1f1f1f;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.gbtn{margin-top:12px;width:100%;background:#fff;border:none;border-radius:14px;padding:15px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:16px;font-weight:800;color:var(--coral-dark);cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .gbtn:active{transform:scale(.98)}
+.lginput{width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;outline:none;box-sizing:border-box}
+#loginForm{margin-top:36px}
+.guestlink{color:#fff;opacity:.92;font-size:13.5px;margin-top:20px;text-decoration:underline;cursor:pointer;font-weight:600}
 .login .terms{color:#fff;opacity:.82;font-size:11px;margin-top:20px;line-height:1.55}
 .login .langsel{position:absolute;top:calc(env(safe-area-inset-top, 0px) + 20px);right:18px;display:flex;gap:6px}
 .login .lgc{background:rgba(255,255,255,.22);color:#fff;border:none;border-radius:16px;padding:6px 9px;font-size:15px;cursor:pointer}
@@ -259,10 +267,12 @@ textarea.wf-in{min-height:110px;resize:none}
   <div class="brand">Rantau</div>
   <div class="tag" id="loginTag">찌까랑 외국인들의 중고장터</div>
   <div class="sub" id="loginSub">5개 언어 자동 번역 · 이웃과 안전하게 거래</div>
-  <button class="gbtn" onclick="enterApp()">
-    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-    <span id="googleBtnTxt">Google로 계속하기</span>
-  </button>
+  <div id="loginForm" style="width:100%">
+    <input class="lginput" id="emailInput" type="email" inputmode="email" placeholder="이메일 주소" autocomplete="email">
+    <button class="gbtn" onclick="sendMagicLink()"><span id="loginBtnTxt">이메일로 로그인 링크 받기</span></button>
+  </div>
+  <div id="loginSent" style="display:none;color:#fff;font-weight:800;font-size:15px;margin-top:24px;line-height:1.5">📧 <span id="sentMsg">메일함을 확인해 로그인 링크를 눌러주세요</span></div>
+  <div class="guestlink" id="guestLink" onclick="enterApp()">로그인 없이 둘러보기</div>
   <div class="terms" id="loginTerms">계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.</div>
 </div>
 
@@ -303,7 +313,7 @@ textarea.wf-in{min-height:110px;resize:none}
     <div class="prof-row">
       <div class="prof-ava">🧑🏻</div>
       <div>
-        <div class="prof-nm"><span class="ltag">KR</span> Mankil J.</div>
+        <div class="prof-nm"><span class="ltag">KR</span> <span id="profName">Mankil J.</span></div>
         <div class="prof-loc" id="profVerified">📍 Lippo Cikarang · 인증 회원 ✓</div>
       </div>
     </div>
@@ -524,7 +534,13 @@ var UI={
  startChat:{ko:'대화를 시작해보세요',en:'Start the conversation',zh:'开始聊天吧',ja:'会話を始めましょう',id:'Mulai percakapan'},
  loginTag:{ko:'떠나온 사람들의 쉼터',en:'A haven for those far from home',zh:'漂泊异乡者的港湾',ja:'故郷を離れた人の憩いの場',id:'Tempat singgah para perantau'},
  loginSub:{ko:'5개 언어 자동 번역 · 이웃과 안전하게 거래',en:'Auto-translated in 5 languages · Trade safely with neighbors',zh:'5种语言自动翻译 · 与邻里安全交易',ja:'5言語に自動翻訳 · ご近所と安全に取引',id:'Terjemahan otomatis 5 bahasa · Transaksi aman dengan tetangga'},
- googleBtn:{ko:'Google로 계속하기',en:'Continue with Google',zh:'使用 Google 继续',ja:'Google で続ける',id:'Lanjut dengan Google'},
+ emailPlaceholder:{ko:'이메일 주소',en:'Email address',zh:'邮箱地址',ja:'メールアドレス',id:'Alamat email'},
+ loginBtn:{ko:'이메일로 로그인 링크 받기',en:'Get login link by email',zh:'通过邮箱获取登录链接',ja:'メールでログインリンクを受け取る',id:'Kirim link login ke email'},
+ sending:{ko:'보내는 중…',en:'Sending…',zh:'发送中…',ja:'送信中…',id:'Mengirim…'},
+ checkEmail:{ko:'메일함을 확인해 로그인 링크를 눌러주세요',en:'Check your inbox and tap the login link',zh:'请查收邮件并点击登录链接',ja:'メールを確認してログインリンクをタップ',id:'Cek email Anda dan klik link login'},
+ badEmail:{ko:'이메일 주소를 확인해주세요',en:'Please check the email address',zh:'请检查邮箱地址',ja:'メールアドレスを確認してください',id:'Periksa alamat email Anda'},
+ guestBrowse:{ko:'로그인 없이 둘러보기',en:'Browse without login',zh:'不登录先逛逛',ja:'ログインせずに見る',id:'Lihat tanpa login'},
+ emailVerified:{ko:'이메일 로그인됨 ✓',en:'Signed in ✓',zh:'已登录 ✓',ja:'ログイン済み ✓',id:'Sudah masuk ✓'},
  loginTerms:{ko:'계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.',en:'By continuing, you agree to the Terms of Service and Privacy Policy.',zh:'继续即表示您同意服务条款和隐私政策。',ja:'続行すると、利用規約とプライバシーポリシーに同意したものとみなされます。',id:'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi.'},
  talkEntry:{ko:'만나서 대화 (통역)',en:'Talk in person (interpreter)',zh:'见面对话（翻译）',ja:'対面で会話（通訳）',id:'Ngobrol langsung (penerjemah)'},
  talkHintText:{ko:'⌨️ 텍스트 모드 · 문구를 눌러 상대에게 화면을 보여주세요',en:'⌨️ Text mode · Tap a phrase, then show your screen to them',zh:'⌨️ 文字模式 · 点击短语后把屏幕给对方看',ja:'⌨️ テキストモード · フレーズを押して画面を相手に見せましょう',id:'⌨️ Mode teks · Ketuk frasa, lalu tunjukkan layar ke lawan bicara'},
@@ -698,7 +714,10 @@ function applyLang(){
   document.getElementById('wfDesc').placeholder=t('wfPhDesc');
   document.getElementById('loginTag').textContent=t('loginTag');
   document.getElementById('loginSub').textContent=t('loginSub');
-  document.getElementById('googleBtnTxt').textContent=t('googleBtn');
+  document.getElementById('emailInput').placeholder=t('emailPlaceholder');
+  document.getElementById('loginBtnTxt').textContent=t('loginBtn');
+  document.getElementById('guestLink').textContent=t('guestBrowse');
+  document.getElementById('sentMsg').textContent=t('checkEmail');
   document.getElementById('loginTerms').textContent=t('loginTerms');
   document.getElementById('talkEntryTxt').textContent=t('talkEntry');
   document.getElementById('talkTitle').textContent=t('talkEntry');
@@ -922,7 +941,7 @@ function renderSheet(type){
   }
 }
 function openSheet(type){renderSheet(type);document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'})}
-function logout(){document.getElementById('sheetBg').classList.remove('show');document.getElementById('loginScreen').classList.remove('hide')}
+function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;document.getElementById('sheetBg').classList.remove('show');document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
 function setLang(code){lang=code;applyLang();toast(t('langSet'));history.back()}
 var currentCity='Cikarang';
@@ -955,6 +974,36 @@ window.addEventListener('popstate',function(e){renderState(e.state)});
 var SB_URL='https://sybionjvpzktbjdcgpki.supabase.co';
 var SB_KEY='sb_publishable_XjLwLcL98X5veuwDpKaxiQ_3EhWaYio';
 function sbGet(path){return fetch(SB_URL+'/rest/v1/'+path,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(function(r){if(!r.ok)throw new Error('sb '+r.status);return r.json()})}
+/* ---- 이메일 링크 로그인 ---- */
+var sbClient=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY):null;
+var CUR_USER=null;
+function sendMagicLink(){
+  var el=document.getElementById('emailInput'),email=(el.value||'').trim();
+  if(email.indexOf('@')<1||email.indexOf('.')<0){toast(t('badEmail'));return}
+  if(!sbClient){toast('연결 준비 중입니다. 잠시 후 다시 시도해주세요.');return}
+  document.getElementById('loginBtnTxt').textContent=t('sending');
+  sbClient.auth.signInWithOtp({email:email,options:{emailRedirectTo:window.location.origin}}).then(function(res){
+    document.getElementById('loginBtnTxt').textContent=t('loginBtn');
+    if(res.error){toast(res.error.message);return}
+    document.getElementById('loginForm').style.display='none';
+    document.getElementById('guestLink').style.display='none';
+    document.getElementById('loginSent').style.display='block';
+  }).catch(function(e){document.getElementById('loginBtnTxt').textContent=t('loginBtn');toast('오류: '+(e&&e.message||''))});
+}
+function onLogin(user){
+  CUR_USER=user;
+  document.getElementById('langPick').classList.add('hide');
+  document.getElementById('loginScreen').classList.add('hide');
+  var nm=(user&&user.email)?user.email.split('@')[0]:'회원';
+  var pn=document.getElementById('profName');if(pn)pn.textContent=nm;
+  var pv=document.getElementById('profVerified');if(pv)pv.textContent='📍 Cikarang · '+t('emailVerified');
+  if(!appVisible())go('comm');
+}
+function checkSession(){
+  if(!sbClient)return;
+  sbClient.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)onLogin(r.data.session.user)});
+  sbClient.auth.onAuthStateChange(function(ev,session){if(session)onLogin(session.user)});
+}
 function mono(tx){return {ko:tx,en:tx,zh:tx,ja:tx,id:tx}}
 var BGS=['linear-gradient(135deg,#2FB36B,#1f7a49)','linear-gradient(135deg,#3B82F6,#1e40af)','linear-gradient(135deg,#8B5CF6,#6d28d9)','linear-gradient(135deg,#374151,#111827)','linear-gradient(135deg,#F59E0B,#b45309)','linear-gradient(135deg,#EC4899,#be185d)','linear-gradient(135deg,#10B981,#047857)','linear-gradient(135deg,#6366F1,#4338ca)','linear-gradient(135deg,#0EA5E9,#0369a1)','linear-gradient(135deg,#EF4444,#991b1b)'];
 function bgFor(id){return BGS[(id||0)%BGS.length]}
@@ -980,6 +1029,7 @@ go('comm');
 renderLangPick();
 cycleHello();setInterval(cycleHello,1400);
 loadData();
+checkSession();
 </script>
 </body>
 </html>
