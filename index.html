@@ -56,6 +56,7 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .post-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .ava{width:38px;height:38px;border-radius:50%;background:var(--coral-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .post-h .nm{font-weight:700;font-size:13px}
+.ltag{display:inline-block;font-size:10px;font-weight:800;color:var(--gray);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px;vertical-align:middle;letter-spacing:.5px}
 .post-h .sub{font-size:11px;color:var(--gray)}
 .cat-pill{font-size:11px;font-weight:700;color:var(--coral-dark);background:var(--coral-light);padding:3px 9px;border-radius:14px;display:inline-block;margin-bottom:8px}
 .post-body{font-size:14px;line-height:1.55;color:#33302d}
@@ -299,7 +300,7 @@ textarea.wf-in{min-height:110px;resize:none}
     <div class="prof-row">
       <div class="prof-ava">🧑🏻</div>
       <div>
-        <div class="prof-nm">🇰🇷 Mankil J.</div>
+        <div class="prof-nm"><span class="ltag">KR</span> Mankil J.</div>
         <div class="prof-loc" id="profVerified">📍 Lippo Cikarang · 인증 회원 ✓</div>
       </div>
     </div>
@@ -449,8 +450,7 @@ var LANGS=[
 var lang='id';
 function L(o){return o[lang]||o.ko}
 var MEMBER_LANG={GolfDad_Kim:'ko',Sarah_Exp:'en',Yuki_T:'ja',Mike_R:'en',Anita:'id',JennyMom:'en',David_L:'en',Emma:'en',Chen_L:'zh',Sato_K:'ja',Budi_S:'id','Mankil J.':'ko'};
-function flagOf(code){return ({ko:'🇰🇷',en:'🇬🇧',zh:'🇨🇳',ja:'🇯🇵',id:'🇮🇩'})[code]||''}
-function flagName(name,src){return flagOf(MEMBER_LANG[name]||src)}
+function langTag(name,src){var m={ko:'KR',en:'EN',zh:'CN',ja:'JP',id:'ID'}[MEMBER_LANG[name]||src];return m?'<span class="ltag">'+m+'</span> ':''}
 
 /* ============ UI STRINGS ============ */
 var UI={
@@ -771,7 +771,7 @@ function renderComm(){
     var translated=(p.src!==lang);
     var bodyText=(translated&&p._orig)?p.body[p.src]:L(p.body);
     var trNote=translated?'<div class="tr-note" onclick="toggleCommOrig('+p.id+')">🌐 '+transLabel(p.src)+' · '+(p._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
-    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+flagName(p.nm,p.src)+' '+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
+    el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+langTag(p.nm,p.src)+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
       '<div class="cat-pill">'+L(p.catT)+'</div>'+
       '<div class="post-body">'+bodyText+'</div>'+trNote+
       '<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span><span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span></div>';
@@ -788,7 +788,7 @@ function renderCmt(){
   document.getElementById('cmtHead').textContent=t('comment')+' '+curCmt.comments.length;
   document.getElementById('cmtInput').placeholder=t('cmtPlaceholder');
   var l=document.getElementById('cmtList');l.innerHTML='';
-  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+flagName(c.nm,c.src)+' '+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
+  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+langTag(c.nm,c.src)+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
 }
 function sendComment(){var i=document.getElementById('cmtInput');if(!i.value.trim())return;curCmt.comments.push({ava:'🧑🏻',nm:'Mankil J.',plain:i.value.trim()});i.value='';renderCmt();renderComm()}
 function renderChatList(){
@@ -796,7 +796,7 @@ function renderChatList(){
   chats.forEach(function(c){
     var el=document.createElement('div');el.className='chatrow';el.onclick=function(){openRoom(c.id)};
     var last=c.msgs[c.msgs.length-1];
-    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+flagName(c.nm,c.partnerSrc)+' '+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+TM(c.time)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
+    el.innerHTML='<div class="th">'+c.th+'</div><div class="body"><div class="top"><span class="nm">'+langTag(c.nm,c.partnerSrc)+c.nm+' <span style="font-size:11px;color:var(--gold);font-weight:700">⭐ '+c.rating+'</span></span><span class="tm">'+TM(c.time)+'</span></div><div class="last" style="display:flex"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+L(last.tx)+'</span>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div></div>';
     cl.appendChild(el);
   });
 }
@@ -816,7 +816,7 @@ function openDetail(id,keepOrig){
   document.getElementById('detImg').style.background=l.bg;
   document.getElementById('detImg').innerHTML='<button class="det-back" onclick="history.back()">←</button>'+l.emoji;
   document.getElementById('detAva').textContent=l.ava;
-  document.getElementById('detSeller').textContent=flagName(l.seller,l.src)+' '+l.seller;
+  document.getElementById('detSeller').innerHTML=langTag(l.seller,l.src)+l.seller;
   document.getElementById('detLoc').textContent='📍 '+l.loc;
   document.getElementById('detTemp').textContent='⭐ '+l.rating+' / 10';
   document.getElementById('detStars').innerHTML=starsHTML(l.rating);
@@ -857,7 +857,7 @@ function startChatFromDetail(){
 /* ============ CHAT ROOM ============ */
 function openRoom(id){
   var c=chats.find(function(x){return x.id===id});curRoom=c;c.unread=0;if(!_replay)pushView({v:'room',id:id});
-  document.getElementById('roomNm').textContent=flagName(c.nm,c.partnerSrc)+' '+c.nm;
+  document.getElementById('roomNm').innerHTML=langTag(c.nm,c.partnerSrc)+c.nm;
   document.getElementById('roomTemp').textContent='⭐ '+c.rating+' / 10 · '+c.reviews+' '+t('reviewWord');
   document.getElementById('roomTh').textContent=c.th;
   document.getElementById('roomPrice').textContent=c.price;
