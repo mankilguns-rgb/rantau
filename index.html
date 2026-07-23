@@ -870,11 +870,28 @@ function setLoc(l){currentCity=l;document.getElementById('homeLoc').textContent=
 /* ============ MISC ============ */
 function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('show')},1900)}
 
+/* ============ BACK BUTTON (뒤로가기 → 앱 내부 이동) ============ */
+function appBack(){
+  if(document.getElementById('cmtBg').classList.contains('show')){closeCmt();return;}
+  if(document.getElementById('sheetBg').classList.contains('show')){closeSheet();return;}
+  if(!document.getElementById('langPick').classList.contains('hide')){return;}
+  if(!document.getElementById('loginScreen').classList.contains('hide')){document.getElementById('langPick').classList.remove('hide');return;}
+  var act=document.querySelector('.screen.active');var id=act?act.id:'';
+  if(id==='s-talk'){backToRoom();return;}
+  if(id==='s-room'){go('chat');return;}
+  if(id==='s-detail'){go('home');return;}
+  if(id==='s-write'){go('comm');return;}
+  if(id==='s-home'||id==='s-chat'||id==='s-prof'){go('comm');return;}
+  /* s-comm(홈)에서는 나가지 않고 그대로 유지 */
+}
+window.addEventListener('popstate',function(){appBack();history.pushState(null,'')});
+
 /* ============ INIT ============ */
 applyLang();
 go('comm');
 renderLangPick();
 cycleHello();setInterval(cycleHello,1400);
+history.pushState(null,'');
 </script>
 </body>
 </html>
