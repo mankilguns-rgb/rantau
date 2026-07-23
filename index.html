@@ -309,6 +309,13 @@ textarea.wf-in{min-height:110px;resize:none}
 <!-- PROFILE -->
 <div class="screen" id="s-prof">
   <div class="topbar"><div class="loc" id="profTitle">내 정보</div><div class="sp"></div><button class="ic-btn" onclick="openSheet('settings')">⚙️</button></div>
+  <div id="profGuest" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:70px 32px;text-align:center;gap:14px">
+    <div style="font-size:54px">🔑</div>
+    <div style="font-size:18px;font-weight:800" id="profGuestTitle">로그인하고 시작하세요</div>
+    <div style="font-size:13.5px;color:var(--gray);line-height:1.55" id="profGuestSub">로그인하면 물건을 팔고, 채팅하고, 내 거래 내역을 볼 수 있어요.</div>
+    <button class="wf-submit" style="margin-top:12px" onclick="showLoginScreen()" id="profLoginBtn">로그인 / 회원가입</button>
+  </div>
+  <div id="profBody">
   <div class="prof-top">
     <div class="prof-row">
       <div class="prof-ava">🧑🏻</div>
@@ -328,6 +335,7 @@ textarea.wf-in{min-height:110px;resize:none}
     <div class="stat-cell"><div class="n">24</div><div class="l" id="stReview">받은 후기</div></div>
   </div>
   <div class="menu-list" id="profMenu"></div>
+  </div>
 </div>
 
 <!-- DETAIL -->
@@ -541,6 +549,9 @@ var UI={
  badEmail:{ko:'이메일 주소를 확인해주세요',en:'Please check the email address',zh:'请检查邮箱地址',ja:'メールアドレスを確認してください',id:'Periksa alamat email Anda'},
  guestBrowse:{ko:'로그인 없이 둘러보기',en:'Browse without login',zh:'不登录先逛逛',ja:'ログインせずに見る',id:'Lihat tanpa login'},
  emailVerified:{ko:'이메일 로그인됨 ✓',en:'Signed in ✓',zh:'已登录 ✓',ja:'ログイン済み ✓',id:'Sudah masuk ✓'},
+ profGuestTitle:{ko:'로그인하고 시작하세요',en:'Log in to get started',zh:'登录后开始使用',ja:'ログインして始めましょう',id:'Masuk untuk mulai'},
+ profGuestSub:{ko:'로그인하면 물건을 팔고, 채팅하고, 내 거래 내역을 볼 수 있어요.',en:'Log in to sell items, chat, and see your activity.',zh:'登录后可出售物品、聊天并查看记录。',ja:'ログインすると出品・チャット・履歴が使えます。',id:'Masuk untuk jual barang, chat, dan lihat aktivitas.'},
+ profLoginBtn:{ko:'로그인 / 회원가입',en:'Log in / Sign up',zh:'登录 / 注册',ja:'ログイン / 新規登録',id:'Masuk / Daftar'},
  loginTerms:{ko:'계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.',en:'By continuing, you agree to the Terms of Service and Privacy Policy.',zh:'继续即表示您同意服务条款和隐私政策。',ja:'続行すると、利用規約とプライバシーポリシーに同意したものとみなされます。',id:'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi.'},
  talkEntry:{ko:'만나서 대화 (통역)',en:'Talk in person (interpreter)',zh:'见面对话（翻译）',ja:'対面で会話（通訳）',id:'Ngobrol langsung (penerjemah)'},
  talkHintText:{ko:'⌨️ 텍스트 모드 · 문구를 눌러 상대에게 화면을 보여주세요',en:'⌨️ Text mode · Tap a phrase, then show your screen to them',zh:'⌨️ 文字模式 · 点击短语后把屏幕给对方看',ja:'⌨️ テキストモード · フレーズを押して画面を相手に見せましょう',id:'⌨️ Mode teks · Ketuk frasa, lalu tunjukkan layar ke lawan bicara'},
@@ -690,6 +701,9 @@ function applyLang(){
   document.getElementById('chatTitle').textContent=t('chatTitle');
   document.getElementById('profTitle').textContent=t('profTitle');
   document.getElementById('profVerified').textContent='📍 Lippo Cikarang · '+t('verified')+' ✓';
+  document.getElementById('profGuestTitle').textContent=t('profGuestTitle');
+  document.getElementById('profGuestSub').textContent=t('profGuestSub');
+  document.getElementById('profLoginBtn').textContent=t('profLoginBtn');
   document.getElementById('profTempLbl').textContent=t('avgRating');
   document.getElementById('stSelling').textContent=t('selling');
   document.getElementById('stDone').textContent=t('done');
@@ -915,7 +929,7 @@ var screens={home:'s-home',comm:'s-comm',chat:'s-chat',prof:'s-prof',write:'s-wr
 function showScreen(sid){[].forEach.call(document.querySelectorAll('.screen'),function(s){s.classList.remove('active')});document.getElementById(sid).classList.add('active');document.getElementById(sid).scrollTop=0;
   var ownBar=(sid==='s-detail'||sid==='s-room'||sid==='s-write'||sid==='s-talk');
   document.querySelector('.tabs').style.display=ownBar?'none':'flex';}
-function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(appVisible())pushView({v:'app',tab:name})}}
+function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(name==='prof')updateProfileView();if(appVisible())pushView({v:'app',tab:name})}}
 
 /* ============ SHEETS ============ */
 function renderSheet(type){
@@ -941,7 +955,7 @@ function renderSheet(type){
   }
 }
 function openSheet(type){renderSheet(type);document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'})}
-function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;document.getElementById('sheetBg').classList.remove('show');document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
+function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;updateProfileView();document.getElementById('sheetBg').classList.remove('show');document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
 function setLang(code){lang=code;applyLang();toast(t('langSet'));history.back()}
 var currentCity='Cikarang';
@@ -997,8 +1011,16 @@ function onLogin(user){
   var nm=(user&&user.email)?user.email.split('@')[0]:'회원';
   var pn=document.getElementById('profName');if(pn)pn.textContent=nm;
   var pv=document.getElementById('profVerified');if(pv)pv.textContent='📍 Cikarang · '+t('emailVerified');
+  updateProfileView();
   if(!appVisible())go('comm');
 }
+function updateProfileView(){
+  var guest=!CUR_USER;
+  var g=document.getElementById('profGuest'),bd=document.getElementById('profBody');
+  if(g)g.style.display=guest?'flex':'none';
+  if(bd)bd.style.display=guest?'none':'block';
+}
+function showLoginScreen(){document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function checkSession(){
   if(!sbClient)return;
   sbClient.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)onLogin(r.data.session.user)});
