@@ -295,7 +295,7 @@ textarea.wf-in{min-height:110px;resize:none}
 
 <!-- PROFILE -->
 <div class="screen" id="s-prof">
-  <div class="topbar"><div class="loc" id="profTitle">내 정보</div><div class="sp"></div><button class="ic-btn" onclick="toast(t('soon'))">⚙️</button></div>
+  <div class="topbar"><div class="loc" id="profTitle">내 정보</div><div class="sp"></div><button class="ic-btn" onclick="openSheet('settings')">⚙️</button></div>
   <div class="prof-top">
     <div class="prof-row">
       <div class="prof-ava">🧑🏻</div>
@@ -501,6 +501,11 @@ var UI={
    ja:'商品の状態、購入時期、取引希望エリア（例：Lippo Cikarang, Jababeka）をご記入ください。',
    id:'Tuliskan kondisi barang, kapan dibeli, dan area COD yang diinginkan (cth: Lippo Cikarang, Jababeka).'},
  setArea:{ko:'내 동네 설정',en:'Set my area',zh:'设置我的地区',ja:'エリアを設定',id:'Atur area saya'},
+ setTitle:{ko:'설정',en:'Settings',zh:'设置',ja:'設定',id:'Pengaturan'},
+ setLangLbl:{ko:'언어 / Language',en:'Language',zh:'语言 / Language',ja:'言語 / Language',id:'Bahasa / Language'},
+ setNoti:{ko:'알림 설정',en:'Notifications',zh:'通知设置',ja:'通知設定',id:'Notifikasi'},
+ setPrivacy:{ko:'계정·개인정보',en:'Account & Privacy',zh:'账号与隐私',ja:'アカウント·プライバシー',id:'Akun & Privasi'},
+ setLogout:{ko:'로그아웃',en:'Log out',zh:'退出登录',ja:'ログアウト',id:'Keluar'},
  setLang:{ko:'언어 선택',en:'Choose language',zh:'选择语言',ja:'言語を選択',id:'Pilih bahasa'},
  like:{ko:'공감',en:'Like',zh:'点赞',ja:'共感',id:'Suka'},
  comment:{ko:'댓글',en:'Comment',zh:'评论',ja:'コメント',id:'Komentar'},
@@ -902,11 +907,19 @@ function showScreen(sid){[].forEach.call(document.querySelectorAll('.screen'),fu
 function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(appVisible())pushView({v:'app',tab:name})}}
 
 /* ============ SHEETS ============ */
-function openSheet(type){
+function renderSheet(type){
   var inner=document.getElementById('sheetInner');
   if(type==='lang'){
     var h='<div class="sheet-grab"></div><div class="sheet-h">'+t('setLang')+'</div>';
     LANGS.forEach(function(l){h+='<div class="sheet-item'+(l.code===lang?' sel':'')+'" onclick="setLang(\''+l.code+'\')"><span class="fl">'+l.flag+'</span> '+l.label+(l.code===lang?'<span class="ck">✓</span>':'')+'</div>'});
+    inner.innerHTML=h;
+  }else if(type==='settings'){
+    var h='<div class="sheet-grab"></div><div class="sheet-h">'+t('setTitle')+'</div>';
+    h+='<div class="sheet-item" onclick="renderSheet(\'lang\')"><span class="fl">🌐</span> '+t('setLangLbl')+'<span class="ck" style="color:#D9D3CD">›</span></div>';
+    h+='<div class="sheet-item" onclick="renderSheet(\'loc\')"><span class="fl">📍</span> '+t('setArea')+'<span class="ck" style="color:#D9D3CD">›</span></div>';
+    h+='<div class="sheet-item" onclick="toast(t(\'soon\'))"><span class="fl">🔔</span> '+t('setNoti')+'<span class="ck" style="color:#D9D3CD">›</span></div>';
+    h+='<div class="sheet-item" onclick="toast(t(\'soon\'))"><span class="fl">🔒</span> '+t('setPrivacy')+'<span class="ck" style="color:#D9D3CD">›</span></div>';
+    h+='<div class="sheet-item" style="color:var(--coral-dark);font-weight:800" onclick="logout()"><span class="fl">🚪</span> '+t('setLogout')+'</div>';
     inner.innerHTML=h;
   }else{
     var locs=['Jakarta','Cikarang','Semarang'];
@@ -915,8 +928,9 @@ function openSheet(type){
     locs.forEach(function(l){h+='<div class="sheet-item'+(l===cur?' sel':'')+'" onclick="setLoc(\''+l+'\')"><span class="pin" style="color:var(--coral)">📍</span> '+l+(l===cur?'<span class="ck">✓</span>':'')+'</div>'});
     inner.innerHTML=h;
   }
-  document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'});
 }
+function openSheet(type){renderSheet(type);document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'})}
+function logout(){document.getElementById('sheetBg').classList.remove('show');document.getElementById('loginScreen').classList.remove('hide')}
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
 function setLang(code){lang=code;applyLang();toast(t('langSet'));history.back()}
 var currentCity='Cikarang';
