@@ -746,16 +746,19 @@ function renderComm(){
   var cf=document.getElementById('commfeed');cf.innerHTML='';
   comm.filter(function(p){return p.city===currentCity}).forEach(function(p){
     var el=document.createElement('div');el.className='post';
-    var trNote=(p.src!==lang)?'<div class="tr-note">🌐 '+transLabel(p.src)+'</div>':'';
+    var translated=(p.src!==lang);
+    var bodyText=(translated&&p._orig)?p.body[p.src]:L(p.body);
+    var trNote=translated?'<div class="tr-note" onclick="toggleCommOrig('+p.id+')">🌐 '+transLabel(p.src)+' · '+(p._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
     el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
       '<div class="cat-pill">'+L(p.catT)+'</div>'+
-      '<div class="post-body">'+L(p.body)+'</div>'+trNote+
+      '<div class="post-body">'+bodyText+'</div>'+trNote+
       '<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span><span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span></div>';
     cf.appendChild(el);
   });
 }
 function commById(id){return comm.find(function(x){return x.id===id})}
 function likePost(id){var p=commById(id);if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;renderComm()}
+function toggleCommOrig(id){var p=commById(id);if(!p)return;p._orig=!p._orig;renderComm()}
 var curCmt=null;
 function openComments(id){curCmt=commById(id);if(!curCmt)return;if(!curCmt.comments)curCmt.comments=[];renderCmt();document.getElementById('cmtBg').classList.add('show');pushView({v:'comments',id:id})}
 function closeCmt(){document.getElementById('cmtBg').classList.remove('show')}
