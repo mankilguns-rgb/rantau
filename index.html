@@ -101,10 +101,10 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .tr-bar .o{margin-left:auto;font-weight:700;text-decoration:underline}
 .det-desc{font-size:14.5px;line-height:1.65;color:#33302d;white-space:pre-line}
 .det-stats{display:flex;gap:16px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--gray)}
-.bottom-bar{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:12px 16px 26px;display:flex;align-items:center;gap:14px;z-index:150}
+.bottom-bar{background:var(--white);border-top:1px solid var(--line);padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);display:flex;align-items:center;gap:14px}
 .heart{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--white);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .chat-btn{flex:1;background:var(--coral);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
-.pill-info{font-size:11px;color:var(--gray);text-align:center;padding:0 16px 6px;line-height:1.4}
+.pill-info{font-size:11px;color:var(--gray);text-align:center;padding:10px 16px;line-height:1.4;background:var(--white)}
 
 .chatrow{display:flex;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line);cursor:pointer;background:var(--white)}
 .chatrow:active{background:var(--bg)}
@@ -121,7 +121,7 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .cr-item .th{width:40px;height:40px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
 .cr-item .pr{font-weight:800;font-size:14px}
 .cr-item .tt{font-size:12px;color:var(--gray)}
-.msgs{padding:14px}
+.msgs{padding:14px;flex:1;overflow-y:auto;overscroll-behavior:contain;min-height:0}
 .mrow{display:flex;flex-direction:column;margin-bottom:10px}
 .mrow.me{align-items:flex-end}
 .bubble{max-width:78%;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.45}
@@ -130,14 +130,17 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .mtr{font-size:10.5px;color:#4F63D2;margin-top:3px;cursor:pointer}
 .mtr.me{color:#B84A34}
 .daydiv{text-align:center;font-size:11px;color:var(--gray);margin:8px 0 12px}
-.cr-input{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:10px 14px 24px;display:flex;gap:10px;align-items:center}
+.cr-input{background:var(--white);border-top:1px solid var(--line);padding:10px 14px calc(env(safe-area-inset-bottom, 0px) + 18px);display:flex;gap:10px;align-items:center;flex-shrink:0}
+.cr-head,.cr-item,.talk-entry{flex-shrink:0}
 .cr-input input{flex:1;border:1px solid var(--line);border-radius:22px;padding:11px 16px;font-size:14px;background:var(--bg);outline:none}
 .send{width:42px;height:42px;border-radius:50%;background:var(--coral);color:#fff;border:none;font-size:18px;cursor:pointer}
 
 /* meet & talk (interpreter) */
 .talk-entry{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#EEF2FF;color:#4F63D2;font-size:13.5px;font-weight:800;cursor:pointer;border-bottom:1px solid var(--line)}
 .talk-entry:active{background:#E2E8FF}
-#s-talk.active{display:flex;flex-direction:column;padding-bottom:0;overflow:hidden}
+#s-talk.active,#s-detail.active,#s-room.active{display:flex;flex-direction:column;padding-bottom:0;overflow:hidden}
+.det-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;min-height:0}
+.det-foot{flex-shrink:0}
 .talk-head-mode{margin-left:auto;display:flex;gap:6px}
 .tmbtn{border:1px solid var(--line);background:#fff;border-radius:16px;padding:6px 11px;font-size:14px;font-weight:700;color:var(--gray);cursor:pointer}
 .tmbtn.on{background:var(--coral-light);color:var(--coral-dark);border-color:#FFD9CF}
@@ -313,7 +316,8 @@ textarea.wf-in{min-height:110px;resize:none}
 
 <!-- DETAIL -->
 <div class="screen" id="s-detail">
-  <div class="det-img" id="detImg"><button class="det-back" onclick="go('home')">←</button></div>
+  <div class="det-scroll">
+  <div class="det-img" id="detImg"><button class="det-back" onclick="history.back()">←</button></div>
   <div class="seller">
     <div class="ava" id="detAva">🧑🏻</div>
     <div><div class="nm" id="detSeller">—</div><div class="lc" id="detLoc">—</div></div>
@@ -327,17 +331,20 @@ textarea.wf-in{min-height:110px;resize:none}
     <div class="det-desc" id="detDesc">—</div>
     <div class="det-stats" id="detStats"></div>
   </div>
-  <div class="pill-info" id="detSafety" style="position:absolute;bottom:78px;width:100%"></div>
-  <div class="bottom-bar">
-    <button class="heart" onclick="likeToggle(this)">🤍</button>
-    <button class="chat-btn" id="detChatBtn" onclick="startChatFromDetail()">💬 채팅하기</button>
+  </div>
+  <div class="det-foot">
+    <div class="pill-info" id="detSafety"></div>
+    <div class="bottom-bar">
+      <button class="heart" onclick="likeToggle(this)">🤍</button>
+      <button class="chat-btn" id="detChatBtn" onclick="startChatFromDetail()">💬 채팅하기</button>
+    </div>
   </div>
 </div>
 
 <!-- CHAT ROOM -->
 <div class="screen" id="s-room">
   <div class="cr-head">
-    <button class="ic-btn" onclick="go('chat')" style="background:transparent">←</button>
+    <button class="ic-btn" onclick="history.back()" style="background:transparent">←</button>
     <div><div style="font-weight:700;font-size:15px" id="roomNm">—</div><div style="font-size:11px;color:var(--gray)" id="roomTemp">—</div></div>
   </div>
   <div class="cr-item">
@@ -357,7 +364,7 @@ textarea.wf-in{min-height:110px;resize:none}
 <!-- MEET & TALK (interpreter) -->
 <div class="screen" id="s-talk">
   <div class="cr-head">
-    <button class="ic-btn" onclick="backToRoom()" style="background:transparent">←</button>
+    <button class="ic-btn" onclick="history.back()" style="background:transparent">←</button>
     <div style="font-weight:800;font-size:15px" id="talkTitle">만나서 대화 (통역)</div>
     <div class="talk-head-mode">
       <button class="tmbtn on" id="tmText" onclick="setTalkMode('text')">⌨️</button>
@@ -380,7 +387,7 @@ textarea.wf-in{min-height:110px;resize:none}
 <!-- WRITE -->
 <div class="screen" id="s-write">
   <div class="cr-head">
-    <button class="ic-btn" onclick="go('home')" style="background:transparent">✕</button>
+    <button class="ic-btn" onclick="history.back()" style="background:transparent">✕</button>
     <div style="font-weight:800;font-size:16px" id="wfHead">내 물건 팔기</div>
   </div>
   <div class="wf">
@@ -402,12 +409,12 @@ textarea.wf-in{min-height:110px;resize:none}
 </div>
 
 <!-- SHEET (location + language) -->
-<div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSheet()">
+<div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)history.back()">
   <div class="sheet" id="sheetInner"></div>
 </div>
 
 <!-- COMMENTS SHEET -->
-<div class="sheet-bg" id="cmtBg" onclick="if(event.target===this)closeCmt()">
+<div class="sheet-bg" id="cmtBg" onclick="if(event.target===this)history.back()">
   <div class="sheet" id="cmtSheet" style="display:flex;flex-direction:column;max-height:82%;padding:10px 0 0">
     <div class="sheet-grab"></div>
     <div class="sheet-h" id="cmtHead">댓글</div>
@@ -602,6 +609,26 @@ var chats=[
         {f:'me',src:'ja',tx:{ko:'배송비는 트럭 부르면 얼마 정도 나올까요?',en:'Roughly how much would delivery cost if we hire a truck?',zh:'如果叫货车，配送费大概多少？',ja:'トラックを頼んだ場合、配送料はどのくらいになりますか？',id:'Kira-kira biaya kirim kalau pakai truk berapa ya?'}}]}
 ];
 
+/* --- 스크롤 테스트용: 마켓/동네생활/채팅 각각 10개로 채우기 (기존 예시 재활용) --- */
+(function(){
+  var cikLocs=['Lippo Cikarang','Jababeka','Cikarang Baru','Kota Deltamas','Cikarang Kota'],li=0;
+  var lBase=listings.slice(),lId=101;
+  while(listings.filter(function(l){return l.city==='Cikarang'}).length<10){
+    var s=lBase[listings.length%lBase.length];
+    listings.push(Object.assign({},s,{id:lId++,city:'Cikarang',loc:cikLocs[li++%cikLocs.length],sold:false,fresh:false}));
+  }
+  var cBase=comm.slice(),cId=101,ci=0;
+  while(comm.filter(function(p){return p.city==='Cikarang'}).length<10){
+    var q=cBase[comm.length%cBase.length];
+    comm.push(Object.assign({},q,{id:cId++,city:'Cikarang',loc:cikLocs[ci++%cikLocs.length],liked:false,comments:(q.comments||[]).slice()}));
+  }
+  var hBase=chats.slice(),hId=101;
+  while(chats.length<10){
+    var r=hBase[chats.length%hBase.length];
+    chats.push(Object.assign({},r,{id:hId++,unread:0,msgs:(r.msgs||[]).slice()}));
+  }
+})();
+
 /* ============ STATE ============ */
 var activeCat='all', curDetail=null, curRoom=null, detShowOrig=false;
 
@@ -661,7 +688,7 @@ function applyLang(){
   if(curRoom&&document.getElementById('s-room').classList.contains('active'))renderMsgs();
 }
 function renderLoginLangs(){var c=document.getElementById('loginLangs');c.innerHTML='';LANGS.forEach(function(l){var b=document.createElement('button');b.className='lgc'+(l.code===lang?' on':'');b.textContent=l.flag;b.onclick=function(){lang=l.code;applyLang()};c.appendChild(b)})}
-function enterApp(){document.getElementById('loginScreen').classList.add('hide')}
+function enterApp(){document.getElementById('loginScreen').classList.add('hide');pushView({v:'app',tab:'comm'})}
 
 /* meet & talk (interpreter) */
 var talkMode='text',talkMy='id',talkPartner='en',_tv=0;
@@ -675,7 +702,7 @@ var TALK_PHRASES=[
  {ko:'어디서 만날까요?',en:'Where should we meet?',zh:'我们在哪见面？',ja:'どこで会いましょうか？',id:'Ketemu di mana?'}
 ];
 function speak(text,code){try{if(!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(text);u.lang={ko:'ko-KR',en:'en-US',zh:'zh-CN',ja:'ja-JP',id:'id-ID'}[code]||'en-US';window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}catch(e){}}
-function openTalk(){talkMy=lang;talkPartner=(curRoom?curRoom.partnerSrc:'en');if(talkPartner===talkMy)talkPartner=(talkMy==='id'?'en':'id');document.getElementById('tLangTop').textContent=LPNAMES[talkPartner];document.getElementById('tLangBot').textContent=LPNAMES[talkMy];document.getElementById('tBigTop').textContent='';document.getElementById('tBigBot').textContent='';setTalkMode(talkMode);showScreen('s-talk')}
+function openTalk(){pushView({v:'talk'});talkMy=lang;talkPartner=(curRoom?curRoom.partnerSrc:'en');if(talkPartner===talkMy)talkPartner=(talkMy==='id'?'en':'id');document.getElementById('tLangTop').textContent=LPNAMES[talkPartner];document.getElementById('tLangBot').textContent=LPNAMES[talkMy];document.getElementById('tBigTop').textContent='';document.getElementById('tBigBot').textContent='';setTalkMode(talkMode);showScreen('s-talk')}
 function backToRoom(){showScreen('s-room')}
 function setTalkMode(m){talkMode=m;document.getElementById('tmText').classList.toggle('on',m==='text');document.getElementById('tmVoice').classList.toggle('on',m==='voice');document.getElementById('talkModeHint').textContent=(m==='text'?t('talkHintText'):t('talkHintVoice'));renderTalkCtrl()}
 function renderTalkCtrl(){
@@ -690,7 +717,7 @@ function talkVoice(side){var hint=document.getElementById('talkModeHint');hint.t
 /* language picker */
 var LPNAMES={id:'Bahasa Indonesia',en:'English',zh:'中文',ko:'한국어',ja:'日本語'};
 function renderLangPick(){var l=document.getElementById('lpList');l.innerHTML='';LANGS.forEach(function(x){var b=document.createElement('div');b.className='lp-item';b.innerHTML='<span class="fl">'+x.flag+'</span> '+LPNAMES[x.code]+'<span class="go">→</span>';b.onclick=function(){pickLang(x.code)};l.appendChild(b)})}
-function pickLang(code){lang=code;applyLang();document.getElementById('langPick').classList.add('hide')}
+function pickLang(code){lang=code;applyLang();document.getElementById('langPick').classList.add('hide');history.replaceState({v:'login'},'')}
 var HELLOS=['Halo 👋','Hello 👋','你好 👋','안녕하세요 👋','こんにちは 👋'],_hi=0;
 function cycleHello(){var el=document.getElementById('lpHello');if(el){el.textContent=HELLOS[_hi%HELLOS.length];_hi++}}
 
@@ -729,7 +756,7 @@ function renderComm(){
 function commById(id){return comm.find(function(x){return x.id===id})}
 function likePost(id){var p=commById(id);if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;renderComm()}
 var curCmt=null;
-function openComments(id){curCmt=commById(id);if(!curCmt)return;if(!curCmt.comments)curCmt.comments=[];renderCmt();document.getElementById('cmtBg').classList.add('show')}
+function openComments(id){curCmt=commById(id);if(!curCmt)return;if(!curCmt.comments)curCmt.comments=[];renderCmt();document.getElementById('cmtBg').classList.add('show');pushView({v:'comments',id:id})}
 function closeCmt(){document.getElementById('cmtBg').classList.remove('show')}
 function renderCmt(){
   document.getElementById('cmtHead').textContent=t('comment')+' '+curCmt.comments.length;
@@ -759,9 +786,9 @@ function renderWfCats(){
 /* ============ DETAIL ============ */
 function openDetail(id,keepOrig){
   var l=listings.find(function(x){return x.id===id});curDetail=l;
-  if(!keepOrig)detShowOrig=false;
+  if(!keepOrig){detShowOrig=false;pushView({v:'detail',id:id})}
   document.getElementById('detImg').style.background=l.bg;
-  document.getElementById('detImg').innerHTML='<button class="det-back" onclick="go(\'home\')">←</button>'+l.emoji;
+  document.getElementById('detImg').innerHTML='<button class="det-back" onclick="history.back()">←</button>'+l.emoji;
   document.getElementById('detAva').textContent=l.ava;
   document.getElementById('detSeller').textContent=l.seller;
   document.getElementById('detLoc').textContent='📍 '+l.loc;
@@ -801,7 +828,7 @@ function startChatFromDetail(){
 
 /* ============ CHAT ROOM ============ */
 function openRoom(id){
-  var c=chats.find(function(x){return x.id===id});curRoom=c;c.unread=0;
+  var c=chats.find(function(x){return x.id===id});curRoom=c;c.unread=0;if(!_replay)pushView({v:'room',id:id});
   document.getElementById('roomNm').textContent=c.nm;
   document.getElementById('roomTemp').textContent='⭐ '+c.rating+' / 10 · '+c.reviews+' '+t('reviewWord');
   document.getElementById('roomTh').textContent=c.th;
@@ -820,7 +847,7 @@ function renderMsgs(){
     m.appendChild(row);
   });
   [].forEach.call(m.querySelectorAll('.mtr'),function(el){el.onclick=function(){var i=+el.getAttribute('data-i');curRoom.msgs[i]._orig=!curRoom.msgs[i]._orig;renderMsgs()}});
-  var sc=document.getElementById('s-room');setTimeout(function(){sc.scrollTop=sc.scrollHeight},30);
+  var sc=document.getElementById('roomMsgs');setTimeout(function(){sc.scrollTop=sc.scrollHeight},30);
 }
 function sendMsg(){
   var i=document.getElementById('msgInput');if(!i.value.trim())return;
@@ -844,7 +871,7 @@ var screens={home:'s-home',comm:'s-comm',chat:'s-chat',prof:'s-prof',write:'s-wr
 function showScreen(sid){[].forEach.call(document.querySelectorAll('.screen'),function(s){s.classList.remove('active')});document.getElementById(sid).classList.add('active');document.getElementById(sid).scrollTop=0;
   var ownBar=(sid==='s-detail'||sid==='s-room'||sid==='s-write'||sid==='s-talk');
   document.querySelector('.tabs').style.display=ownBar?'none':'flex';}
-function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)})}}
+function go(name){if(screens[name]){showScreen(screens[name]);['home','comm','chat','prof'].forEach(function(x){var el=document.getElementById('t-'+x);if(el)el.classList.toggle('on',x===name)});if(appVisible())pushView({v:'app',tab:name})}}
 
 /* ============ SHEETS ============ */
 function openSheet(type){
@@ -860,38 +887,41 @@ function openSheet(type){
     locs.forEach(function(l){h+='<div class="sheet-item'+(l===cur?' sel':'')+'" onclick="setLoc(\''+l+'\')"><span class="pin" style="color:var(--coral)">📍</span> '+l+(l===cur?'<span class="ck">✓</span>':'')+'</div>'});
     inner.innerHTML=h;
   }
-  document.getElementById('sheetBg').classList.add('show');
+  document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'});
 }
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
-function setLang(code){lang=code;closeSheet();applyLang();toast(t('langSet'))}
+function setLang(code){lang=code;applyLang();toast(t('langSet'));history.back()}
 var currentCity='Cikarang';
-function setLoc(l){currentCity=l;document.getElementById('homeLoc').textContent=l;var cl=document.getElementById('commLoc');if(cl)cl.textContent='· '+l;renderFeed();renderComm();closeSheet();toast('📍 '+l+t('areaSet'))}
+function setLoc(l){currentCity=l;document.getElementById('homeLoc').textContent=l;var cl=document.getElementById('commLoc');if(cl)cl.textContent='· '+l;renderFeed();renderComm();toast('📍 '+l+t('areaSet'));history.back()}
 
 /* ============ MISC ============ */
 function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('show')},1900)}
 
-/* ============ BACK BUTTON (뒤로가기 → 앱 내부 이동) ============ */
-function appBack(){
-  if(document.getElementById('cmtBg').classList.contains('show')){closeCmt();return;}
-  if(document.getElementById('sheetBg').classList.contains('show')){closeSheet();return;}
-  if(!document.getElementById('langPick').classList.contains('hide')){return;}
-  if(!document.getElementById('loginScreen').classList.contains('hide')){document.getElementById('langPick').classList.remove('hide');return;}
-  var act=document.querySelector('.screen.active');var id=act?act.id:'';
-  if(id==='s-talk'){backToRoom();return;}
-  if(id==='s-room'){go('chat');return;}
-  if(id==='s-detail'){go('home');return;}
-  if(id==='s-write'){go('comm');return;}
-  if(id==='s-home'||id==='s-chat'||id==='s-prof'){go('comm');return;}
-  /* s-comm(홈)에서는 나가지 않고 그대로 유지 */
+/* ============ BACK BUTTON (브라우저 방문기록 연동) ============ */
+var _replay=false;
+function appVisible(){return document.getElementById('loginScreen').classList.contains('hide')&&document.getElementById('langPick').classList.contains('hide');}
+function pushView(s){if(!_replay)history.pushState(s,'')}
+function renderState(s){
+  _replay=true;
+  if(document.getElementById('cmtBg').classList.contains('show'))closeCmt();
+  if(document.getElementById('sheetBg').classList.contains('show'))closeSheet();
+  var lp=document.getElementById('langPick'),lg=document.getElementById('loginScreen');
+  if(!s){lp.classList.remove('hide')}
+  else if(s.v==='login'){lp.classList.add('hide');lg.classList.remove('hide')}
+  else{lp.classList.add('hide');lg.classList.add('hide');
+    if(s.v==='detail'){openDetail(s.id)}
+    else if(s.v==='room'){openRoom(s.id)}
+    else{go((s&&s.tab)||'comm')}
+  }
+  _replay=false;
 }
-window.addEventListener('popstate',function(){appBack();history.pushState(null,'')});
+window.addEventListener('popstate',function(e){renderState(e.state)});
 
 /* ============ INIT ============ */
 applyLang();
 go('comm');
 renderLangPick();
 cycleHello();setInterval(cycleHello,1400);
-history.pushState(null,'');
 </script>
 </body>
 </html>
