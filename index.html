@@ -101,6 +101,9 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .tr-bar .o{margin-left:auto;font-weight:700;text-decoration:underline}
 .det-desc{font-size:14.5px;line-height:1.65;color:#33302d;white-space:pre-line}
 .det-stats{display:flex;gap:16px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--gray)}
+.ds-act{cursor:pointer;user-select:none}
+.ds-act:active{opacity:.5}
+.ds-act.on{color:var(--coral)}
 .bottom-bar{background:var(--white);border-top:1px solid var(--line);padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);display:flex;align-items:center;gap:14px}
 .heart{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--white);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .chat-btn{flex:1;background:var(--coral);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
@@ -302,7 +305,6 @@ textarea.wf-in{min-height:110px;resize:none}
     </div>
     <div class="temp-card">
       <div class="row"><span class="t1" id="profTempLbl">평균 별점</span><span class="t2" id="profRatingVal">⭐ 9.3 / 10</span></div>
-      <div id="profStars" style="margin-top:2px"></div>
       <div style="font-size:11px;color:var(--gray);margin-top:8px" id="profReviews">받은 후기 24</div>
     </div>
   </div>
@@ -335,7 +337,7 @@ textarea.wf-in{min-height:110px;resize:none}
   <div class="det-foot">
     <div class="pill-info" id="detSafety"></div>
     <div class="bottom-bar">
-      <button class="heart" onclick="likeToggle(this)">🤍</button>
+      <button class="heart" id="detHeart" onclick="likeDetail()">🤍</button>
       <button class="chat-btn" id="detChatBtn" onclick="startChatFromDetail()">💬 채팅하기</button>
     </div>
   </div>
@@ -658,7 +660,6 @@ function applyLang(){
   document.getElementById('stDone').textContent=t('done');
   document.getElementById('stReview').textContent=t('reviews');
   document.getElementById('profRatingVal').textContent='⭐ '+MY_RATING+' / 10';
-  document.getElementById('profStars').innerHTML=starsHTML(MY_RATING);
   document.getElementById('profReviews').textContent=t('reviews')+' '+MY_REVIEWS;
   document.getElementById('detTempLbl').textContent=t('avgRating');
   document.getElementById('detChatBtn').textContent=t('chatBtn');
@@ -797,7 +798,8 @@ function openDetail(id,keepOrig){
   document.getElementById('detTempLbl').textContent=t('avgRating')+' · '+l.reviews+' '+t('reviewWord');
   document.getElementById('detCat').textContent=t('category')+' · '+L(CATNAME[l.cat])+(l.nego?' · '+t('negoOk'):'');
   document.getElementById('detPrice').textContent='Rp '+l.price+'  '+l.rp;
-  document.getElementById('detStats').innerHTML='<span>❤️ '+t('likes')+' '+l.likes+'</span><span>💬 '+t('chatsN')+' '+l.chats+'</span><span>👁️ '+t('views')+' '+(l.likes*7+13)+'</span>';
+  renderDetStats();
+  document.getElementById('detHeart').textContent=l.liked?'❤️':'🤍';
   var trBar=document.getElementById('detTrBar');
   if(l.src!==lang){
     trBar.style.display='flex';
@@ -815,7 +817,8 @@ function openDetail(id,keepOrig){
   showScreen('s-detail');
 }
 function toggleDetOrig(){detShowOrig=!detShowOrig;openDetail(curDetail.id,true)}
-function likeToggle(b){b.textContent=b.textContent==='🤍'?'❤️':'🤍'}
+function renderDetStats(){var l=curDetail;if(!l)return;document.getElementById('detStats').innerHTML='<span class="ds-act'+(l.liked?' on':'')+'" onclick="likeDetail()">❤️ '+t('likes')+' '+l.likes+'</span><span class="ds-act" onclick="startChatFromDetail()">💬 '+t('chatsN')+' '+l.chats+'</span><span>👁️ '+t('views')+' '+(l.likes*7+13)+'</span>'}
+function likeDetail(){if(!curDetail)return;curDetail.liked=!curDetail.liked;curDetail.likes+=curDetail.liked?1:-1;var h=document.getElementById('detHeart');if(h)h.textContent=curDetail.liked?'❤️':'🤍';renderDetStats();renderFeed()}
 function startChatFromDetail(){
   var ex=chats.find(function(c){return c.item===curDetail.id});
   if(ex){openRoom(ex.id);return}
