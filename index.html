@@ -273,7 +273,11 @@ textarea.wf-in{min-height:110px;resize:none}
   <div class="sub" id="loginSub">5개 언어 자동 번역 · 이웃과 안전하게 거래</div>
   <div id="loginForm" style="width:100%">
     <input class="lginput" id="emailInput" type="email" inputmode="email" placeholder="이메일 주소" autocomplete="email">
-    <button class="gbtn" onclick="sendMagicLink()"><span id="loginBtnTxt">이메일로 로그인 링크 받기</span></button>
+    <input class="lginput" id="pwInput" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <input class="lginput" id="nickInputSignup" type="text" placeholder="닉네임" autocomplete="nickname" style="display:none">
+    <button class="gbtn" onclick="doAuth()"><span id="loginBtnTxt">로그인</span></button>
+    <div class="authswitch" id="authSwitch" onclick="toggleAuthMode()" style="color:#fff;font-size:13px;margin-top:15px;text-decoration:underline;cursor:pointer;opacity:.95">처음이신가요? 회원가입</div>
+    <div id="forgotLink" onclick="requestReset()" style="color:#fff;font-size:12.5px;margin-top:9px;cursor:pointer;opacity:.8">비밀번호를 잊으셨나요?</div>
   </div>
   <div id="loginSent" style="display:none;color:#fff;font-weight:800;font-size:15px;margin-top:24px;line-height:1.5">📧 <span id="sentMsg">메일함을 확인해 로그인 링크를 눌러주세요</span></div>
   <div class="guestlink" id="guestLink" onclick="enterApp()">로그인 없이 둘러보기</div>
@@ -473,6 +477,17 @@ textarea.wf-in{min-height:110px;resize:none}
   </div>
 </div>
 
+<!-- NEW PASSWORD (비밀번호 재설정) -->
+<div class="sheet-bg" id="newPwBg">
+  <div class="sheet" style="padding:14px 20px 30px">
+    <div class="sheet-grab"></div>
+    <div class="sheet-h" id="newPwTitle">새 비밀번호 설정</div>
+    <div style="font-size:12.5px;color:var(--gray);margin:2px 0 14px" id="newPwSub">사용할 새 비밀번호를 입력해주세요.</div>
+    <input class="lginput" id="newPwInput" type="password" autocomplete="new-password" style="background:var(--bg);border:1px solid var(--line)" placeholder="새 비밀번호 (6자 이상)">
+    <button class="wf-submit" style="margin-top:12px" onclick="saveNewPassword()" id="newPwSaveBtn">변경하기</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- TABS -->
@@ -570,6 +585,24 @@ var UI={
  loginSub:{ko:'5개 언어 자동 번역 · 이웃과 안전하게 거래',en:'Auto-translated in 5 languages · Trade safely with neighbors',zh:'5种语言自动翻译 · 与邻里安全交易',ja:'5言語に自動翻訳 · ご近所と安全に取引',id:'Terjemahan otomatis 5 bahasa · Transaksi aman dengan tetangga'},
  emailPlaceholder:{ko:'이메일 주소',en:'Email address',zh:'邮箱地址',ja:'メールアドレス',id:'Alamat email'},
  loginBtn:{ko:'이메일로 로그인 링크 받기',en:'Get login link by email',zh:'通过邮箱获取登录链接',ja:'メールでログインリンクを受け取る',id:'Kirim link login ke email'},
+ pwPlaceholder:{ko:'비밀번호',en:'Password',zh:'密码',ja:'パスワード',id:'Kata sandi'},
+ nickPlaceholder:{ko:'닉네임',en:'Nickname',zh:'昵称',ja:'ニックネーム',id:'Nama panggilan'},
+ loginBtnPw:{ko:'로그인',en:'Log in',zh:'登录',ja:'ログイン',id:'Masuk'},
+ signupBtn:{ko:'회원가입',en:'Sign up',zh:'注册',ja:'新規登録',id:'Daftar'},
+ toSignup:{ko:'처음이신가요? 회원가입',en:"First time? Sign up",zh:'第一次来？注册',ja:'はじめての方はこちら（新規登録）',id:'Baru di sini? Daftar'},
+ toLogin:{ko:'이미 계정이 있나요? 로그인',en:'Already have an account? Log in',zh:'已有账号？登录',ja:'アカウントをお持ちの方はログイン',id:'Sudah punya akun? Masuk'},
+ pwShort:{ko:'비밀번호는 6자 이상 입력해주세요',en:'Password must be at least 6 characters',zh:'密码至少6位',ja:'パスワードは6文字以上です',id:'Kata sandi minimal 6 karakter'},
+ wrongLogin:{ko:'이메일 또는 비밀번호가 올바르지 않아요',en:'Incorrect email or password',zh:'邮箱或密码不正确',ja:'メールまたはパスワードが違います',id:'Email atau kata sandi salah'},
+ signupDone:{ko:'✅ 가입 완료! 환영해요 🎉',en:'✅ Signed up! Welcome 🎉',zh:'✅ 注册成功！欢迎 🎉',ja:'✅ 登録完了！ようこそ 🎉',id:'✅ Berhasil daftar! Selamat datang 🎉'},
+ emailTaken:{ko:'이미 가입된 이메일이에요. 로그인해주세요',en:'This email is already registered. Please log in',zh:'该邮箱已注册，请登录',ja:'登録済みのメールです。ログインしてください',id:'Email sudah terdaftar. Silakan masuk'},
+ forgotPw:{ko:'비밀번호를 잊으셨나요?',en:'Forgot your password?',zh:'忘记密码了？',ja:'パスワードをお忘れですか？',id:'Lupa kata sandi?'},
+ resetNeedEmail:{ko:'먼저 이메일 주소를 입력해주세요',en:'Please enter your email first',zh:'请先输入邮箱地址',ja:'先にメールアドレスを入力してください',id:'Masukkan email Anda dulu'},
+ resetSent:{ko:'📧 비밀번호 재설정 메일을 보냈어요. 메일함(스팸함 포함)을 확인해주세요',en:'📧 Reset email sent. Check your inbox (and spam)',zh:'📧 已发送重置邮件，请查收（含垃圾邮件）',ja:'📧 再設定メールを送りました。メール（迷惑メールも）をご確認ください',id:'📧 Email reset terkirim. Cek inbox (dan spam)'},
+ newPwTitle:{ko:'새 비밀번호 설정',en:'Set new password',zh:'设置新密码',ja:'新しいパスワード設定',id:'Atur kata sandi baru'},
+ newPwSub:{ko:'사용할 새 비밀번호를 입력해주세요.',en:'Enter a new password to use.',zh:'请输入要使用的新密码。',ja:'新しいパスワードを入力してください。',id:'Masukkan kata sandi baru.'},
+ newPwPh:{ko:'새 비밀번호 (6자 이상)',en:'New password (6+ chars)',zh:'新密码（至少6位）',ja:'新しいパスワード（6文字以上）',id:'Kata sandi baru (min. 6)'},
+ newPwSaveBtn:{ko:'변경하기',en:'Change password',zh:'修改密码',ja:'変更する',id:'Ubah kata sandi'},
+ pwChanged:{ko:'✅ 비밀번호가 변경됐어요',en:'✅ Password changed',zh:'✅ 密码已修改',ja:'✅ パスワードを変更しました',id:'✅ Kata sandi diubah'},
  sending:{ko:'보내는 중…',en:'Sending…',zh:'发送中…',ja:'送信中…',id:'Mengirim…'},
  checkEmail:{ko:'메일함을 확인해 로그인 링크를 눌러주세요',en:'Check your inbox and tap the login link',zh:'请查收邮件并点击登录链接',ja:'メールを確認してログインリンクをタップ',id:'Cek email Anda dan klik link login'},
  badEmail:{ko:'이메일 주소를 확인해주세요',en:'Please check the email address',zh:'请检查邮箱地址',ja:'メールアドレスを確認してください',id:'Periksa alamat email Anda'},
@@ -779,7 +812,14 @@ function applyLang(){
   document.getElementById('loginTag').textContent=t('loginTag');
   document.getElementById('loginSub').textContent=t('loginSub');
   document.getElementById('emailInput').placeholder=t('emailPlaceholder');
-  document.getElementById('loginBtnTxt').textContent=t('loginBtn');
+  document.getElementById('pwInput').placeholder=t('pwPlaceholder');
+  document.getElementById('nickInputSignup').placeholder=t('nickPlaceholder');
+  applyAuthModeText();
+  document.getElementById('forgotLink').textContent=t('forgotPw');
+  document.getElementById('newPwTitle').textContent=t('newPwTitle');
+  document.getElementById('newPwSub').textContent=t('newPwSub');
+  document.getElementById('newPwInput').placeholder=t('newPwPh');
+  document.getElementById('newPwSaveBtn').textContent=t('newPwSaveBtn');
   document.getElementById('guestLink').textContent=t('guestBrowse');
   document.getElementById('sentMsg').textContent=t('checkEmail');
   document.getElementById('loginTerms').textContent=t('loginTerms');
@@ -828,11 +868,12 @@ function renderChips(){
   var c=document.getElementById('chips');c.innerHTML='';
   CATS.forEach(function(cat){var d=document.createElement('div');d.className='chip'+(cat.key===activeCat?' on':'');d.textContent=L(cat.t);d.onclick=function(){activeCat=cat.key;renderChips();renderFeed()};c.appendChild(d)});
 }
-function renderFeed(){
+function renderFeed(skipTr){
   var f=document.getElementById('feed');f.innerHTML='';
+  if(!skipTr&&typeof ensureFeedTranslations==='function')setTimeout(ensureFeedTranslations,10);
   listings.filter(function(l){return (activeCat==='all'||l.cat===activeCat)&&l.city===currentCity}).forEach(function(l){
     var el=document.createElement('div');el.className='item';el.onclick=function(){openDetail(l.id)};
-    var trBadge=(l.src!==lang&&!l._db)?'<span class="b tr">🌐 '+t('seeTrans')+'</span>':'';
+    var trBadge=(l.src!==lang&&(!l._db||l._tr))?'<span class="b tr">🌐 '+t('seeTrans')+'</span>':'';
     var thumbStyle=l.img?'background-image:url('+l.img+');background-size:cover;background-position:center':'background:'+l.bg;
     el.innerHTML='<div class="thumb" style="'+thumbStyle+'">'+(l.img?'':'<div class="emoji">'+l.emoji+'</div>')+(l.sold?'<div class="tag-sold">'+t('soldOut')+'</div>':'')+'</div>'+
       '<div class="info"><div class="title">'+L(l.title)+'</div>'+
@@ -843,13 +884,14 @@ function renderFeed(){
     f.appendChild(el);
   });
 }
-function renderComm(){
+function renderComm(skipTr){
   var cc=document.getElementById('commchips');cc.innerHTML='';
+  if(!skipTr&&typeof ensureCommTranslations==='function')setTimeout(ensureCommTranslations,10);
   COMMCATS.forEach(function(cat,i){var d=document.createElement('div');d.className='chip'+(i===0?' on':'');d.textContent=L(cat);d.onclick=function(){[].forEach.call(cc.children,function(x){x.classList.remove('on')});d.classList.add('on')};cc.appendChild(d)});
   var cf=document.getElementById('commfeed');cf.innerHTML='';
   comm.filter(function(p){return p.city===currentCity}).forEach(function(p){
     var el=document.createElement('div');el.className='post';
-    var translated=(p.src!==lang&&!p._db);
+    var translated=(p.src!==lang&&(!p._db||p._tr));
     var bodyText=(translated&&p._orig)?p.body[p.src]:L(p.body);
     var trNote=translated?'<div class="tr-note" onclick="toggleCommOrig('+p.id+')">🌐 '+transLabel(p.src)+' · '+(p._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
     el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+langTag(p.nm,p.src)+p.nm+'</div><div class="sub">'+p.loc+' · '+tlabel(p)+'</div></div></div>'+
@@ -863,13 +905,13 @@ function commById(id){return comm.find(function(x){return x.id===id})}
 function likePost(id){if(!requireLogin())return;var p=commById(id);if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;renderComm()}
 function toggleCommOrig(id){var p=commById(id);if(!p)return;p._orig=!p._orig;renderComm()}
 var curCmt=null;
-function openComments(id){curCmt=commById(id);if(!curCmt)return;if(!curCmt.comments)curCmt.comments=[];renderCmt();document.getElementById('cmtBg').classList.add('show');pushView({v:'comments',id:id})}
+function openComments(id){curCmt=commById(id);if(!curCmt)return;if(!curCmt.comments)curCmt.comments=[];renderCmt();document.getElementById('cmtBg').classList.add('show');pushView({v:'comments',id:id});if(typeof ensureCmtTranslations==='function')ensureCmtTranslations()}
 function closeCmt(){document.getElementById('cmtBg').classList.remove('show')}
 function renderCmt(){
   document.getElementById('cmtHead').textContent=t('comment')+' '+curCmt.comments.length;
   document.getElementById('cmtInput').placeholder=t('cmtPlaceholder');
   var l=document.getElementById('cmtList');l.innerHTML='';
-  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+langTag(c.nm,c.src)+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
+  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';var body=c.tx?L(c.tx):(c.trText&&c.src!==lang?c.trText+' <span style="font-size:10px;color:#4F63D2">🌐</span>':c.plain);d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+langTag(c.nm,c.src)+c.nm+'</div><div class="tx">'+body+'</div></div>';l.appendChild(d)});
 }
 function sendComment(){
   if(!requireLogin())return;
@@ -885,7 +927,7 @@ function sendComment(){
     curCmt.comments.push({ava:'🧑',nm:MY_NAME||'Guest',src:lang,plain:v});i.value='';renderCmt();renderComm();
   }
 }
-function msgText(x){return x?(x.tx?(x._orig?x.tx[x.src]:L(x.tx)):x.plain):''}
+function msgText(x){if(!x)return '';if(x.tx)return x._orig?x.tx[x.src]:L(x.tx);if(x.trText&&!x._orig)return x.trText;return x.plain}
 function renderChatList(){
   var cl=document.getElementById('chatlist');cl.innerHTML='';
   if(!chats.length){cl.innerHTML='<div style="padding:44px 24px;text-align:center;color:var(--gray);font-size:13.5px">'+t('myEmpty')+'</div>';return}
@@ -927,8 +969,9 @@ function openDetail(id,keepOrig){
   document.getElementById('detPrice').textContent='Rp '+l.price+'  '+l.rp;
   renderDetStats();
   document.getElementById('detHeart').textContent=l.liked?'❤️':'🤍';
+  if(l._db&&typeof ensureDetailTranslations==='function')ensureDetailTranslations(l);
   var trBar=document.getElementById('detTrBar');
-  if(l.src!==lang&&!l._db){
+  if(l.src!==lang&&(!l._db||l._tr)){
     trBar.style.display='flex';
     document.getElementById('detTrText').textContent=transLabel(l.src);
     document.getElementById('detTrToggle').textContent=detShowOrig?t('seeTrans'):t('seeOrig');
@@ -989,6 +1032,7 @@ function loadRoomMsgs(c){
     if(m.error||!m.data)return;
     var n=m.data.map(function(msg){return {f:(msg.user_id===CUR_USER.id)?'me':'them',src:msg.src_lang||'en',plain:msg.body,created_at:msg.created_at}});
     if(n.length!==c.msgs.length){c.msgs=n;if(n.length)c.created_at=n[n.length-1].created_at;if(curRoom===c&&document.getElementById('s-room').classList.contains('active'))renderMsgs();renderChatList()}
+    if(typeof ensureMsgTranslations==='function')ensureMsgTranslations(c);
   }).catch(function(){});
 }
 var pollT=null;
@@ -1020,7 +1064,7 @@ function renderMsgs(){
   var m=document.getElementById('roomMsgs');m.innerHTML='<div class="daydiv">'+t('today')+'</div>';
   curRoom.msgs.forEach(function(x,i){
     var row=document.createElement('div');row.className='mrow '+(x.f==='me'?'me':'them');
-    var showsTrans=(x.tx&&x.src&&x.src!==lang);
+    var showsTrans=((x.tx||x.trText)&&x.src&&x.src!==lang);
     var trLine=showsTrans?'<div class="mtr'+(x.f==='me'?' me':'')+'" data-i="'+i+'">🌐 '+transLabel(x.src)+' · '+(x._orig?t('seeTrans'):t('seeOrig'))+'</div>':'';
     row.innerHTML='<div class="bubble '+(x.f==='me'?'me':'them')+'">'+msgText(x)+'</div>'+trLine;
     m.appendChild(row);
@@ -1166,7 +1210,7 @@ function renderSheet(type){
   }
 }
 function openSheet(type){renderSheet(type);document.getElementById('sheetBg').classList.add('show');pushView({v:'sheet'})}
-function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;updateProfileView();document.getElementById('sheetBg').classList.remove('show');document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
+function logout(){if(sbClient)try{sbClient.auth.signOut()}catch(e){}CUR_USER=null;MY_NAME='';updateProfileView();document.getElementById('sheetBg').classList.remove('show');showLoginScreen()}
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show')}
 function setLang(code){lang=code;applyLang();toast(t('langSet'));history.back()}
 var currentCity='Cikarang';
@@ -1209,18 +1253,62 @@ function closeNick(){document.getElementById('nickBg').classList.remove('show')}
 function saveNickname(){var v=(document.getElementById('nickInput').value||'').trim();if(v.length<2){toast(t('nickReq'));return}
   if(!sbClient||!CUR_USER){MY_NAME=v;MY_LANG=lang;applyMyName();closeNick();return}
   sbClient.from('profiles').upsert({id:CUR_USER.id,name:v,lang:lang}).then(function(r){if(r.error){toast(r.error.message);return}MY_NAME=v;MY_LANG=lang;applyMyName();closeNick();toast(t('nickSaved'))}).catch(function(e){toast('오류: '+(e&&e.message||''))})}
-function sendMagicLink(){
-  var el=document.getElementById('emailInput'),email=(el.value||'').trim();
+/* ---- 아이디(이메일)+비밀번호 로그인 / 회원가입 ---- */
+var authMode='login',pendingNick='';
+function applyAuthModeText(){
+  var isSignup=authMode==='signup';
+  var nk=document.getElementById('nickInputSignup');if(nk)nk.style.display=isSignup?'':'none';
+  var fl=document.getElementById('forgotLink');if(fl)fl.style.display=isSignup?'none':'';
+  var bt=document.getElementById('loginBtnTxt');if(bt)bt.textContent=isSignup?t('signupBtn'):t('loginBtnPw');
+  var sw=document.getElementById('authSwitch');if(sw)sw.textContent=isSignup?t('toLogin'):t('toSignup');
+  var pw=document.getElementById('pwInput');if(pw)pw.setAttribute('autocomplete',isSignup?'new-password':'current-password');
+}
+function toggleAuthMode(){authMode=(authMode==='signup')?'login':'signup';applyAuthModeText()}
+function doAuth(){
+  var email=(document.getElementById('emailInput').value||'').trim();
+  var pw=document.getElementById('pwInput').value||'';
   if(email.indexOf('@')<1||email.indexOf('.')<0){toast(t('badEmail'));return}
+  if(pw.length<6){toast(t('pwShort'));return}
   if(!sbClient){toast('연결 준비 중입니다. 잠시 후 다시 시도해주세요.');return}
-  document.getElementById('loginBtnTxt').textContent=t('sending');
-  sbClient.auth.signInWithOtp({email:email,options:{emailRedirectTo:window.location.origin}}).then(function(res){
-    document.getElementById('loginBtnTxt').textContent=t('loginBtn');
+  var btn=document.getElementById('loginBtnTxt');btn.textContent=t('sending');
+  if(authMode==='signup'){
+    var nick=(document.getElementById('nickInputSignup').value||'').trim();
+    if(nick.length<2){btn.textContent=t('signupBtn');toast(t('nickReq'));return}
+    pendingNick=nick;
+    sbClient.auth.signUp({email:email,password:pw}).then(function(res){
+      btn.textContent=t('signupBtn');
+      if(res.error){pendingNick='';var m=(res.error.message||'');toast(/already|registered|exists/i.test(m)?t('emailTaken'):m);return}
+      if(res.data&&res.data.session){toast(t('signupDone'))} /* 확인메일 OFF → 즉시 로그인(onAuthStateChange 처리) */
+      else{ /* 확인메일 ON인 경우: 바로 로그인 시도 */
+        sbClient.auth.signInWithPassword({email:email,password:pw}).then(function(r2){if(r2.error){document.getElementById('loginForm').style.display='none';document.getElementById('guestLink').style.display='none';document.getElementById('loginSent').style.display='block'}else{toast(t('signupDone'))}});
+      }
+    }).catch(function(e){pendingNick='';btn.textContent=t('signupBtn');toast('오류: '+(e&&e.message||''))});
+  }else{
+    sbClient.auth.signInWithPassword({email:email,password:pw}).then(function(res){
+      btn.textContent=t('loginBtnPw');
+      if(res.error){toast(t('wrongLogin'));return}
+    }).catch(function(e){btn.textContent=t('loginBtnPw');toast('오류: '+(e&&e.message||''))});
+  }
+}
+/* ---- 비밀번호 찾기(재설정 메일) ---- */
+function requestReset(){
+  var email=(document.getElementById('emailInput').value||'').trim();
+  if(email.indexOf('@')<1||email.indexOf('.')<0){toast(t('resetNeedEmail'));return}
+  if(!sbClient){toast('연결 준비 중입니다. 잠시 후 다시 시도해주세요.');return}
+  sbClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin}).then(function(res){
     if(res.error){toast(res.error.message);return}
-    document.getElementById('loginForm').style.display='none';
-    document.getElementById('guestLink').style.display='none';
-    document.getElementById('loginSent').style.display='block';
-  }).catch(function(e){document.getElementById('loginBtnTxt').textContent=t('loginBtn');toast('오류: '+(e&&e.message||''))});
+    toast(t('resetSent'));
+  }).catch(function(e){toast('오류: '+(e&&e.message||''))});
+}
+function openNewPw(){document.getElementById('newPwInput').value='';document.getElementById('newPwBg').classList.add('show')}
+function saveNewPassword(){
+  var v=document.getElementById('newPwInput').value||'';
+  if(v.length<6){toast(t('pwShort'));return}
+  if(!sbClient){toast('연결 준비 중입니다.');return}
+  sbClient.auth.updateUser({password:v}).then(function(res){
+    if(res.error){toast(res.error.message);return}
+    document.getElementById('newPwBg').classList.remove('show');toast(t('pwChanged'));
+  }).catch(function(e){toast('오류: '+(e&&e.message||''))});
 }
 function onLogin(user){
   CUR_USER=user;
@@ -1230,7 +1318,10 @@ function onLogin(user){
   var pv=document.getElementById('profVerified');if(pv)pv.textContent='📍 Cikarang · '+t('emailVerified');
   updateProfileView();
   if(!appVisible())go('comm');
-  if(sbClient&&user){sbClient.from('profiles').select('name,lang').eq('id',user.id).maybeSingle().then(function(r){var p=r&&r.data;if(p&&p.name){MY_NAME=p.name;if(p.lang)MY_LANG=p.lang;applyMyName()}else{openNick(true)}}).catch(function(){})}
+  if(sbClient&&user){
+    if(pendingNick){var nk=pendingNick;pendingNick='';sbClient.from('profiles').upsert({id:user.id,name:nk,lang:lang}).then(function(){MY_NAME=nk;MY_LANG=lang;applyMyName()}).catch(function(){});}
+    else{sbClient.from('profiles').select('name,lang').eq('id',user.id).maybeSingle().then(function(r){var p=r&&r.data;if(p&&p.name){MY_NAME=p.name;if(p.lang)MY_LANG=p.lang;applyMyName()}else{openNick(true)}}).catch(function(){})}
+  }
   loadChats();
 }
 function updateProfileView(){
@@ -1307,12 +1398,12 @@ function editPost(id){
   editTarget={type:'post',id:id};
   document.getElementById('wfSubmit').textContent=t('editDone');
 }
-function showLoginScreen(){document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
+function showLoginScreen(){authMode='login';applyAuthModeText();var p=document.getElementById('pwInput');if(p)p.value='';document.getElementById('loginForm').style.display='';document.getElementById('guestLink').style.display='';document.getElementById('loginSent').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
 function requireLogin(){if(CUR_USER)return true;toast(t('needLogin'));showLoginScreen();return false}
 function checkSession(){
   if(!sbClient)return;
   sbClient.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)onLogin(r.data.session.user)});
-  sbClient.auth.onAuthStateChange(function(ev,session){if(session)onLogin(session.user)});
+  sbClient.auth.onAuthStateChange(function(ev,session){if(ev==='PASSWORD_RECOVERY'){if(session)onLogin(session.user);openNewPw();return}if(session)onLogin(session.user)});
 }
 function mono(tx){return {ko:tx,en:tx,zh:tx,ja:tx,id:tx}}
 var BGS=['linear-gradient(135deg,#2FB36B,#1f7a49)','linear-gradient(135deg,#3B82F6,#1e40af)','linear-gradient(135deg,#8B5CF6,#6d28d9)','linear-gradient(135deg,#374151,#111827)','linear-gradient(135deg,#F59E0B,#b45309)','linear-gradient(135deg,#EC4899,#be185d)','linear-gradient(135deg,#10B981,#047857)','linear-gradient(135deg,#6366F1,#4338ca)','linear-gradient(135deg,#0EA5E9,#0369a1)','linear-gradient(135deg,#EF4444,#991b1b)'];
@@ -1331,6 +1422,71 @@ function loadData(){
     if(ps&&ps.length){var cmap={};(cs||[]).forEach(function(c){(cmap[c.post_id]=cmap[c.post_id]||[]).push(mapComment(c))});comm.length=0;ps.forEach(function(r){comm.push(mapPost(r,cmap[r.id]||[]))})}
     renderChips();renderFeed();renderComm();updateMyStats();
   }).catch(function(e){console.log('DB 로드 실패, 데모 데이터 사용:',e&&e.message)});
+}
+
+/* ============ 자동 번역 (서버 함수 /api/translate) ============ */
+var TR_API='/api/translate',trMem={},trFail=0;
+function trKeyOf(txt){return lang+'|'+txt}
+function trGet(txt){var k=trKeyOf(txt);if(trMem[k])return trMem[k];try{var v=localStorage.getItem('tr:'+k);if(v){trMem[k]=v;return v}}catch(e){}return null}
+function trSet(txt,tr){var k=trKeyOf(txt);trMem[k]=tr;try{localStorage.setItem('tr:'+k,tr)}catch(e){}}
+function translateBatch(texts,cb){
+  if(trFail>2){cb();return}
+  var need=[];texts.forEach(function(tx){if(tx&&!trGet(tx)&&need.indexOf(tx)<0)need.push(tx)});
+  if(!need.length){cb();return}
+  fetch(TR_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texts:need,target:lang})})
+    .then(function(r){if(!r.ok)throw new Error('api '+r.status);return r.json()})
+    .then(function(d){trFail=0;(d.translations||[]).forEach(function(tr,i){if(tr&&need[i])trSet(need[i],tr)});cb()})
+    .catch(function(){trFail++;cb()});
+}
+function ensureFeedTranslations(){
+  var texts=[];
+  listings.forEach(function(l){if(l._db&&l.src!==lang)texts.push(l.title[l.src])});
+  if(!texts.length)return;
+  translateBatch(texts,function(){
+    var ch=false;
+    listings.forEach(function(l){if(l._db&&l.src!==lang){var c=trGet(l.title[l.src]);if(c&&l.title[lang]!==c){l.title[lang]=c;l._tr=true;ch=true}}});
+    if(ch)renderFeed(true);
+  });
+}
+function ensureCommTranslations(){
+  var texts=[];
+  comm.forEach(function(p){if(p._db&&p.src!==lang)texts.push(p.body[p.src])});
+  if(!texts.length)return;
+  translateBatch(texts,function(){
+    var ch=false;
+    comm.forEach(function(p){if(p._db&&p.src!==lang){var c=trGet(p.body[p.src]);if(c&&p.body[lang]!==c){p.body[lang]=c;p._tr=true;ch=true}}});
+    if(ch)renderComm(true);
+  });
+}
+function ensureDetailTranslations(l){
+  if(!l._db||l.src===lang)return;
+  translateBatch([l.title[l.src],l.desc[l.src]],function(){
+    var ct=trGet(l.title[l.src]),cd=trGet(l.desc[l.src]),ch=false;
+    if(ct&&l.title[lang]!==ct){l.title[lang]=ct;ch=true}
+    if(cd&&l.desc[lang]!==cd){l.desc[lang]=cd;ch=true}
+    if(ch){l._tr=true;if(curDetail===l&&document.getElementById('s-detail').classList.contains('active'))openDetail(l.id,true)}
+  });
+}
+function ensureMsgTranslations(c){
+  var texts=[];
+  (c.msgs||[]).forEach(function(x){if(x.plain&&x.src&&x.src!==lang)texts.push(x.plain)});
+  if(!texts.length)return;
+  translateBatch(texts,function(){
+    var ch=false;
+    (c.msgs||[]).forEach(function(x){if(x.plain&&x.src&&x.src!==lang){var tr=trGet(x.plain);if(tr&&x.trText!==tr){x.trText=tr;ch=true}}});
+    if(ch&&curRoom===c&&document.getElementById('s-room').classList.contains('active'))renderMsgs();
+  });
+}
+function ensureCmtTranslations(){
+  if(!curCmt)return;
+  var texts=[];
+  (curCmt.comments||[]).forEach(function(c){if(c.plain&&c.src&&c.src!==lang)texts.push(c.plain)});
+  if(!texts.length)return;
+  translateBatch(texts,function(){
+    var ch=false;
+    (curCmt.comments||[]).forEach(function(c){if(c.plain&&c.src&&c.src!==lang){var tr=trGet(c.plain);if(tr&&c.trText!==tr){c.trText=tr;ch=true}}});
+    if(ch&&document.getElementById('cmtBg').classList.contains('show'))renderCmt();
+  });
 }
 
 /* ============ INIT ============ */
