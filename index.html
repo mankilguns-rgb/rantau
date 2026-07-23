@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Rantau — 찌까랑 외국인 중고장터</title>
 <style>
 :root{
@@ -11,14 +11,14 @@
   --green:#2FB36B; --gold:#F5A623; --blue:#3B82F6;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:#e5e2de;color:var(--ink);display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
-.phone{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.35);border:10px solid #111}
-.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:30px;background:#111;border-radius:0 0 18px 18px;z-index:200}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:78px;display:none}
+body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);display:flex;justify-content:center;min-height:100vh}
+.phone{width:100%;max-width:480px;height:100vh;height:100dvh;background:var(--bg);overflow:hidden;position:relative}
+.notch{display:none}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 78px);display:none}
 .screen.active{display:block}
 .screen::-webkit-scrollbar{display:none}
 
-.topbar{position:sticky;top:0;z-index:100;background:var(--white);padding:44px 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.topbar{position:sticky;top:0;z-index:100;background:var(--white);padding:calc(env(safe-area-inset-top, 0px) + 16px) 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
 .loc{display:flex;align-items:center;gap:4px;font-weight:800;font-size:18px;cursor:pointer}
 .loc .pin{color:var(--coral)}
 .loc .chev{font-size:12px;color:var(--gray)}
@@ -61,7 +61,7 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .tr-note{font-size:11px;color:#4F63D2;background:#EEF2FF;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;margin-top:8px;cursor:pointer}
 .post-f{display:flex;gap:18px;margin-top:12px;font-size:12.5px;color:var(--gray);font-weight:600}
 
-.tabs{position:absolute;bottom:0;left:0;right:0;height:78px;background:var(--white);border-top:1px solid var(--line);display:flex;padding-bottom:14px;z-index:150}
+.tabs{position:absolute;bottom:0;left:0;right:0;min-height:64px;background:var(--white);border-top:1px solid var(--line);display:flex;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 14px);z-index:150}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--gray);cursor:pointer;font-weight:600}
 .tab.on{color:var(--coral)}
 .tab .ti{font-size:22px;line-height:1}
@@ -69,7 +69,7 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .tab.write span{position:relative;top:-10px}
 
 .det-img{width:100%;height:380px;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:120px;position:relative}
-.det-back{position:absolute;top:50px;left:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);color:#fff;border:none;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+.det-back{position:absolute;top:calc(env(safe-area-inset-top, 0px) + 16px);left:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);color:#fff;border:none;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
 .seller{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--line)}
 .seller .nm{font-weight:700;font-size:15px}
 .seller .lc{font-size:12px;color:var(--gray)}
@@ -104,7 +104,7 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .chatrow .th{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--coral-light)}
 .unread{width:18px;height:18px;border-radius:50%;background:var(--coral);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:8px;flex-shrink:0}
 
-.cr-head{position:sticky;top:0;z-index:100;background:var(--white);padding:44px 14px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.cr-head{position:sticky;top:0;z-index:100;background:var(--white);padding:calc(env(safe-area-inset-top, 0px) + 16px) 14px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
 .cr-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--coral-light);border-bottom:1px solid var(--line)}
 .cr-item .th{width:40px;height:40px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
 .cr-item .pr{font-weight:800;font-size:14px}
@@ -199,12 +199,12 @@ textarea.wf-in{min-height:110px;resize:none}
 .gbtn{margin-top:42px;width:100%;background:#fff;border:none;border-radius:14px;padding:15px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:16px;font-weight:700;color:#1f1f1f;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .gbtn:active{transform:scale(.98)}
 .login .terms{color:#fff;opacity:.82;font-size:11px;margin-top:20px;line-height:1.55}
-.login .langsel{position:absolute;top:56px;right:18px;display:flex;gap:6px}
+.login .langsel{position:absolute;top:calc(env(safe-area-inset-top, 0px) + 20px);right:18px;display:flex;gap:6px}
 .login .lgc{background:rgba(255,255,255,.22);color:#fff;border:none;border-radius:16px;padding:6px 9px;font-size:15px;cursor:pointer}
 .login .lgc.on{background:#fff}
 
 /* language picker (first screen) */
-.langpick{position:absolute;inset:0;z-index:500;background:#fff;display:flex;flex-direction:column;align-items:center;padding:84px 26px 28px;text-align:center;overflow-y:auto}
+.langpick{position:absolute;inset:0;z-index:500;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top, 0px) + 40px) 26px 40px;text-align:center;overflow-y:auto}
 .langpick.hide{display:none}
 .lp-brand{font-size:22px;font-weight:900;color:var(--coral);letter-spacing:-.5px}
 .lp-globe{font-size:50px;margin-top:22px}
