@@ -171,6 +171,7 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .prof-row{display:flex;align-items:center;gap:16px}
 .prof-ava{width:64px;height:64px;border-radius:50%;background:var(--coral-light);display:flex;align-items:center;justify-content:center;font-size:30px}
 .prof-nm{font-size:19px;font-weight:800}
+.nick-edit{cursor:pointer;font-size:13px;opacity:.55;margin-left:2px}
 .prof-loc{font-size:13px;color:var(--gray);margin-top:2px}
 .temp-card{margin-top:18px;background:var(--bg);border-radius:14px;padding:14px}
 .temp-card .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -320,7 +321,7 @@ textarea.wf-in{min-height:110px;resize:none}
     <div class="prof-row">
       <div class="prof-ava">🧑🏻</div>
       <div>
-        <div class="prof-nm"><span class="ltag">KR</span> <span id="profName">Mankil J.</span></div>
+        <div class="prof-nm"><span class="ltag" id="profLtag">KR</span> <span id="profName">Mankil J.</span> <span class="nick-edit" onclick="openNick(false)">✏️</span></div>
         <div class="prof-loc" id="profVerified">📍 Lippo Cikarang · 인증 회원 ✓</div>
       </div>
     </div>
@@ -447,6 +448,17 @@ textarea.wf-in{min-height:110px;resize:none}
   </div>
 </div>
 
+<!-- NICKNAME SHEET -->
+<div class="sheet-bg" id="nickBg" onclick="if(event.target===this&&!nickForced)closeNick()">
+  <div class="sheet" style="padding:14px 20px 30px">
+    <div class="sheet-grab"></div>
+    <div class="sheet-h" id="nickTitle">닉네임 설정</div>
+    <div style="font-size:12.5px;color:var(--gray);margin:2px 0 14px" id="nickSub">다른 사람에게 이 이름으로 보여요.</div>
+    <input class="lginput" id="nickInput" style="background:var(--bg);border:1px solid var(--line)" placeholder="닉네임" maxlength="20">
+    <button class="wf-submit" style="margin-top:12px" onclick="saveNickname()" id="nickSaveBtn">저장</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- TABS -->
@@ -552,6 +564,12 @@ var UI={
  profGuestTitle:{ko:'로그인하고 시작하세요',en:'Log in to get started',zh:'登录后开始使用',ja:'ログインして始めましょう',id:'Masuk untuk mulai'},
  profGuestSub:{ko:'로그인하면 물건을 팔고, 채팅하고, 내 거래 내역을 볼 수 있어요.',en:'Log in to sell items, chat, and see your activity.',zh:'登录后可出售物品、聊天并查看记录。',ja:'ログインすると出品・チャット・履歴が使えます。',id:'Masuk untuk jual barang, chat, dan lihat aktivitas.'},
  profLoginBtn:{ko:'로그인 / 회원가입',en:'Log in / Sign up',zh:'登录 / 注册',ja:'ログイン / 新規登録',id:'Masuk / Daftar'},
+ nickTitle:{ko:'닉네임 설정',en:'Set nickname',zh:'设置昵称',ja:'ニックネーム設定',id:'Atur nama panggilan'},
+ nickSub:{ko:'다른 사람에게 이 이름으로 보여요.',en:'Others will see you by this name.',zh:'其他人会看到这个名字。',ja:'他の人にこの名前で表示されます。',id:'Orang lain melihat Anda dengan nama ini.'},
+ nickFirst:{ko:'환영해요! 사용할 닉네임을 정해주세요.',en:'Welcome! Please choose a nickname.',zh:'欢迎！请设置一个昵称。',ja:'ようこそ！ニックネームを決めてください。',id:'Selamat datang! Pilih nama panggilan Anda.'},
+ nickReq:{ko:'닉네임을 2자 이상 입력해주세요',en:'Enter a nickname (2+ chars)',zh:'请输入至少2个字符的昵称',ja:'ニックネームを2文字以上入力',id:'Masukkan nama (min. 2 huruf)'},
+ nickSaved:{ko:'닉네임이 저장됐어요',en:'Nickname saved',zh:'昵称已保存',ja:'ニックネームを保存しました',id:'Nama panggilan tersimpan'},
+ save:{ko:'저장',en:'Save',zh:'保存',ja:'保存',id:'Simpan'},
  loginTerms:{ko:'계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.',en:'By continuing, you agree to the Terms of Service and Privacy Policy.',zh:'继续即表示您同意服务条款和隐私政策。',ja:'続行すると、利用規約とプライバシーポリシーに同意したものとみなされます。',id:'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi.'},
  talkEntry:{ko:'만나서 대화 (통역)',en:'Talk in person (interpreter)',zh:'见面对话（翻译）',ja:'対面で会話（通訳）',id:'Ngobrol langsung (penerjemah)'},
  talkHintText:{ko:'⌨️ 텍스트 모드 · 문구를 눌러 상대에게 화면을 보여주세요',en:'⌨️ Text mode · Tap a phrase, then show your screen to them',zh:'⌨️ 文字模式 · 点击短语后把屏幕给对方看',ja:'⌨️ テキストモード · フレーズを押して画面を相手に見せましょう',id:'⌨️ Mode teks · Ketuk frasa, lalu tunjukkan layar ke lawan bicara'},
@@ -704,6 +722,7 @@ function applyLang(){
   document.getElementById('profGuestTitle').textContent=t('profGuestTitle');
   document.getElementById('profGuestSub').textContent=t('profGuestSub');
   document.getElementById('profLoginBtn').textContent=t('profLoginBtn');
+  if(CUR_USER)applyMyName();
   document.getElementById('profTempLbl').textContent=t('avgRating');
   document.getElementById('stSelling').textContent=t('selling');
   document.getElementById('stDone').textContent=t('done');
@@ -990,7 +1009,14 @@ var SB_KEY='sb_publishable_XjLwLcL98X5veuwDpKaxiQ_3EhWaYio';
 function sbGet(path){return fetch(SB_URL+'/rest/v1/'+path,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(function(r){if(!r.ok)throw new Error('sb '+r.status);return r.json()})}
 /* ---- 이메일 링크 로그인 ---- */
 var sbClient=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY):null;
-var CUR_USER=null;
+var CUR_USER=null,MY_NAME='',MY_LANG='',nickForced=false;
+var LCODE={ko:'KR',en:'EN',zh:'CN',ja:'JP',id:'ID'};
+function applyMyName(){var pn=document.getElementById('profName');if(pn&&MY_NAME)pn.textContent=MY_NAME;var lt=document.getElementById('profLtag');if(lt)lt.textContent=LCODE[MY_LANG||lang]||'';}
+function openNick(force){nickForced=!!force;document.getElementById('nickInput').value=MY_NAME||'';document.getElementById('nickTitle').textContent=t('nickTitle');document.getElementById('nickSub').textContent=force?t('nickFirst'):t('nickSub');document.getElementById('nickSaveBtn').textContent=t('save');document.getElementById('nickBg').classList.add('show')}
+function closeNick(){document.getElementById('nickBg').classList.remove('show')}
+function saveNickname(){var v=(document.getElementById('nickInput').value||'').trim();if(v.length<2){toast(t('nickReq'));return}
+  if(!sbClient||!CUR_USER){MY_NAME=v;MY_LANG=lang;applyMyName();closeNick();return}
+  sbClient.from('profiles').upsert({id:CUR_USER.id,name:v,lang:lang}).then(function(r){if(r.error){toast(r.error.message);return}MY_NAME=v;MY_LANG=lang;applyMyName();closeNick();toast(t('nickSaved'))}).catch(function(e){toast('오류: '+(e&&e.message||''))})}
 function sendMagicLink(){
   var el=document.getElementById('emailInput'),email=(el.value||'').trim();
   if(email.indexOf('@')<1||email.indexOf('.')<0){toast(t('badEmail'));return}
@@ -1008,11 +1034,11 @@ function onLogin(user){
   CUR_USER=user;
   document.getElementById('langPick').classList.add('hide');
   document.getElementById('loginScreen').classList.add('hide');
-  var nm=(user&&user.email)?user.email.split('@')[0]:'회원';
-  var pn=document.getElementById('profName');if(pn)pn.textContent=nm;
+  MY_NAME=(user&&user.email)?user.email.split('@')[0]:'회원';MY_LANG=lang;applyMyName();
   var pv=document.getElementById('profVerified');if(pv)pv.textContent='📍 Cikarang · '+t('emailVerified');
   updateProfileView();
   if(!appVisible())go('comm');
+  if(sbClient&&user){sbClient.from('profiles').select('name,lang').eq('id',user.id).maybeSingle().then(function(r){var p=r&&r.data;if(p&&p.name){MY_NAME=p.name;if(p.lang)MY_LANG=p.lang;applyMyName()}else{openNick(true)}}).catch(function(){})}
 }
 function updateProfileView(){
   var guest=!CUR_USER;
