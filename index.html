@@ -416,17 +416,26 @@ textarea.wf-in{min-height:110px;resize:none}
     <div style="font-weight:800;font-size:16px" id="wfHead">내 물건 팔기</div>
   </div>
   <div class="wf">
-    <div class="wf-photos">
-      <div class="wf-add" onclick="toast(t('soon'))">📷<span>0/10</span></div>
-      <div class="wf-ph">🏌️</div><div class="wf-ph">👟</div>
+    <div class="wf-cats" style="margin-bottom:4px">
+      <div class="wf-cat on" id="wfTypeSell" onclick="setWfType('sell')">🏷️ 팔기</div>
+      <div class="wf-cat" id="wfTypePost" onclick="setWfType('post')">🏘️ 동네생활</div>
     </div>
-    <div class="wf-label" id="wfLTitle">제목</div>
-    <input class="wf-in" id="wfTitle">
-    <div class="wf-label" id="wfLCat">카테고리</div>
-    <div class="wf-cats" id="wfcats"></div>
-    <div class="wf-label" id="wfLPrice">가격 (Rp)</div>
-    <input class="wf-in" id="wfPrice" inputmode="numeric">
-    <div style="margin-top:10px;font-size:13px;color:var(--gray);display:flex;align-items:center;gap:8px"><input type="checkbox" id="nego"> <label for="nego" id="wfNego">가격 제안 받기</label></div>
+    <div id="wfMarket">
+      <div class="wf-photos" style="margin-top:12px">
+        <div class="wf-add" onclick="toast(t('soon'))">📷<span>0/10</span></div>
+      </div>
+      <div class="wf-label" id="wfLTitle">제목</div>
+      <input class="wf-in" id="wfTitle">
+      <div class="wf-label" id="wfLCat">카테고리</div>
+      <div class="wf-cats" id="wfcats"></div>
+      <div class="wf-label" id="wfLPrice">가격 (Rp)</div>
+      <input class="wf-in" id="wfPrice" inputmode="numeric">
+      <div style="margin-top:10px;font-size:13px;color:var(--gray);display:flex;align-items:center;gap:8px"><input type="checkbox" id="nego"> <label for="nego" id="wfNego">가격 제안 받기</label></div>
+    </div>
+    <div id="wfPostFields" style="display:none">
+      <div class="wf-label" id="wfLPostCat">주제</div>
+      <div class="wf-cats" id="wfpostcats"></div>
+    </div>
     <div class="wf-label" id="wfLDesc">설명</div>
     <textarea class="wf-in" id="wfDesc"></textarea>
     <button class="wf-submit" onclick="submitListing()" id="wfSubmit">작성 완료</button>
@@ -570,6 +579,13 @@ var UI={
  nickReq:{ko:'닉네임을 2자 이상 입력해주세요',en:'Enter a nickname (2+ chars)',zh:'请输入至少2个字符的昵称',ja:'ニックネームを2文字以上入力',id:'Masukkan nama (min. 2 huruf)'},
  nickSaved:{ko:'닉네임이 저장됐어요',en:'Nickname saved',zh:'昵称已保存',ja:'ニックネームを保存しました',id:'Nama panggilan tersimpan'},
  save:{ko:'저장',en:'Save',zh:'保存',ja:'保存',id:'Simpan'},
+ needLogin:{ko:'로그인이 필요해요',en:'Please log in first',zh:'请先登录',ja:'ログインが必要です',id:'Silakan masuk dulu'},
+ needTitle:{ko:'제목을 입력해주세요',en:'Please enter a title',zh:'请输入标题',ja:'タイトルを入力してください',id:'Masukkan judul'},
+ needBody:{ko:'내용을 입력해주세요',en:'Please write something',zh:'请输入内容',ja:'内容を入力してください',id:'Tulis sesuatu'},
+ postedReal:{ko:'✅ 등록됐어요!',en:'✅ Posted!',zh:'✅ 已发布！',ja:'✅ 投稿しました！',id:'✅ Terposting!'},
+ wfTypeSell:{ko:'🏷️ 팔기',en:'🏷️ Sell',zh:'🏷️ 出售',ja:'🏷️ 売る',id:'🏷️ Jual'},
+ wfTypePost:{ko:'🏘️ 동네생활',en:'🏘️ Community',zh:'🏘️ 社区',ja:'🏘️ コミュニティ',id:'🏘️ Komunitas'},
+ wfLPostCat:{ko:'주제',en:'Topic',zh:'主题',ja:'トピック',id:'Topik'},
  loginTerms:{ko:'계속하면 이용약관 및 개인정보처리방침에 동의하게 됩니다.',en:'By continuing, you agree to the Terms of Service and Privacy Policy.',zh:'继续即表示您同意服务条款和隐私政策。',ja:'続行すると、利用規約とプライバシーポリシーに同意したものとみなされます。',id:'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi.'},
  talkEntry:{ko:'만나서 대화 (통역)',en:'Talk in person (interpreter)',zh:'见面对话（翻译）',ja:'対面で会話（通訳）',id:'Ngobrol langsung (penerjemah)'},
  talkHintText:{ko:'⌨️ 텍스트 모드 · 문구를 눌러 상대에게 화면을 보여주세요',en:'⌨️ Text mode · Tap a phrase, then show your screen to them',zh:'⌨️ 文字模式 · 点击短语后把屏幕给对方看',ja:'⌨️ テキストモード · フレーズを押して画面を相手に見せましょう',id:'⌨️ Mode teks · Ketuk frasa, lalu tunjukkan layar ke lawan bicara'},
@@ -741,6 +757,9 @@ function applyLang(){
   document.getElementById('wfNego').textContent=t('wfNego');
   document.getElementById('wfLDesc').textContent=t('wfLDesc');
   document.getElementById('wfSubmit').textContent=t('wfSubmit');
+  document.getElementById('wfTypeSell').textContent=t('wfTypeSell');
+  document.getElementById('wfTypePost').textContent=t('wfTypePost');
+  document.getElementById('wfLPostCat').textContent=t('wfLPostCat');
   document.getElementById('wfHead').textContent=t('wfHead');
   document.getElementById('wfTitle').placeholder=t('wfPhTitle');
   document.getElementById('wfPrice').placeholder=t('wfPhPrice');
@@ -839,7 +858,19 @@ function renderCmt(){
   var l=document.getElementById('cmtList');l.innerHTML='';
   curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+langTag(c.nm,c.src)+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
 }
-function sendComment(){var i=document.getElementById('cmtInput');if(!i.value.trim())return;curCmt.comments.push({ava:'🧑🏻',nm:'Mankil J.',plain:i.value.trim()});i.value='';renderCmt();renderComm()}
+function sendComment(){
+  var i=document.getElementById('cmtInput'),v=(i.value||'').trim();if(!v)return;
+  if(curCmt&&curCmt._db){
+    if(!CUR_USER||!sbClient){toast(t('needLogin'));showLoginScreen();return}
+    sbClient.from('comments').insert({post_id:curCmt.id,user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',body:v,src_lang:lang}).then(function(r){
+      if(r.error){toast(r.error.message);return}
+      curCmt.comments.push({ava:'🧑',nm:MY_NAME,src:MY_LANG||lang,plain:v});curCmt.cmt=curCmt.comments.length;
+      i.value='';renderCmt();renderComm();
+    }).catch(function(e){toast('오류: '+(e&&e.message||''))});
+  }else{
+    curCmt.comments.push({ava:'🧑',nm:MY_NAME||'Guest',src:lang,plain:v});i.value='';renderCmt();renderComm();
+  }
+}
 function renderChatList(){
   var cl=document.getElementById('chatlist');cl.innerHTML='';
   chats.forEach(function(c){
@@ -853,9 +884,12 @@ function renderProfMenu(){
   var m=document.getElementById('profMenu');m.innerHTML='';
   MENU.forEach(function(it){var d=document.createElement('div');d.className='menu-item';d.innerHTML='<span class="mi">'+it.i+'</span> '+L(it.k)+' <span class="ar">›</span>';d.onclick=function(){if(it.i==='🌐'){openSheet('lang')}else{toast(t('soon'))}};m.appendChild(d)});
 }
+var wfType='sell',wfCatSel='etc',wfPostCatSel='question';
+function setWfType(tp){wfType=tp;document.getElementById('wfTypeSell').classList.toggle('on',tp==='sell');document.getElementById('wfTypePost').classList.toggle('on',tp==='post');document.getElementById('wfMarket').style.display=(tp==='sell')?'block':'none';document.getElementById('wfPostFields').style.display=(tp==='post')?'block':'none'}
 function renderWfCats(){
   var w=document.getElementById('wfcats');w.innerHTML='';
-  ['golf','hobby','elec','furn','kids','etc'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat';d.textContent=L(CATNAME[k]);d.onclick=function(){[].forEach.call(w.children,function(x){x.classList.remove('on')});d.classList.add('on')};w.appendChild(d)});
+  ['golf','hobby','elec','furn','kids','etc'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat'+(k===wfCatSel?' on':'');d.textContent=L(CATNAME[k]);d.onclick=function(){wfCatSel=k;[].forEach.call(w.children,function(x){x.classList.remove('on')});d.classList.add('on')};w.appendChild(d)});
+  var w2=document.getElementById('wfpostcats');if(w2){w2.innerHTML='';['question','meetup','info'].forEach(function(k){var d=document.createElement('div');d.className='wf-cat'+(k===wfPostCatSel?' on':'');d.textContent=L(POSTCAT[k]);d.onclick=function(){wfPostCatSel=k;[].forEach.call(w2.children,function(x){x.classList.remove('on')});d.classList.add('on')};w2.appendChild(d)})}
 }
 
 /* ============ DETAIL ============ */
@@ -940,8 +974,34 @@ function sendMsg(){
   },900);
 }
 
-/* ============ WRITE ============ */
-function submitListing(){toast(t('posted'));setTimeout(function(){go('home')},900)}
+/* ============ WRITE (실제 DB 저장) ============ */
+var CAT_EMOJI={golf:'⛳',hobby:'🚲',elec:'📺',furn:'🛋️',kids:'🍼',etc:'📦'};
+function submitListing(){
+  if(!CUR_USER||!sbClient){toast(t('needLogin'));showLoginScreen();return}
+  var desc=(document.getElementById('wfDesc').value||'').trim();
+  var btn=document.getElementById('wfSubmit');
+  if(wfType==='sell'){
+    var title=(document.getElementById('wfTitle').value||'').trim();
+    var price=(document.getElementById('wfPrice').value||'').trim();
+    if(!title){toast(t('needTitle'));return}
+    btn.disabled=true;
+    sbClient.from('listings').insert({user_id:CUR_USER.id,seller_name:MY_NAME,seller_lang:MY_LANG||lang,seller_avatar:'🧑',title:title,descr:desc,price:price,category:wfCatSel,city:currentCity,loc:currentCity,emoji:CAT_EMOJI[wfCatSel]||'📦',src_lang:lang}).then(function(r){
+      btn.disabled=false;
+      if(r.error){toast(r.error.message);return}
+      document.getElementById('wfTitle').value='';document.getElementById('wfPrice').value='';document.getElementById('wfDesc').value='';
+      toast(t('postedReal'));loadData();go('home');
+    }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+  }else{
+    if(!desc){toast(t('needBody'));return}
+    btn.disabled=true;
+    sbClient.from('posts').insert({user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',category:wfPostCatSel,body:desc,city:currentCity,loc:currentCity,src_lang:lang}).then(function(r){
+      btn.disabled=false;
+      if(r.error){toast(r.error.message);return}
+      document.getElementById('wfDesc').value='';
+      toast(t('postedReal'));loadData();go('comm');
+    }).catch(function(e){btn.disabled=false;toast('오류: '+(e&&e.message||''))});
+  }
+}
 
 /* ============ NAV ============ */
 var screens={home:'s-home',comm:'s-comm',chat:'s-chat',prof:'s-prof',write:'s-write'};
