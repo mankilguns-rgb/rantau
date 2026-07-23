@@ -11,10 +11,11 @@
   --green:#2FB36B; --gold:#F5A623; --blue:#3B82F6;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);display:flex;justify-content:center;min-height:100vh}
-.phone{width:100%;max-width:480px;height:100vh;height:100dvh;background:var(--bg);overflow:hidden;position:relative}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);display:flex;justify-content:center;position:fixed;inset:0}
+.phone{width:100%;max-width:480px;height:100%;background:var(--bg);overflow:hidden;position:relative}
 .notch{display:none}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 78px);display:none}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 78px);display:none}
 .screen.active{display:block}
 .screen::-webkit-scrollbar{display:none}
 
@@ -60,6 +61,17 @@ body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:
 .post-body{font-size:14px;line-height:1.55;color:#33302d}
 .tr-note{font-size:11px;color:#4F63D2;background:#EEF2FF;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;margin-top:8px;cursor:pointer}
 .post-f{display:flex;gap:18px;margin-top:12px;font-size:12.5px;color:var(--gray);font-weight:600}
+.pf-act{cursor:pointer;padding:2px 0;user-select:none}
+.pf-act:active{opacity:.5}
+.pf-act.on{color:var(--coral)}
+.cmt-list{overflow-y:auto;flex:1;overscroll-behavior:contain}
+.cmt-row{display:flex;gap:10px;padding:11px 20px;align-items:flex-start}
+.cmt-row .ava{width:34px;height:34px;font-size:16px}
+.cmt-b .nm{font-weight:700;font-size:12.5px}
+.cmt-b .tx{font-size:14px;line-height:1.45;margin-top:2px;color:#33302d}
+.cmt-input{display:flex;gap:8px;padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);border-top:1px solid var(--line);background:#fff}
+.cmt-input input{flex:1;border:1px solid var(--line);border-radius:20px;padding:11px 15px;font-size:14px;background:var(--bg);outline:none}
+.cmt-input button{width:42px;height:42px;border-radius:50%;background:var(--coral);color:#fff;border:none;font-size:16px;cursor:pointer;flex-shrink:0}
 
 .tabs{position:absolute;bottom:0;left:0;right:0;min-height:64px;background:var(--white);border-top:1px solid var(--line);display:flex;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 14px);z-index:150}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--gray);cursor:pointer;font-weight:600}
@@ -204,7 +216,7 @@ textarea.wf-in{min-height:110px;resize:none}
 .login .lgc.on{background:#fff}
 
 /* language picker (first screen) */
-.langpick{position:absolute;inset:0;z-index:500;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top, 0px) + 40px) 26px 40px;text-align:center;overflow-y:auto}
+.langpick{position:absolute;inset:0;z-index:500;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top, 0px) + 40px) 26px 40px;text-align:center;overflow-y:auto;overscroll-behavior:contain}
 .langpick.hide{display:none}
 .lp-brand{font-size:22px;font-weight:900;color:var(--coral);letter-spacing:-.5px}
 .lp-globe{font-size:50px;margin-top:22px}
@@ -394,6 +406,16 @@ textarea.wf-in{min-height:110px;resize:none}
   <div class="sheet" id="sheetInner"></div>
 </div>
 
+<!-- COMMENTS SHEET -->
+<div class="sheet-bg" id="cmtBg" onclick="if(event.target===this)closeCmt()">
+  <div class="sheet" id="cmtSheet" style="display:flex;flex-direction:column;max-height:82%;padding:10px 0 0">
+    <div class="sheet-grab"></div>
+    <div class="sheet-h" id="cmtHead">댓글</div>
+    <div class="cmt-list" id="cmtList"></div>
+    <div class="cmt-input"><input id="cmtInput" placeholder="댓글 달기…" onkeydown="if(event.key==='Enter')sendComment()"><button onclick="sendComment()">➤</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- TABS -->
@@ -470,6 +492,7 @@ var UI={
  setLang:{ko:'언어 선택',en:'Choose language',zh:'选择语言',ja:'言語を選択',id:'Pilih bahasa'},
  like:{ko:'공감',en:'Like',zh:'点赞',ja:'共感',id:'Suka'},
  comment:{ko:'댓글',en:'Comment',zh:'评论',ja:'コメント',id:'Komentar'},
+ cmtPlaceholder:{ko:'댓글 달기…',en:'Add a comment…',zh:'写评论…',ja:'コメントする…',id:'Tulis komentar…'},
  transFrom:{ko:'에서 자동 번역됨',en:'Auto-translated from ',zh:'自动翻译自 ',ja:'から自動翻訳',id:'Diterjemahkan otomatis dari '},
  seeOrig:{ko:'원문',en:'Original',zh:'原文',ja:'原文',id:'Asli'},
  seeTrans:{ko:'번역',en:'Translation',zh:'译文',ja:'翻訳',id:'Terjemahan'},
@@ -548,13 +571,17 @@ var listings=[
 /* ============ COMMUNITY ============ */
 var COMMCATS=[{ko:'전체',en:'All',zh:'全部',ja:'すべて',id:'Semua'},{ko:'질문',en:'Questions',zh:'提问',ja:'質問',id:'Tanya'},{ko:'모임',en:'Meetups',zh:'聚会',ja:'集まり',id:'Kumpul'},{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'}];
 var comm=[
- {ava:'👩🏼',nm:'Emma',loc:'Lippo Cikarang',city:'Cikarang',time:'m20',src:'en',likes:8,cmt:12,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
+ {id:1,liked:false,ava:'👩🏼',nm:'Emma',loc:'Lippo Cikarang',city:'Cikarang',time:'m20',src:'en',likes:8,cmt:12,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
+  comments:[{ava:'🧑🏻',nm:'GolfDad_Kim',tx:{ko:'세나요CC 프로님 추천해요!',en:'I recommend the pro at Sena CC!',zh:'推荐Sena CC的教练！',ja:'セナCCのプロがおすすめです！',id:'Rekomendasi pro di Sena CC!'}},{ava:'👩🏼',nm:'Sarah_Exp',tx:{ko:'저도 배우고 싶어요, 같이 가요',en:'I want to learn too, let us go together',zh:'我也想学，一起去吧',ja:'私も習いたいです、一緒に行きましょう',id:'Saya juga mau belajar, ayo bareng'}}],
   body:{ko:'찌까랑에서 골프 레슨 받을 만한 곳 아시는 분 계세요? 주말에 배우고 싶은데 영어 되는 프로님 추천해 주세요 🙏',en:'Does anyone know a good place for golf lessons in Cikarang? I want to learn on weekends — please recommend an English-speaking pro 🙏',zh:'有人知道芝卡朗哪里可以上高尔夫课吗？想周末学，请推荐会说英语的教练 🙏',ja:'チカランでゴルフレッスンを受けられる良い所をご存知の方いますか？週末に習いたいので、英語が通じるプロを教えてください 🙏',id:'Ada yang tahu tempat les golf yang bagus di Cikarang? Mau belajar tiap akhir pekan — tolong rekomendasi pro yang bisa bahasa Inggris 🙏'}},
- {ava:'🧑🏻',nm:'GolfDad_Kim',loc:'Jababeka',city:'Cikarang',time:'h1',src:'ko',likes:14,cmt:6,catT:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},
+ {id:2,liked:false,ava:'🧑🏻',nm:'GolfDad_Kim',loc:'Jababeka',city:'Cikarang',time:'h1',src:'ko',likes:14,cmt:6,catT:{ko:'모임',en:'Meetup',zh:'聚会',ja:'集まり',id:'Kumpul'},
+  comments:[{ava:'🧔🏽',nm:'Mike_R',tx:{ko:'저 토요일 가능합니다!',en:'I am free on Saturday!',zh:'我周六可以！',ja:'土曜日行けます！',id:'Saya bisa Sabtu!'}},{ava:'🧑🏽',nm:'David_L',tx:{ko:'한 자리 남았나요?',en:'Is there still a spot?',zh:'还有名额吗？',ja:'まだ空きありますか？',id:'Masih ada slot?'}}],
   body:{ko:'이번 토요일 아침 세나요 골프장 라운딩 같이 하실 두 분 구합니다. 초보 환영이에요!',en:'Looking for 2 people to join a round at Sena Yeo golf course this Saturday morning. Beginners welcome!',zh:'找两位这周六早上一起去 Sena Yeo 球场打球的球友。欢迎新手！',ja:'今週土曜の朝、セナヨゴルフ場のラウンドを一緒に回る方2名募集します。初心者歓迎です！',id:'Mencari 2 orang untuk main golf bareng di lapangan Sena Yeo Sabtu pagi ini. Pemula welcome!'}},
- {ava:'🧔🏽',nm:'Mike_R',loc:'Jakarta Pusat',city:'Jakarta',time:'h3',src:'en',likes:22,cmt:9,catT:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},
+ {id:3,liked:false,ava:'🧔🏽',nm:'Mike_R',loc:'Jakarta Pusat',city:'Jakarta',time:'h3',src:'en',likes:22,cmt:9,catT:{ko:'정보',en:'Info',zh:'信息',ja:'情報',id:'Info'},
+  comments:[{ava:'👩🏼',nm:'JennyMom',tx:{ko:'정보 감사합니다! 가봐야겠어요',en:'Thanks for the info! I should check it out',zh:'谢谢信息！我去看看',ja:'情報ありがとう！行ってみます',id:'Makasih infonya! Mau mampir'}},{ava:'👩🏻',nm:'Anita',tx:{ko:'주차 되나요?',en:'Is there parking?',zh:'有停车位吗？',ja:'駐車場ありますか？',id:'Ada parkir?'}}],
   body:{ko:'델타마스 쪽에 새로 생긴 한인마트 가봤는데 물건 종류가 꽤 많네요. 라면이랑 고추장 재고도 많습니다.',en:'Checked out the new Korean mart near Deltamas — quite a wide selection. Plenty of ramen and gochujang in stock too.',zh:'去了 Deltamas 附近新开的韩国超市，种类挺多的。泡面和辣椒酱库存也很足。',ja:'デルタマス付近に新しくできた韓国系スーパーに行きましたが、品揃えがかなり豊富です。ラーメンやコチュジャンの在庫も多いです。',id:'Coba mampir ke Korean mart baru dekat Deltamas — pilihannya cukup banyak. Stok ramyeon dan gochujang juga melimpah.'}},
- {ava:'👩🏻',nm:'Anita',loc:'Semarang',city:'Semarang',time:'h5',src:'id',likes:5,cmt:7,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
+ {id:4,liked:false,ava:'👩🏻',nm:'Anita',loc:'Semarang',city:'Semarang',time:'h5',src:'id',likes:5,cmt:7,catT:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tanya'},
+  comments:[{ava:'🧑🏻',nm:'Yuki_T',tx:{ko:'제가 쓰는 기사님 번호 DM 드릴게요',en:'I will DM you my repair guy number',zh:'我私信给你维修师傅电话',ja:'業者の番号をDMします',id:'Saya DM nomor tukang saya'}},{ava:'👩🏼',nm:'Emma',tx:{ko:'저도 필요했는데 감사해요',en:'I needed this too, thanks',zh:'我也需要，谢谢',ja:'私も必要でした、ありがとう',id:'Saya juga butuh, makasih'}}],
   body:{ko:'자바베카 근처에 믿을 만한 에어컨 수리 기사님 아시는 분? 어젯밤에 고장 났어요 🥵 (영어 가능!)',en:'Anyone know a trustworthy AC repair guy around Jababeka? Mine broke last night 🥵 (English ok!)',zh:'有人知道 Jababeka 附近靠谱的空调维修师傅吗？昨晚坏了 🥵（会英语！）',ja:'ジャバベカ周辺で信頼できるエアコン修理業者をご存知の方いますか？昨夜壊れてしまいました 🥵（英語OK！）',id:'Ada yang tahu tukang servis AC yang terpercaya di sekitar Jababeka? Punya saya rusak semalam 🥵 (bisa bahasa Inggris!)'}}
 ];
 
@@ -695,10 +722,22 @@ function renderComm(){
     el.innerHTML='<div class="post-h"><div class="ava">'+p.ava+'</div><div><div class="nm">'+p.nm+'</div><div class="sub">'+p.loc+' · '+TM(p.time)+'</div></div></div>'+
       '<div class="cat-pill">'+L(p.catT)+'</div>'+
       '<div class="post-body">'+L(p.body)+'</div>'+trNote+
-      '<div class="post-f"><span>👍 '+t('like')+' '+p.likes+'</span><span>💬 '+t('comment')+' '+p.cmt+'</span></div>';
+      '<div class="post-f"><span class="pf-act'+(p.liked?' on':'')+'" onclick="likePost('+p.id+')">👍 '+t('like')+' '+p.likes+'</span><span class="pf-act" onclick="openComments('+p.id+')">💬 '+t('comment')+' '+(p.comments?p.comments.length:p.cmt)+'</span></div>';
     cf.appendChild(el);
   });
 }
+function commById(id){return comm.find(function(x){return x.id===id})}
+function likePost(id){var p=commById(id);if(!p)return;p.liked=!p.liked;p.likes+=p.liked?1:-1;renderComm()}
+var curCmt=null;
+function openComments(id){curCmt=commById(id);if(!curCmt)return;if(!curCmt.comments)curCmt.comments=[];renderCmt();document.getElementById('cmtBg').classList.add('show')}
+function closeCmt(){document.getElementById('cmtBg').classList.remove('show')}
+function renderCmt(){
+  document.getElementById('cmtHead').textContent=t('comment')+' '+curCmt.comments.length;
+  document.getElementById('cmtInput').placeholder=t('cmtPlaceholder');
+  var l=document.getElementById('cmtList');l.innerHTML='';
+  curCmt.comments.forEach(function(c){var d=document.createElement('div');d.className='cmt-row';d.innerHTML='<div class="ava">'+c.ava+'</div><div class="cmt-b"><div class="nm">'+c.nm+'</div><div class="tx">'+(c.tx?L(c.tx):c.plain)+'</div></div>';l.appendChild(d)});
+}
+function sendComment(){var i=document.getElementById('cmtInput');if(!i.value.trim())return;curCmt.comments.push({ava:'🧑🏻',nm:'Mankil J.',plain:i.value.trim()});i.value='';renderCmt();renderComm()}
 function renderChatList(){
   var cl=document.getElementById('chatlist');cl.innerHTML='';
   chats.forEach(function(c){
