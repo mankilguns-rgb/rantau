@@ -890,7 +890,7 @@ function sendComment(){
   var i=document.getElementById('cmtInput'),v=(i.value||'').trim();if(!v)return;
   if(curCmt&&curCmt._db){
     if(!CUR_USER||!sbClient){toast(t('needLogin'));showLoginScreen();return}
-    sbClient.from('comments').insert({post_id:curCmt.id,user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',body:v,src_lang:lang}).then(function(r){
+    sbClient.from('comments').insert({post_id:curCmt.id,user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',body:v,src_lang:detectLang(v)||lang}).then(function(r){
       if(r.error){toast(r.error.message);return}
       curCmt.comments.push({ava:'🧑',nm:MY_NAME,src:MY_LANG||lang,plain:v});curCmt.cmt=curCmt.comments.length;
       i.value='';renderCmt();renderComm();
@@ -1020,7 +1020,7 @@ function loadRoomMsgs(c){
   if(!sbClient||!CUR_USER)return;
   sbClient.from('messages').select('*').eq('chat_id',c.id).order('id').then(function(m){
     if(m.error||!m.data)return;
-    var n=m.data.map(function(msg){return {f:(msg.user_id===CUR_USER.id)?'me':'them',src:msg.src_lang||'en',plain:msg.body,created_at:msg.created_at}});
+    var n=m.data.map(function(msg){return {f:(msg.user_id===CUR_USER.id)?'me':'them',src:srcOf(msg.body,msg.src_lang),plain:msg.body,created_at:msg.created_at}});
     if(n.length!==c.msgs.length){c.msgs=n;if(n.length)c.created_at=n[n.length-1].created_at;if(curRoom===c&&document.getElementById('s-room').classList.contains('active'))renderMsgs();renderChatList()}
     if(typeof ensureMsgTranslations==='function')ensureMsgTranslations(c);
   }).catch(function(){});
@@ -1048,7 +1048,7 @@ function loadChats(cb){
     var ids=chats.map(function(c){return c.id});
     if(!ids.length){renderChatList();if(cb)cb();return}
     sbClient.from('messages').select('*').in('chat_id',ids).order('id').then(function(m){
-      if(!m.error&&m.data){m.data.forEach(function(msg){var c=chats.find(function(x){return x.id===msg.chat_id});if(c)c.msgs.push({f:(msg.user_id===CUR_USER.id)?'me':'them',src:msg.src_lang||'en',plain:msg.body,created_at:msg.created_at})});chats.forEach(function(c){if(c.msgs.length)c.created_at=c.msgs[c.msgs.length-1].created_at})}
+      if(!m.error&&m.data){m.data.forEach(function(msg){var c=chats.find(function(x){return x.id===msg.chat_id});if(c)c.msgs.push({f:(msg.user_id===CUR_USER.id)?'me':'them',src:srcOf(msg.body,msg.src_lang),plain:msg.body,created_at:msg.created_at})});chats.forEach(function(c){if(c.msgs.length)c.created_at=c.msgs[c.msgs.length-1].created_at})}
       renderChatList();if(cb)cb();
     });
   }).catch(function(){if(cb)cb()});
@@ -1073,7 +1073,7 @@ function sendMsg(){
     if(!CUR_USER||!sbClient){toast(t('needLogin'));return}
     curRoom.msgs.push({f:'me',src:lang,plain:val});
     i.value='';renderMsgs();renderChatList();
-    sbClient.from('messages').insert({chat_id:curRoom.id,user_id:CUR_USER.id,body:val,src_lang:lang}).then(function(r){if(r.error)toast(r.error.message)}).catch(function(e){toast('오류: '+(e&&e.message||''))});
+    sbClient.from('messages').insert({chat_id:curRoom.id,user_id:CUR_USER.id,body:val,src_lang:detectLang(val)||lang}).then(function(r){if(r.error)toast(r.error.message)}).catch(function(e){toast('오류: '+(e&&e.message||''))});
     return;
   }
   var obj={};LANGS.forEach(function(l){obj[l.code]=val});
@@ -1162,7 +1162,7 @@ function submitListing(){
   if(!desc){toast(t('needBody'));return}
   btn.disabled=true;
   uploadPhotosThen(function(urls){
-    sbClient.from('posts').insert({user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',category:wfPostCatSel,body:desc,city:currentCity,loc:currentCity,src_lang:lang,images:urls.length?urls:null}).then(function(r){
+    sbClient.from('posts').insert({user_id:CUR_USER.id,author_name:MY_NAME,author_lang:MY_LANG||lang,author_avatar:'🧑',category:wfPostCatSel,body:desc,city:currentCity,loc:currentCity,src_lang:detectLang(desc)||lang,images:urls.length?urls:null}).then(function(r){
       btn.disabled=false;
       if(r.error){toast(r.error.message);return}
       document.getElementById('wfDesc').value='';resetPhotos();
@@ -1439,8 +1439,18 @@ var POSTCAT={question:{ko:'질문',en:'Question',zh:'提问',ja:'質問',id:'Tan
 function relTime(iso){try{var d=(Date.now()-new Date(iso).getTime())/1000;var L={ko:{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'},en:{n:'just now',mi:' min ago',h:' hr ago',d:' day ago'},zh:{n:'刚刚',mi:'分钟前',h:'小时前',d:'天前'},ja:{n:'たった今',mi:'分前',h:'時間前',d:'日前'},id:{n:'baru saja',mi:' menit lalu',h:' jam lalu',d:' hari lalu'}}[lang]||{n:'방금',mi:'분 전',h:'시간 전',d:'일 전'};if(d<60)return L.n;if(d<3600)return Math.floor(d/60)+L.mi;if(d<86400)return Math.floor(d/3600)+L.h;return Math.floor(d/86400)+L.d}catch(e){return ''}}
 function tlabel(o){return o&&o._db?relTime(o.created_at):TM(o.time)}
 function mapListing(r){return {id:r.id,_db:true,uid:r.user_id||null,img:r.image_url||null,created_at:r.created_at,emoji:r.emoji||'📦',bg:bgFor(r.id),cat:r.category||'etc',price:r.price||'',rp:krw(r.price),loc:r.loc||r.city||'',city:r.city||'Cikarang',seller:r.seller_name||'',ava:r.seller_avatar||'🧑',rating:Number(r.seller_rating)||0,reviews:r.seller_reviews||0,likes:r.likes||0,chats:r.chats||0,nego:false,fresh:false,sold:r.sold||false,src:r.src_lang||'ko',title:mono(r.title||''),desc:mono(r.descr||'')}}
-function mapComment(r){return {ava:r.author_avatar||'🧑',nm:r.author_name||'',src:r.src_lang||'ko',plain:r.body||''}}
-function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,catKey:r.category||'talk',created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:r.src_lang||'ko',likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],images:Array.isArray(r.images)?r.images:[],body:mono(r.body||'')}}
+/* 글자를 보고 실제 언어 감지 — 화면 언어(UI)가 아니라 실제 쓴 언어를 원문으로 잡기 위함 */
+function detectLang(s){
+  s=String(s||'');
+  if(/[가-힣]/.test(s))return 'ko';
+  if(/[぀-ヿ]/.test(s))return 'ja';
+  if(/[一-鿿]/.test(s))return 'zh';
+  if(/\b(yang|dan|di|ini|itu|saya|aku|tidak|nggak|ada|dengan|untuk|dari|ke|apa|bisa|mau|sudah|jual|beli|gratis|harga|tolong|terima)\b/i.test(s))return 'id';
+  return null;
+}
+function srcOf(text,fallback){return detectLang(text)||fallback||'ko';}
+function mapComment(r){return {ava:r.author_avatar||'🧑',nm:r.author_name||'',src:srcOf(r.body,r.src_lang),plain:r.body||''}}
+function mapPost(r,cmts){return {id:r.id,_db:true,uid:r.user_id||null,catKey:r.category||'talk',created_at:r.created_at,liked:false,ava:r.author_avatar||'🧑',nm:r.author_name||'',loc:r.loc||r.city||'',city:r.city||'Cikarang',src:srcOf(r.body,r.src_lang),likes:r.likes||0,cmt:(cmts||[]).length,catT:POSTCAT[r.category]||POSTCAT.talk,comments:cmts||[],images:Array.isArray(r.images)?r.images:[],body:mono(r.body||'')}}
 function loadData(){
   Promise.all([sbGet('listings?select=*&order=id.desc'),sbGet('posts?select=*&order=id.desc'),sbGet('comments?select=*&order=id.asc')]).then(function(res){
     var ls=res[0],ps=res[1],cs=res[2];
@@ -1473,7 +1483,10 @@ function translateBatch(texts,cb){
       .then(function(r){if(!r.ok)throw new Error('api '+r.status);return r.json()})
       .then(function(d){
         if(d&&d.error)throw new Error(d.error);
-        (d.translations||[]).forEach(function(tr,i){if(tr&&need[i])trSet(need[i],tr)});cb();
+        var tr=d.translations||[];
+        /* 개수가 정확히 맞을 때만 저장 — 안 맞으면 엉뚱한 글에 매칭될 수 있어 건너뜀 */
+        if(tr.length===need.length){tr.forEach(function(x,i){if(x&&need[i])trSet(need[i],x)});}
+        cb();
       })
       .catch(function(){
         if(tries<2){setTimeout(function(){attempt(tries+1)},1500*(tries+1))}
